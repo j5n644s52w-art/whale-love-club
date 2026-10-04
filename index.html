@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
   <title>Whale Love Club</title>
 
+  <!-- LINE LIFF SDK -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
   <style>
+
     * {
       box-sizing: border-box;
     }
@@ -15,26 +22,43 @@
       margin: 0;
       background: #0b0b0d;
       color: #ffffff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                   "Noto Sans TC", sans-serif;
+
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Noto Sans TC",
+        sans-serif;
     }
 
     .app {
       max-width: 430px;
       margin: auto;
+
       min-height: 100vh;
-      padding: 28px 20px 50px;
+
+      padding:
+        28px
+        20px
+        50px;
     }
+
+
+    /* -------------------------
+       Header
+    ------------------------- */
 
     .brand {
       font-size: 12px;
       letter-spacing: 3px;
       color: #888;
+
       margin-bottom: 8px;
     }
 
     h1 {
       margin: 0;
+
       font-size: 26px;
       font-weight: 500;
       letter-spacing: 1px;
@@ -42,285 +66,528 @@
 
     .subtitle {
       margin-top: 5px;
+
       font-size: 12px;
       color: #777;
+
       letter-spacing: 2px;
     }
 
+
+    /* -------------------------
+       Member Card
+    ------------------------- */
+
     .member-card {
+
       margin-top: 30px;
+
       padding: 25px;
+
       height: 205px;
+
       border-radius: 22px;
-      background: linear-gradient(135deg, #222, #090909);
+
+      background:
+        linear-gradient(
+          135deg,
+          #222,
+          #090909
+        );
+
       border: 1px solid #333;
-      box-shadow: 0 20px 50px rgba(0,0,0,.45);
+
+      box-shadow:
+        0
+        20px
+        50px
+        rgba(0,0,0,.45);
+
       display: flex;
       flex-direction: column;
       justify-content: space-between;
     }
 
     .card-top {
+
       display: flex;
       justify-content: space-between;
+
       font-size: 12px;
+
       color: #aaa;
+
       letter-spacing: 2px;
     }
 
     .member-name {
+
       font-size: 23px;
+
       letter-spacing: 2px;
     }
 
     .member-number {
+
       color: #888;
+
       font-size: 12px;
+
       letter-spacing: 2px;
+
       margin-top: 5px;
     }
 
     .level {
+
       font-size: 11px;
+
       letter-spacing: 2px;
+
       color: #aaa;
     }
 
+
+    /* -------------------------
+       Love Points
+    ------------------------- */
+
     .points {
-      margin: 32px 0 22px;
+
+      margin:
+        32px
+        0
+        22px;
+
       text-align: center;
     }
 
     .points-label {
+
       color: #777;
+
       font-size: 11px;
+
       letter-spacing: 3px;
     }
 
     .points-number {
+
       font-size: 45px;
+
       margin-top: 4px;
+
       font-weight: 300;
     }
 
+
+    /* -------------------------
+       Function Menu
+    ------------------------- */
+
     .grid {
+
       display: grid;
-      grid-template-columns: 1fr 1fr;
+
+      grid-template-columns:
+        1fr
+        1fr;
+
       gap: 12px;
     }
 
     .menu {
+
       background: #151517;
-      border: 1px solid #242426;
+
+      border:
+        1px
+        solid
+        #242426;
+
       border-radius: 17px;
-      padding: 20px 17px;
+
+      padding:
+        20px
+        17px;
+
       min-height: 110px;
     }
 
     .icon {
+
       font-size: 24px;
+
       margin-bottom: 14px;
     }
 
     .menu-title {
+
       font-size: 14px;
     }
 
     .menu-value {
+
       margin-top: 5px;
+
       color: #777;
+
       font-size: 12px;
     }
 
-    .footer {
+
+    /* -------------------------
+       LINE Status
+    ------------------------- */
+
+    .line-status {
+
+      margin-top: 30px;
+
       text-align: center;
+
+      font-size: 11px;
+
+      color: #666;
+
+      letter-spacing: 1.5px;
+
+      line-height: 1.8;
+    }
+
+
+    /* -------------------------
+       Footer
+    ------------------------- */
+
+    .footer {
+
+      text-align: center;
+
       color: #444;
-      margin-top: 35px;
+
+      margin-top: 25px;
+
       font-size: 10px;
+
       letter-spacing: 2px;
     }
+
   </style>
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>  
+
 </head>
 
-<script>
-  async function initLINE() {
-    try {
-      await liff.init({
-        liffId: '2011857712-lXq9lJFT'
-      });
 
-      if (!liff.isLoggedIn()) {
-        liff.login();
-        return;
-      }
-
-      const profile = await liff.getProfile();
-
-      console.log('LINE User ID:', profile.userId);
-      console.log('Display Name:', profile.displayName);
-
-      document.getElementById('line-test').innerHTML =
-        'LINE CONNECTED ✓<br>' +
-        profile.displayName;
-    } catch (error) {
-      console.error(error);
-
-      document.getElementById('line-test').innerHTML =
-        'LINE CONNECTION ERROR';
-    }
-  }
-
-  window.onload = initLINE;
-</script>
-
-<script>
-async function testAPI() {
-
-  const apiUrl = 'https://script.google.com/macros/s/AKfycbz2XTu9CQrzJUzBv69f8X-Zg2mefCLfBPXxYFfcfuy9RNNfCZUvhbTTQ3YVI87IInN1/exec';
-
-  document.getElementById('api-test').innerText =
-    'TESTING...';
-
-  try {
-
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'testLineLogin'
-      })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      document.getElementById('api-test').innerText =
-        'API CONNECTED ✓ ' + data.message;
-    } else {
-      document.getElementById('api-test').innerText =
-        'API ERROR: ' + data.message;
-    }
-
-  } catch (error) {
-
-    document.getElementById('api-test').innerText =
-      'CONNECTION ERROR';
-
-    console.error(error);
-  }
-}
-</script>
 <body>
 
 <div class="app">
 
-  <div class="brand">PRIVATE MEMBERS CLUB</div>
 
-  <h1>♡ Whale Love Club</h1>
+  <!-- Header -->
+
+  <div class="brand">
+    PRIVATE MEMBERS CLUB
+  </div>
+
+  <h1>
+    ♡ Whale Love Club
+  </h1>
 
   <div class="subtitle">
     MEMBERS ONLY
   </div>
 
+
+
+  <!-- Member Card -->
+
   <div class="member-card">
 
     <div class="card-top">
-      <span>♡ WLC</span>
-      <span>MEMBER</span>
+
+      <span>
+        ♡ WLC
+      </span>
+
+      <span>
+        MEMBER
+      </span>
+
     </div>
+
 
     <div>
-      <div class="member-name">
+
+      <div
+        class="member-name"
+        id="member-name">
+
         LIFETIME MEMBER
+
       </div>
 
-      <div class="member-number">
+
+      <div
+        class="member-number"
+        id="member-number">
+
         WLC001
+
       </div>
+
     </div>
 
-    <div class="level">
+
+    <div
+      class="level"
+      id="member-level">
+
       LIFETIME VIP · SINCE 2026
+
     </div>
 
   </div>
+
+
+
+  <!-- Love Points -->
 
   <div class="points">
 
     <div class="points-label">
+
       LOVE POINTS
+
     </div>
 
-    <div class="points-number">
+    <div
+      class="points-number"
+      id="love-points">
+
       520
+
     </div>
 
   </div>
+
+
+
+  <!-- Menu -->
 
   <div class="grid">
 
-    <div class="menu">
-      <div class="icon">💆</div>
-      <div class="menu-title">Massage</div>
-      <div class="menu-value">3 POINTS</div>
-    </div>
 
     <div class="menu">
-      <div class="icon">🎟️</div>
-      <div class="menu-title">Love Coupon</div>
-      <div class="menu-value">MY COUPONS</div>
+
+      <div class="icon">
+        💆
+      </div>
+
+      <div class="menu-title">
+        Massage
+      </div>
+
+      <div
+        class="menu-value"
+        id="massage-points">
+
+        3 POINTS
+
+      </div>
+
     </div>
 
-    <div class="menu">
-      <div class="icon">🎁</div>
-      <div class="menu-title">Gift Box</div>
-      <div class="menu-value">MY GIFTS</div>
-    </div>
+
 
     <div class="menu">
-      <div class="icon">♠️</div>
-      <div class="menu-title">Collection</div>
-      <div class="menu-value">NFC CARDS</div>
+
+      <div class="icon">
+        🎟️
+      </div>
+
+      <div class="menu-title">
+        Love Coupon
+      </div>
+
+      <div class="menu-value">
+        MY COUPONS
+      </div>
+
     </div>
+
+
+
+    <div class="menu">
+
+      <div class="icon">
+        🎁
+      </div>
+
+      <div class="menu-title">
+        Gift Box
+      </div>
+
+      <div class="menu-value">
+        MY GIFTS
+      </div>
+
+    </div>
+
+
+
+    <div class="menu">
+
+      <div class="icon">
+        ♠️
+      </div>
+
+      <div class="menu-title">
+        Collection
+      </div>
+
+      <div class="menu-value">
+        NFC CARDS
+      </div>
+
+    </div>
+
 
   </div>
 
-  <div id="line-test"
-     style="text-align:center;
-            margin-top:30px;
-            font-size:11px;
-            color:#666;
-            letter-spacing:2px;">
-  CONNECTING TO LINE...
+
+
+  <!-- LINE Connection Test -->
+
+  <div
+    id="line-status"
+    class="line-status">
+
+    CONNECTING TO LINE...
+
   </div>
 
-  <button onclick="testAPI()"
-        style="
-          display:block;
-          margin:18px auto;
-          padding:12px 20px;
-          border:1px solid #333;
-          border-radius:12px;
-          background:#151517;
-          color:white;
-        ">
-  TEST API
-</button>
 
-<div id="api-test"
-     style="
-       text-align:center;
-       font-size:11px;
-       color:#777;
-       margin-bottom:20px;
-     ">
-</div>
-  
+
+  <!-- Footer -->
+
   <div class="footer">
+
     WHALE LOVE CLUB · PRIVATE MEMBERSHIP
+
   </div>
 
+
 </div>
+
+
+<script>
+
+  /* =========================================
+     LINE MINI APP / LIFF
+     ========================================= */
+
+
+  // 把這裡換成你的 Developing LIFF ID
+  const LIFF_ID =
+    '2011857712-lXq9lJFT';
+
+
+
+  async function initLINE() {
+
+    const status =
+      document.getElementById(
+        'line-status'
+      );
+
+
+    try {
+
+
+      /* 初始化 LIFF */
+
+      await liff.init({
+
+        liffId:
+          LIFF_ID
+
+      });
+
+
+
+      /* 尚未登入 LINE */
+
+      if (
+        !liff.isLoggedIn()
+      ) {
+
+        liff.login();
+
+        return;
+
+      }
+
+
+
+      /* 取得 LINE Profile */
+
+      const profile =
+        await liff.getProfile();
+
+
+
+      /* 測試輸出 */
+
+      console.log(
+        'LINE User ID:',
+        profile.userId
+      );
+
+      console.log(
+        'LINE Display Name:',
+        profile.displayName
+      );
+
+
+
+      /* 頁面顯示 */
+
+      status.innerHTML =
+        'LINE CONNECTED ✓<br>' +
+        profile.displayName;
+
+
+
+    } catch (error) {
+
+
+      console.error(
+        'LIFF ERROR:',
+        error
+      );
+
+
+      status.innerHTML =
+        'LINE CONNECTION ERROR';
+
+
+    }
+
+  }
+
+
+
+  /* 網頁載入後執行 */
+
+  window.addEventListener(
+    'load',
+    initLINE
+  );
+
+
+</script>
+
 
 </body>
+
 </html>
