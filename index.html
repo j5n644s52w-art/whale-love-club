@@ -173,6 +173,43 @@
 
   window.onload = initLINE;
 </script>
+
+<script>
+async function testAPI() {
+
+  const apiUrl = 'https://script.google.com/macros/s/AKfycbz2XTu9CQrzJUzBv69f8X-Zg2mefCLfBPXxYFfcfuy9RNNfCZUvhbTTQ3YVI87IInN1/exec';
+
+  document.getElementById('api-test').innerText =
+    'TESTING...';
+
+  try {
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'testLineLogin'
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      document.getElementById('api-test').innerText =
+        'API CONNECTED ✓ ' + data.message;
+    } else {
+      document.getElementById('api-test').innerText =
+        'API ERROR: ' + data.message;
+    }
+
+  } catch (error) {
+
+    document.getElementById('api-test').innerText =
+      'CONNECTION ERROR';
+
+    console.error(error);
+  }
+}
+</script>
 <body>
 
 <div class="app">
@@ -256,6 +293,28 @@
             letter-spacing:2px;">
   CONNECTING TO LINE...
   </div>
+
+  <button onclick="testAPI()"
+        style="
+          display:block;
+          margin:18px auto;
+          padding:12px 20px;
+          border:1px solid #333;
+          border-radius:12px;
+          background:#151517;
+          color:white;
+        ">
+  TEST API
+</button>
+
+<div id="api-test"
+     style="
+       text-align:center;
+       font-size:11px;
+       color:#777;
+       margin-bottom:20px;
+     ">
+</div>
   
   <div class="footer">
     WHALE LOVE CLUB · PRIVATE MEMBERSHIP
