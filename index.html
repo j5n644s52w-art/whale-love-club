@@ -140,8 +140,39 @@
       letter-spacing: 2px;
     }
   </style>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>  
 </head>
 
+<script>
+  async function initLINE() {
+    try {
+      await liff.init({
+        liffId: '2011857712-lXq9lJFT'
+      });
+
+      if (!liff.isLoggedIn()) {
+        liff.login();
+        return;
+      }
+
+      const profile = await liff.getProfile();
+
+      console.log('LINE User ID:', profile.userId);
+      console.log('Display Name:', profile.displayName);
+
+      document.getElementById('line-test').innerHTML =
+        'LINE CONNECTED ✓<br>' +
+        profile.displayName;
+    } catch (error) {
+      console.error(error);
+
+      document.getElementById('line-test').innerHTML =
+        'LINE CONNECTION ERROR';
+    }
+  }
+
+  window.onload = initLINE;
+</script>
 <body>
 
 <div class="app">
@@ -217,6 +248,15 @@
 
   </div>
 
+  <div id="line-test"
+     style="text-align:center;
+            margin-top:30px;
+            font-size:11px;
+            color:#666;
+            letter-spacing:2px;">
+  CONNECTING TO LINE...
+  </div>
+  
   <div class="footer">
     WHALE LOVE CLUB · PRIVATE MEMBERSHIP
   </div>
