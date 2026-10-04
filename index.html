@@ -4,8 +4,10 @@
 <head>
   <meta charset="UTF-8">
 
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
 
   <title>Whale Love Club</title>
 
@@ -13,16 +15,17 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
   <style>
-
     * {
       box-sizing: border-box;
     }
 
+    html,
     body {
       margin: 0;
+      padding: 0;
+      min-height: 100%;
       background: #0b0b0d;
       color: #ffffff;
-
       font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -31,34 +34,34 @@
         sans-serif;
     }
 
-    .app {
-      max-width: 430px;
-      margin: auto;
-
+    body {
       min-height: 100vh;
-
-      padding:
-        28px
-        20px
-        50px;
     }
 
+    .app {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      margin: 0 auto;
+      padding:
+        calc(28px + env(safe-area-inset-top))
+        20px
+        calc(50px + env(safe-area-inset-bottom));
+    }
 
-    /* -------------------------
+    /* =========================
        Header
-    ------------------------- */
+       ========================= */
 
     .brand {
+      margin-bottom: 8px;
+      color: #888;
       font-size: 12px;
       letter-spacing: 3px;
-      color: #888;
-
-      margin-bottom: 8px;
     }
 
     h1 {
       margin: 0;
-
       font-size: 26px;
       font-weight: 500;
       letter-spacing: 1px;
@@ -66,26 +69,25 @@
 
     .subtitle {
       margin-top: 5px;
-
-      font-size: 12px;
       color: #777;
-
+      font-size: 12px;
       letter-spacing: 2px;
     }
 
-
-    /* -------------------------
+    /* =========================
        Member Card
-    ------------------------- */
+       ========================= */
 
     .member-card {
-
+      height: 205px;
       margin-top: 30px;
-
       padding: 25px;
 
-      height: 205px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
 
+      border: 1px solid #333;
       border-radius: 22px;
 
       background:
@@ -95,412 +97,479 @@
           #090909
         );
 
-      border: 1px solid #333;
-
       box-shadow:
-        0
-        20px
-        50px
-        rgba(0,0,0,.45);
-
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+        0 20px 50px
+        rgba(0, 0, 0, 0.45);
     }
 
     .card-top {
-
       display: flex;
       justify-content: space-between;
 
-      font-size: 12px;
-
       color: #aaa;
-
+      font-size: 12px;
       letter-spacing: 2px;
     }
 
     .member-name {
-
       font-size: 23px;
-
       letter-spacing: 2px;
     }
 
     .member-number {
-
-      color: #888;
-
-      font-size: 12px;
-
-      letter-spacing: 2px;
-
       margin-top: 5px;
+      color: #888;
+      font-size: 12px;
+      letter-spacing: 2px;
     }
 
     .level {
-
-      font-size: 11px;
-
-      letter-spacing: 2px;
-
       color: #aaa;
+      font-size: 11px;
+      letter-spacing: 2px;
     }
 
-
-    /* -------------------------
+    /* =========================
        Love Points
-    ------------------------- */
+       ========================= */
 
     .points {
-
-      margin:
-        32px
-        0
-        22px;
-
+      margin: 32px 0 22px;
       text-align: center;
     }
 
     .points-label {
-
       color: #777;
-
       font-size: 11px;
-
       letter-spacing: 3px;
     }
 
     .points-number {
-
-      font-size: 45px;
-
       margin-top: 4px;
-
+      font-size: 45px;
       font-weight: 300;
     }
 
-
-    /* -------------------------
-       Function Menu
-    ------------------------- */
+    /* =========================
+       Menu
+       ========================= */
 
     .grid {
-
       display: grid;
-
-      grid-template-columns:
-        1fr
-        1fr;
-
+      grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
 
     .menu {
+      min-height: 110px;
+      padding: 20px 17px;
 
-      background: #151517;
-
-      border:
-        1px
-        solid
-        #242426;
-
+      border: 1px solid #242426;
       border-radius: 17px;
 
-      padding:
-        20px
-        17px;
-
-      min-height: 110px;
+      background: #151517;
     }
 
     .icon {
-
-      font-size: 24px;
-
       margin-bottom: 14px;
+      font-size: 24px;
     }
 
     .menu-title {
-
       font-size: 14px;
     }
 
     .menu-value {
-
       margin-top: 5px;
-
       color: #777;
-
       font-size: 12px;
     }
 
-
-    /* -------------------------
+    /* =========================
        LINE Status
-    ------------------------- */
+       ========================= */
 
     .line-status {
-
+      min-height: 45px;
       margin-top: 30px;
 
-      text-align: center;
-
-      font-size: 11px;
-
       color: #666;
-
-      letter-spacing: 1.5px;
-
+      font-size: 11px;
       line-height: 1.8;
+      letter-spacing: 1.5px;
+      text-align: center;
     }
 
+    .line-success {
+      color: #888;
+    }
 
-    /* -------------------------
+    .line-error {
+      color: #aaa;
+    }
+
+    /* =========================
        Footer
-    ------------------------- */
+       ========================= */
 
     .footer {
-
-      text-align: center;
-
+      margin-top: 22px;
       color: #444;
-
-      margin-top: 25px;
-
       font-size: 10px;
-
       letter-spacing: 2px;
+      text-align: center;
     }
-
   </style>
-
 </head>
 
 
 <body>
 
-<div class="app">
+  <main class="app">
 
+    <!-- Header -->
+    <div class="brand">
+      PRIVATE MEMBERS CLUB
+    </div>
 
-  <!-- Header -->
+    <h1>
+      ♡ Whale Love Club
+    </h1>
 
-  <div class="brand">
-    PRIVATE MEMBERS CLUB
-  </div>
-
-  <h1>
-    ♡ Whale Love Club
-  </h1>
-
-  <div class="subtitle">
-    MEMBERS ONLY
-  </div>
-
-
-
-  <!-- Member Card -->
-
-  <div class="member-card">
-
-    <div class="card-top">
-
-      <span>
-        ♡ WLC
-      </span>
-
-      <span>
-        MEMBER
-      </span>
-
+    <div class="subtitle">
+      MEMBERS ONLY
     </div>
 
 
-    <div>
+    <!-- Member Card -->
+    <section class="member-card">
+
+      <div class="card-top">
+        <span>♡ WLC</span>
+        <span>MEMBER</span>
+      </div>
+
+      <div>
+
+        <div
+          class="member-name"
+          id="member-name"
+        >
+          LIFETIME MEMBER
+        </div>
+
+        <div
+          class="member-number"
+          id="member-number"
+        >
+          WLC001
+        </div>
+
+      </div>
 
       <div
-        class="member-name"
-        id="member-name">
+        class="level"
+        id="member-level"
+      >
+        LIFETIME VIP · SINCE 2026
+      </div>
 
-        LIFETIME MEMBER
+    </section>
+
+
+    <!-- Love Points -->
+    <section class="points">
+
+      <div class="points-label">
+        LOVE POINTS
+      </div>
+
+      <div
+        class="points-number"
+        id="love-points"
+      >
+        520
+      </div>
+
+    </section>
+
+
+    <!-- Functions -->
+    <section class="grid">
+
+      <div class="menu">
+
+        <div class="icon">
+          💆
+        </div>
+
+        <div class="menu-title">
+          Massage
+        </div>
+
+        <div
+          class="menu-value"
+          id="massage-points"
+        >
+          3 POINTS
+        </div>
 
       </div>
 
 
-      <div
-        class="member-number"
-        id="member-number">
+      <div class="menu">
 
-        WLC001
+        <div class="icon">
+          🎟️
+        </div>
+
+        <div class="menu-title">
+          Love Coupon
+        </div>
+
+        <div class="menu-value">
+          MY COUPONS
+        </div>
 
       </div>
 
-    </div>
+
+      <div class="menu">
+
+        <div class="icon">
+          🎁
+        </div>
+
+        <div class="menu-title">
+          Gift Box
+        </div>
+
+        <div class="menu-value">
+          MY GIFTS
+        </div>
+
+      </div>
 
 
+      <div class="menu">
+
+        <div class="icon">
+          ♠️
+        </div>
+
+        <div class="menu-title">
+          Collection
+        </div>
+
+        <div class="menu-value">
+          NFC CARDS
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- LINE Connection Status -->
     <div
-      class="level"
-      id="member-level">
-
-      LIFETIME VIP · SINCE 2026
-
-    </div>
-
-  </div>
-
-
-
-  <!-- Love Points -->
-
-  <div class="points">
-
-    <div class="points-label">
-
-      LOVE POINTS
-
-    </div>
-
-    <div
-      class="points-number"
-      id="love-points">
-
-      520
-
-    </div>
-
-  </div>
-
-
-
-  <!-- Menu -->
-
-  <div class="grid">
-
-
-    <div class="menu">
-
-      <div class="icon">
-        💆
-      </div>
-
-      <div class="menu-title">
-        Massage
-      </div>
-
-      <div
-        class="menu-value"
-        id="massage-points">
-
-        3 POINTS
-
-      </div>
-
+      id="line-status"
+      class="line-status"
+    >
+      CONNECTING TO LINE...
     </div>
 
 
-
-    <div class="menu">
-
-      <div class="icon">
-        🎟️
-      </div>
-
-      <div class="menu-title">
-        Love Coupon
-      </div>
-
-      <div class="menu-value">
-        MY COUPONS
-      </div>
-
+    <!-- Footer -->
+    <div class="footer">
+      WHALE LOVE CLUB · PRIVATE MEMBERSHIP
     </div>
 
+  </main>
 
 
-    <div class="menu">
+  <script>
+    /* =========================================
+       Whale Love Club - LINE MINI App
+       ========================================= */
 
-      <div class="icon">
-        🎁
-      </div>
 
-      <div class="menu-title">
-        Gift Box
-      </div>
+    /* -----------------------------------------
+       這裡是唯一需要你自己修改的地方
+       ----------------------------------------- */
 
-      <div class="menu-value">
-        MY GIFTS
-      </div>
-
-    </div>
+    const LIFF_ID = 'https://miniapp.line.me/2011857712-lXq9lJFT';
 
 
 
-    <div class="menu">
+    /* -----------------------------------------
+       修改 LINE 狀態文字
+       ----------------------------------------- */
 
-      <div class="icon">
-        ♠️
-      </div>
+    function setLineStatus(message, type = '') {
 
-      <div class="menu-title">
-        Collection
-      </div>
+      const status =
+        document.getElementById('line-status');
 
-      <div class="menu-value">
-        NFC CARDS
-      </div>
+      status.className =
+        'line-status';
 
-    </div>
+      if (type === 'success') {
+        status.classList.add('line-success');
+      }
 
+      if (type === 'error') {
+        status.classList.add('line-error');
+      }
 
-  </div>
-
-
-
-  <!-- LINE Connection Test -->
-
-  <div
-    id="line-status"
-    class="line-status">
-
-    CONNECTING TO LINE...
-
-  </div>
+      status.innerHTML = message;
+    }
 
 
 
-  <!-- Footer -->
+    /* -----------------------------------------
+       初始化 LINE MINI App
+       ----------------------------------------- */
 
-  <div class="footer">
+    async function initLINE() {
 
-    WHALE LOVE CLUB · PRIVATE MEMBERSHIP
+      try {
 
-  </div>
+        setLineStatus(
+          'CONNECTING TO LINE...'
+        );
 
 
-</div>
+        /* 1. 確認 LIFF SDK 有載入 */
+
+        if (
+          typeof liff === 'undefined'
+        ) {
+
+          throw new Error(
+            'LIFF SDK 尚未載入'
+          );
+
+        }
 
 
-<script>
+        /* 2. 初始化 LIFF */
 
-  /* =========================================
-     LINE MINI APP / LIFF
-     ========================================= */
+        await liff.init({
+          liffId: LIFF_ID
+        });
 
-  const LIFF_ID =
-    'https://miniapp.line.me/2011857712-lXq9lJFT';
 
-  async function initLINE() {
-    ...
-  }
+        /* 3. 確認登入 */
 
-  window.addEventListener(
-    'load',
-    initLINE
-  );
+        if (
+          !liff.isLoggedIn()
+        ) {
 
-</script>
+          liff.login();
 
+          return;
+
+        }
+
+
+        /* 4. 取得 LINE Profile */
+
+        const profile =
+          await liff.getProfile();
+
+
+        /* 5. 取得 ID Token */
+
+        const idToken =
+          liff.getIDToken();
+
+
+        /* 6. 沒有取得 ID Token */
+
+        if (!idToken) {
+
+          setLineStatus(
+            'LINE CONNECTED ✓' +
+            '<br>' +
+            escapeHtml(
+              profile.displayName
+            ) +
+            '<br>' +
+            'ID TOKEN NOT AVAILABLE',
+            'error'
+          );
+
+          return;
+
+        }
+
+
+        /* 7. 驗證完成 */
+
+        setLineStatus(
+          'LINE CONNECTED ✓' +
+          '<br>' +
+          escapeHtml(
+            profile.displayName
+          ) +
+          '<br>' +
+          'SECURE TOKEN READY ✓',
+          'success'
+        );
+
+
+        /*
+         * 注意：
+         *
+         * 不把 ID Token 顯示在網頁上
+         * 不 console.log(idToken)
+         *
+         * 下一步才會把它安全交給後端驗證。
+         */
+
+
+      } catch (error) {
+
+        console.error(
+          'Whale Love Club LIFF Error:',
+          error
+        );
+
+        setLineStatus(
+          'LINE CONNECTION ERROR' +
+          '<br>' +
+          escapeHtml(
+            error.message ||
+            'Unknown error'
+          ),
+          'error'
+        );
+
+      }
+
+    }
+
+    /* -----------------------------------------
+       基本 HTML 安全處理
+       ----------------------------------------- */
+
+    function escapeHtml(value) {
+
+      const div =
+        document.createElement('div');
+
+      div.textContent =
+        String(value || '');
+
+      return div.innerHTML;
+
+    }
+
+    /* -----------------------------------------
+       啟動
+       ----------------------------------------- */
+    initLINE();
+  </script>
 
 </body>
-
 </html>
