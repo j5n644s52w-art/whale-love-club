@@ -486,104 +486,17 @@
      LINE MINI APP / LIFF
      ========================================= */
 
-
-  // 把這裡換成你的 Developing LIFF ID
   const LIFF_ID =
-    '2011857712-lXq9lJFT';
-
-
+    'https://miniapp.line.me/2011857712-lXq9lJFT';
 
   async function initLINE() {
-
-    const status =
-      document.getElementById(
-        'line-status'
-      );
-
-
-    try {
-
-
-      /* 初始化 LIFF */
-
-      await liff.init({
-
-        liffId:
-          LIFF_ID
-
-      });
-
-
-
-      /* 尚未登入 LINE */
-
-      if (
-        !liff.isLoggedIn()
-      ) {
-
-        liff.login();
-
-        return;
-
-      }
-
-
-
-      /* 取得 LINE Profile */
-
-      const profile =
-        await liff.getProfile();
-
-
-
-      /* 測試輸出 */
-
-      console.log(
-        'LINE User ID:',
-        profile.userId
-      );
-
-      console.log(
-        'LINE Display Name:',
-        profile.displayName
-      );
-
-
-
-      /* 頁面顯示 */
-
-      status.innerHTML =
-        'LINE CONNECTED ✓<br>' +
-        profile.displayName;
-
-
-
-    } catch (error) {
-
-
-      console.error(
-        'LIFF ERROR:',
-        error
-      );
-
-
-      status.innerHTML =
-        'LINE CONNECTION ERROR';
-
-
-    }
-
+    ...
   }
-
-
-
-  /* 網頁載入後執行 */
 
   window.addEventListener(
     'load',
     initLINE
   );
-
 
 </script>
 
