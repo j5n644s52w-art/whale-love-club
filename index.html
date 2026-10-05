@@ -43,6 +43,7 @@
       max-width: 430px;
       min-height: 100vh;
       margin: 0 auto;
+
       padding:
         calc(28px + env(safe-area-inset-top))
         20px
@@ -190,7 +191,7 @@
        ========================= */
 
     .line-status {
-      min-height: 45px;
+      min-height: 55px;
       margin-top: 30px;
 
       color: #666;
@@ -201,7 +202,7 @@
     }
 
     .line-success {
-      color: #888;
+      color: #8c8c8c;
     }
 
     .line-error {
@@ -214,6 +215,7 @@
 
     .footer {
       margin-top: 22px;
+
       color: #444;
       font-size: 10px;
       letter-spacing: 2px;
@@ -228,6 +230,7 @@
   <main class="app">
 
     <!-- Header -->
+
     <div class="brand">
       PRIVATE MEMBERS CLUB
     </div>
@@ -242,6 +245,7 @@
 
 
     <!-- Member Card -->
+
     <section class="member-card">
 
       <div class="card-top">
@@ -278,6 +282,7 @@
 
 
     <!-- Love Points -->
+
     <section class="points">
 
       <div class="points-label">
@@ -294,7 +299,8 @@
     </section>
 
 
-    <!-- Functions -->
+    <!-- Menu -->
+
     <section class="grid">
 
       <div class="menu">
@@ -311,7 +317,7 @@
           class="menu-value"
           id="massage-points"
         >
-          555 POINTS
+          3 POINTS
         </div>
 
       </div>
@@ -370,7 +376,8 @@
     </section>
 
 
-    <!-- LINE Connection Status -->
+    <!-- LINE / Security Status -->
+
     <div
       id="line-status"
       class="line-status"
@@ -380,6 +387,7 @@
 
 
     <!-- Footer -->
+
     <div class="footer">
       WHALE LOVE CLUB · PRIVATE MEMBERSHIP
     </div>
@@ -388,24 +396,26 @@
 
 
   <script>
+
     /* =========================================
-       Whale Love Club - LINE MINI App
+       Whale Love Club
+       LINE MINI App Authentication
        ========================================= */
 
 
-    /* -----------------------------------------
-       這裡是唯一需要你自己修改的地方
-       ----------------------------------------- */
+    /* =========================
+       只修改這一行
+       ========================= */
 
     const LIFF_ID = '2011857712-lXq9lJFT';
 
 
 
-    /* -----------------------------------------
-       修改 LINE 狀態文字
-       ----------------------------------------- */
+    /* =========================
+       狀態顯示
+       ========================= */
 
-    function setLineStatus(message, type = '') {
+    function setStatus(message, type = '') {
 
       const status =
         document.getElementById('line-status');
@@ -421,45 +431,122 @@
         status.classList.add('line-error');
       }
 
-      status.innerHTML = message;
+      status.innerHTML =
+        message;
     }
 
 
 
-    /* -----------------------------------------
-       初始化 LINE MINI App
-       ----------------------------------------- */
+    /* =========================
+       HTML 安全處理
+       ========================= */
+
+    function escapeHtml(value) {
+
+      const div =
+        document.createElement('div');
+
+      div.textContent =
+        String(value || '');
+
+      return div.innerHTML;
+    }
+
+
+
+    /* =========================
+       呼叫 Vercel 後端
+       ========================= */
+
+    async function verifyWithServer(idToken) {
+
+      const response =
+        await fetch(
+          '/api/verify-line',
+          {
+            method: 'POST',
+
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+
+            body:
+              JSON.stringify({
+                idToken: idToken
+              })
+          }
+        );
+
+
+      let data;
+
+      try {
+
+        data =
+          await response.json();
+
+      } catch (error) {
+
+        throw new Error(
+          'Server returned invalid response'
+        );
+
+      }
+
+
+      if (
+        !response.ok ||
+        !data.success
+      ) {
+
+        throw new Error(
+          data.message ||
+          'LINE verification failed'
+        );
+
+      }
+
+
+      return data;
+    }
+
+
+
+    /* =========================
+       LINE 初始化
+       ========================= */
 
     async function initLINE() {
 
       try {
 
-        setLineStatus(
+        setStatus(
           'CONNECTING TO LINE...'
         );
 
 
-        /* 1. 確認 LIFF SDK 有載入 */
+        /* 1. 確認 LIFF SDK */
 
         if (
           typeof liff === 'undefined'
         ) {
 
           throw new Error(
-            'LIFF SDK 尚未載入'
+            'LIFF SDK is not available'
           );
 
         }
 
 
-        /* 2. 初始化 LIFF */
+        /* 2. 初始化 */
 
         await liff.init({
           liffId: LIFF_ID
         });
 
 
-        /* 3. 確認登入 */
+        /* 3. 尚未登入 */
 
         if (
           !liff.isLoggedIn()
@@ -472,104 +559,112 @@
         }
 
 
-        /* 4. 取得 LINE Profile */
-
-        const profile =
-          await liff.getProfile();
-
-
-        /* 5. 取得 ID Token */
+        /* 4. 取得 ID Token */
 
         const idToken =
           liff.getIDToken();
 
 
-        /* 6. 沒有取得 ID Token */
-
         if (!idToken) {
 
-          setLineStatus(
-            'LINE CONNECTED ✓' +
-            '<br>' +
-            escapeHtml(
-              profile.displayName
-            ) +
-            '<br>' +
-            'ID TOKEN NOT AVAILABLE',
-            'error'
+          throw new Error(
+            'ID token is not available'
           );
-
-          return;
 
         }
 
 
-        /* 7. 驗證完成 */
+        setStatus(
+          'VERIFYING LINE IDENTITY...'
+        );
 
-        setLineStatus(
+
+        /* 5. 送到 Vercel 後端驗證 */
+
+        const result =
+          await verifyWithServer(
+            idToken
+          );
+
+
+        /* 6. 驗證成功 */
+
+        const verifiedName =
+          result.user &&
+          result.user.name
+            ? result.user.name
+            : 'LINE MEMBER';
+
+
+        setStatus(
+
           'LINE CONNECTED ✓' +
           '<br>' +
+
           escapeHtml(
-            profile.displayName
+            verifiedName
           ) +
+
           '<br>' +
-          'SECURE TOKEN READY ✓',
+
+          'IDENTITY VERIFIED ✓',
+
           'success'
+
         );
 
 
         /*
          * 注意：
          *
-         * 不把 ID Token 顯示在網頁上
-         * 不 console.log(idToken)
+         * result.user.lineUserId
          *
-         * 下一步才會把它安全交給後端驗證。
+         * 現在已經是後端向 LINE 官方
+         * 驗證後得到的可信任 User ID。
+         *
+         * 不顯示在頁面。
+         * 不需要貼給 ChatGPT。
+         *
+         * 下一步會用它去找 Members。
          */
 
 
       } catch (error) {
 
         console.error(
-          'Whale Love Club LIFF Error:',
+          'Whale Love Club Error:',
           error
         );
 
-        setLineStatus(
+
+        setStatus(
+
           'LINE CONNECTION ERROR' +
           '<br>' +
+
           escapeHtml(
             error.message ||
             'Unknown error'
           ),
+
           'error'
+
         );
 
       }
 
     }
 
-    /* -----------------------------------------
-       基本 HTML 安全處理
-       ----------------------------------------- */
 
-    function escapeHtml(value) {
 
-      const div =
-        document.createElement('div');
-
-      div.textContent =
-        String(value || '');
-
-      return div.innerHTML;
-
-    }
-
-    /* -----------------------------------------
+    /* =========================
        啟動
-       ----------------------------------------- */
+       ========================= */
+
     initLINE();
+
   </script>
 
 </body>
+
 </html>
