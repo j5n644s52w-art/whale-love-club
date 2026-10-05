@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <title>Whale Love Club Membership Activation</title>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background: #0b0b0d;
+      color: #fff;
+
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Noto Sans TC",
+        sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding:
+        calc(24px + env(safe-area-inset-top))
+        22px
+        calc(24px + env(safe-area-inset-bottom));
+    }
+
+    .card {
+      width: 100%;
+      max-width: 400px;
+
+      padding: 34px 26px;
+
+      border: 1px solid #29292c;
+      border-radius: 26px;
+
+      background:
+        linear-gradient(
+          145deg,
+          #18181b,
+          #0d0d0f
+        );
+
+      box-shadow:
+        0 25px 70px
+        rgba(0, 0, 0, .5);
+
+      text-align: center;
+    }
+
+    .heart {
+      margin-bottom: 18px;
+
+      font-size: 40px;
+    }
+
+    .brand {
+      color: #777;
+
+      font-size: 10px;
+      letter-spacing: 3px;
+    }
+
+    h1 {
+      margin: 9px 0 8px;
+
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    .subtitle {
+      color: #777;
+
+      font-size: 12px;
+      letter-spacing: 2px;
+    }
+
+    .divider {
+      height: 1px;
+
+      margin: 27px 0;
+
+      background: #29292c;
+    }
+
+    .status-title {
+      font-size: 18px;
+      line-height: 1.5;
+    }
+
+    .status-text {
+      margin-top: 10px;
+
+      color: #888;
+
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .member-no {
+      display: none;
+
+      margin-top: 22px;
+
+      font-size: 28px;
+      letter-spacing: 3px;
+    }
+
+    .button {
+      display: none;
+
+      width: 100%;
+      height: 48px;
+
+      margin-top: 28px;
+
+      border: 0;
+      border-radius: 13px;
+
+      background: #fff;
+      color: #111;
+
+      font-size: 14px;
+      font-weight: 600;
+
+      cursor: pointer;
+    }
+
+    .footer {
+      margin-top: 28px;
+
+      color: #454545;
+
+      font-size: 9px;
+      letter-spacing: 2px;
+    }
+  </style>
+</head>
+
+
+<body>
+
+  <main class="card">
+
+    <div class="heart">
+      ♡
+    </div>
+
+    <div class="brand">
+      WHALE LOVE CLUB
+    </div>
+
+    <h1>
+      MEMBERSHIP ACTIVATION
+    </h1>
+
+    <div class="subtitle">
+      PRIVATE MEMBERS ONLY
+    </div>
+
+    <div class="divider"></div>
+
+
+    <div
+      id="status-title"
+      class="status-title"
+    >
+      正在確認您的專屬會員卡…
+    </div>
+
+
+    <div
+      id="status-text"
+      class="status-text"
+    >
+      CONNECTING TO LINE
+    </div>
+
+
+    <div
+      id="member-no"
+      class="member-no"
+    ></div>
+
+
+    <button
+      id="enter-button"
+      class="button"
+      type="button"
+    >
+      進入會員中心 ♡
+    </button>
+
+
+    <div class="footer">
+      WHALE LOVE CLUB · PRIVATE MEMBERSHIP
+    </div>
+
+  </main>
+
+
+  <script>
+
+    /* =========================================
+       ★ 換成你的 Developing LIFF ID
+       ========================================= */
+
+    const LIFF_ID =
+      '2011857712-lXq9lJFT';
+
+
+
+    function showResult(
+      title,
+      text,
+      memberNo = '',
+      showButton = false
+    ) {
+
+      document
+        .getElementById(
+          'status-title'
+        )
+        .textContent =
+          title;
+
+
+      document
+        .getElementById(
+          'status-text'
+        )
+        .innerHTML =
+          text;
+
+
+      const memberBox =
+        document.getElementById(
+          'member-no'
+        );
+
+
+      if (memberNo) {
+
+        memberBox.textContent =
+          memberNo;
+
+        memberBox.style.display =
+          'block';
+
+      } else {
+
+        memberBox.style.display =
+          'none';
+
+      }
+
+
+      document
+        .getElementById(
+          'enter-button'
+        )
+        .style.display =
+          showButton
+            ? 'block'
+            : 'none';
+
+    }
+
+
+
+    async function activateMembership(
+      idToken,
+      token
+    ) {
+
+      const response =
+        await fetch(
+          '/api/activate-member',
+          {
+            method: 'POST',
+
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+
+            body:
+              JSON.stringify({
+                idToken:
+                  idToken,
+
+                token:
+                  token
+              })
+          }
+        );
+
+
+      let data;
+
+
+      try {
+
+        data =
+          await response.json();
+
+      } catch (error) {
+
+        throw new Error(
+          'Invalid server response'
+        );
+
+      }
+
+
+      if (
+        !response.ok ||
+        !data.success
+      ) {
+
+        const error =
+          new Error(
+            data.message ||
+            'Membership activation failed'
+          );
+
+        error.status =
+          data.status || '';
+
+        throw error;
+
+      }
+
+
+      return data;
+
+    }
+
+
+
+    async function initActivation() {
+
+      try {
+
+        if (
+          typeof liff ===
+          'undefined'
+        ) {
+
+          throw new Error(
+            'LIFF SDK is not available'
+          );
+
+        }
+
+
+        /* 1. 初始化 LINE */
+
+        await liff.init({
+          liffId:
+            LIFF_ID
+        });
+
+
+        /*
+         * 重要：
+         * query parameter 要在 liff.init()
+         * 完成之後再讀
+         */
+
+        const params =
+          new URLSearchParams(
+            window.location.search
+          );
+
+
+        const token =
+          params.get('token');
+
+
+        if (!token) {
+
+          showResult(
+            '無法辨識會員卡',
+            '這張卡片沒有有效的啟用資訊。'
+          );
+
+          return;
+
+        }
+
+
+        /* 2. LINE Login */
+
+        if (
+          !liff.isLoggedIn()
+        ) {
+
+          liff.login();
+
+          return;
+
+        }
+
+
+        /* 3. ID Token */
+
+        const idToken =
+          liff.getIDToken();
+
+
+        if (!idToken) {
+
+          throw new Error(
+            'ID token is not available'
+          );
+
+        }
+
+
+        showResult(
+          '正在驗證會員身分…',
+          'VERIFYING MEMBERSHIP CARD'
+        );
+
+
+        /* 4. 啟用 */
+
+        const result =
+          await activateMembership(
+            idToken,
+            token
+          );
+
+
+        /* 第一次成功啟用 */
+
+        if (
+          result.status ===
+          'ACTIVATED'
+        ) {
+
+          showResult(
+            'WELCOME TO WHALE LOVE CLUB ♡',
+            '您的專屬會員資格已正式啟用',
+            result.memberNo,
+            true
+          );
+
+          return;
+
+        }
+
+
+        /* 同一會員再次碰自己的卡 */
+
+        if (
+          result.status ===
+          'ALREADY_ACTIVATED'
+        ) {
+
+          showResult(
+            'WELCOME BACK ♡',
+            '這張會員卡已經完成啟用',
+            result.memberNo,
+            true
+          );
+
+          return;
+
+        }
+
+
+        showResult(
+          '會員卡已確認',
+          result.message ||
+          'Membership verified',
+          result.memberNo || '',
+          true
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          'Activation Error:',
+          error
+        );
+
+
+        const message =
+          error.message ||
+          'Unknown error';
+
+
+        /*
+         * LINE Token 過期：
+         * 自動重新取得登入狀態
+         */
+
+        if (
+          message.includes(
+            'IdToken expired'
+          )
+        ) {
+
+          showResult(
+            'LINE 登入已過期',
+            '正在重新登入…'
+          );
+
+
+          try {
+            liff.logout();
+          } catch (e) {
+          }
+
+
+          liff.login();
+
+          return;
+
+        }
+
+
+        /*
+         * 卡片已被其他人使用
+         */
+
+        if (
+          error.status ===
+          'CARD_ALREADY_USED'
+        ) {
+
+          showResult(
+            '此會員卡已完成綁定',
+            '這張專屬會員卡已經被啟用，無法再次綁定其他帳號。'
+          );
+
+          return;
+
+        }
+
+
+        /*
+         * 會員已經綁定其他帳號
+         */
+
+        if (
+          error.status ===
+          'MEMBER_ALREADY_BOUND'
+        ) {
+
+          showResult(
+            '會員帳號已完成綁定',
+            '此會員資格已經綁定 LINE 帳號。'
+          );
+
+          return;
+
+        }
+
+
+        /*
+         * 無效卡片
+         */
+
+        if (
+          error.status ===
+          'INVALID_CARD'
+        ) {
+
+          showResult(
+            '無法辨識會員卡',
+            '這不是有效的 Whale Love Club 會員卡。'
+          );
+
+          return;
+
+        }
+
+
+        showResult(
+          'MEMBERSHIP ACTIVATION ERROR',
+          message
+        );
+
+      }
+
+    }
+
+
+
+    /*
+     * 進入正式會員首頁
+     */
+
+    document
+      .getElementById(
+        'enter-button'
+      )
+      .addEventListener(
+        'click',
+        function () {
+
+          window.location.href =
+            '/';
+
+        }
+      );
+
+
+
+    initActivation();
+
+  </script>
+
+</body>
+
+</html>
