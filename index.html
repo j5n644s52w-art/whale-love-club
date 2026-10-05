@@ -761,24 +761,47 @@
       );
 
 
-      } catch (error) {
+} catch (error) {
 
-        console.error(
-          'Whale Love Club Error:',
-          error
-        );
+  console.error(
+    'Whale Love Club Error:',
+    error
+  );
 
+  const message =
+    error.message || 'Unknown error';
 
-        setStatus(
-          'MEMBER CONNECTION ERROR' +
-          '<br>' +
-          escapeHtml(
-            error.message ||
-            'Unknown error'
-          )
-        );
+  // LINE ID Token 已過期
+  if (
+    message.includes('IdToken expired')
+  ) {
 
-      }
+    setStatus(
+      'LINE SESSION EXPIRED' +
+      '<br>' +
+      '正在重新登入...'
+    );
+
+    try {
+
+      liff.logout();
+
+    } catch (e) {
+      console.error(e);
+    }
+
+    liff.login();
+
+    return;
+  }
+
+  setStatus(
+    'MEMBER CONNECTION ERROR' +
+    '<br>' +
+    escapeHtml(message)
+  );
+
+}
 
     }
 
