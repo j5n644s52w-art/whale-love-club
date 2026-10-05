@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <title>Whale Love Club Admin Setup</title>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #0b0b0d;
+      color: white;
+
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Noto Sans TC",
+        sans-serif;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 24px;
+    }
+
+    .box {
+      width: 100%;
+      max-width: 400px;
+
+      padding: 28px;
+
+      border: 1px solid #29292c;
+      border-radius: 22px;
+
+      background: #121214;
+    }
+
+    .brand {
+      color: #777;
+      font-size: 11px;
+      letter-spacing: 3px;
+    }
+
+    h1 {
+      margin: 10px 0 8px;
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    .description {
+      margin-bottom: 22px;
+
+      color: #888;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    input {
+      width: 100%;
+      height: 48px;
+
+      padding: 0 15px;
+
+      border: 1px solid #333;
+      border-radius: 12px;
+      outline: none;
+
+      background: #09090b;
+      color: white;
+
+      font-size: 15px;
+    }
+
+    button {
+      width: 100%;
+      height: 48px;
+
+      margin-top: 12px;
+
+      border: 0;
+      border-radius: 12px;
+
+      background: white;
+      color: #111;
+
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+    }
+
+    #status {
+      min-height: 45px;
+
+      margin-top: 20px;
+
+      color: #888;
+      font-size: 12px;
+      line-height: 1.8;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="box">
+
+    <div class="brand">
+      WHALE LOVE CLUB
+    </div>
+
+    <h1>
+      ADMIN SETUP
+    </h1>
+
+    <div class="description">
+      第一次綁定管理員帳號。<br>
+      成功後，此 LINE 帳號將綁定至 ADMIN001。
+    </div>
+
+    <input
+      id="bind-code"
+      type="password"
+      placeholder="Admin Bind Code"
+      autocomplete="off"
+    >
+
+    <button
+      id="bind-button"
+      type="button"
+      disabled
+    >
+      LINE 驗證中...
+    </button>
+
+    <div id="status">
+      CONNECTING TO LINE...
+    </div>
+
+  </div>
+
+
+  <script>
+
+    // 換成你的 Developing LIFF ID
+    const LIFF_ID = '2011857712-lXq9lJFT';
+
+    let currentIdToken = null;
+
+
+    function setStatus(message) {
+      document.getElementById('status').innerHTML = message;
+    }
+
+
+    async function initLINE() {
+
+      try {
+
+        await liff.init({
+          liffId: LIFF_ID
+        });
+
+
+        if (!liff.isLoggedIn()) {
+
+          liff.login();
+          return;
+
+        }
+
+
+        const idToken =
+          liff.getIDToken();
+
+
+        if (!idToken) {
+
+          throw new Error(
+            'ID token is not available'
+          );
+
+        }
+
+
+        currentIdToken =
+          idToken;
+
+
+        document
+          .getElementById('bind-button')
+          .disabled = false;
+
+
+        document
+          .getElementById('bind-button')
+          .innerText =
+            '綁定 ADMIN001';
+
+
+        setStatus(
+          'LINE READY ✓'
+        );
+
+
+      } catch (error) {
+
+        setStatus(
+          'LINE ERROR<br>' +
+          error.message
+        );
+
+      }
+
+    }
+
+
+    async function bindAdmin() {
+
+      const code =
+        document
+          .getElementById('bind-code')
+          .value
+          .trim();
+
+
+      const button =
+        document.getElementById(
+          'bind-button'
+        );
+
+
+      if (!code) {
+
+        setStatus(
+          '請輸入 ADMIN_BIND_CODE'
+        );
+
+        return;
+
+      }
+
+
+      if (!currentIdToken) {
+
+        setStatus(
+          'LINE 尚未完成驗證'
+        );
+
+        return;
+
+      }
+
+
+      button.disabled = true;
+      button.innerText = '綁定中...';
+
+
+      try {
+
+        const response =
+          await fetch(
+            '/api/bind-admin',
+            {
+              method: 'POST',
+
+              headers: {
+                'Content-Type':
+                  'application/json'
+              },
+
+              body:
+                JSON.stringify({
+                  idToken:
+                    currentIdToken,
+
+                  bindCode:
+                    code
+                })
+            }
+          );
+
+
+        const data =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !data.success
+        ) {
+
+          throw new Error(
+            data.message ||
+            'Admin binding failed'
+          );
+
+        }
+
+
+        setStatus(
+          'ADMIN001 BOUND ✓' +
+          '<br>' +
+          '管理員帳號綁定成功'
+        );
+
+
+        document
+          .getElementById(
+            'bind-code'
+          )
+          .value = '';
+
+
+        button.innerText =
+          'BOUND ✓';
+
+
+      } catch (error) {
+
+        setStatus(
+          'BINDING ERROR' +
+          '<br>' +
+          error.message
+        );
+
+
+        button.disabled = false;
+
+        button.innerText =
+          '綁定 ADMIN001';
+
+      }
+
+    }
+
+
+    document
+      .getElementById('bind-button')
+      .addEventListener(
+        'click',
+        bindAdmin
+      );
+
+
+    initLINE();
+
+  </script>
+
+</body>
+
+</html>
