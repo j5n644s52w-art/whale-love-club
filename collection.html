@@ -1,0 +1,2242 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <title>卡片收藏 | Whale Love Club</title>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+
+      --bg: #070707;
+      --card: #111111;
+      --card2: #171717;
+
+      --line:
+        rgba(255,255,255,.08);
+
+      --text:
+        #f7f3ed;
+
+      --muted:
+        #918b84;
+
+      --gold:
+        #d7b184;
+
+      --gold-soft:
+        #f0d5b2;
+
+    }
+
+
+    body {
+
+      margin: 0;
+
+      min-height: 100vh;
+
+      background:
+
+        radial-gradient(
+          circle at 50% -5%,
+          rgba(215,177,132,.18),
+          transparent 30%
+        ),
+
+        radial-gradient(
+          circle at 85% 30%,
+          rgba(120,80,45,.08),
+          transparent 30%
+        ),
+
+        #070707;
+
+      color:
+        var(--text);
+
+      font-family:
+
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "PingFang TC",
+        "Noto Sans TC",
+        sans-serif;
+
+      padding-bottom:
+        calc(
+          40px +
+          env(safe-area-inset-bottom)
+        );
+
+    }
+
+
+    button {
+      font: inherit;
+      cursor: pointer;
+    }
+
+
+    .page {
+
+      width:
+        min(100%, 760px);
+
+      margin:
+        0 auto;
+
+      padding:
+
+        calc(
+          20px +
+          env(safe-area-inset-top)
+        )
+
+        18px
+        40px;
+
+    }
+
+
+    /* =========================
+       HEADER
+       ========================= */
+
+    .topbar {
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
+
+      margin-bottom:
+        28px;
+
+    }
+
+
+    .back {
+
+      border:
+        0;
+
+      background:
+        transparent;
+
+      color:
+        var(--muted);
+
+      padding:
+        8px 0;
+
+      font-size:
+        14px;
+
+    }
+
+
+    .brand {
+      text-align:
+        right;
+    }
+
+
+    .brand-small {
+
+      color:
+        var(--gold);
+
+      letter-spacing:
+        3px;
+
+      font-size:
+        10px;
+
+    }
+
+
+    .brand-name {
+
+      margin-top:
+        4px;
+
+      font-size:
+        15px;
+
+      font-family:
+        Georgia, serif;
+
+    }
+
+
+    /* =========================
+       TITLE
+       ========================= */
+
+    .eyebrow {
+
+      font-size:
+        10px;
+
+      letter-spacing:
+        4px;
+
+      color:
+        var(--gold);
+
+      margin-bottom:
+        10px;
+
+    }
+
+
+    h1 {
+
+      margin:
+        0;
+
+      font-family:
+        Georgia,
+        "Noto Serif TC",
+        serif;
+
+      font-weight:
+        400;
+
+      font-size:
+        31px;
+
+      letter-spacing:
+        2px;
+
+    }
+
+
+    .subtitle {
+
+      margin-top:
+        8px;
+
+      color:
+        var(--muted);
+
+      font-size:
+        13px;
+
+      line-height:
+        1.7;
+
+    }
+
+
+    /* =========================
+       COLLECTION SUMMARY
+       ========================= */
+
+    .collection-summary {
+
+      margin-top:
+        28px;
+
+      border:
+        1px solid
+        rgba(215,177,132,.22);
+
+      border-radius:
+        20px;
+
+      padding:
+        21px;
+
+      background:
+
+        linear-gradient(
+          145deg,
+          rgba(215,177,132,.08),
+          rgba(255,255,255,.015)
+        );
+
+    }
+
+
+    .summary-top {
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        flex-end;
+
+    }
+
+
+    .summary-label {
+
+      color:
+        var(--muted);
+
+      font-size:
+        11px;
+
+      letter-spacing:
+        2px;
+
+    }
+
+
+    .summary-count {
+
+      font-family:
+        Georgia, serif;
+
+      font-size:
+        28px;
+
+      color:
+        var(--gold-soft);
+
+    }
+
+
+    .progress {
+
+      height:
+        5px;
+
+      border-radius:
+        999px;
+
+      background:
+        rgba(255,255,255,.07);
+
+      overflow:
+        hidden;
+
+      margin-top:
+        17px;
+
+    }
+
+
+    .progress-fill {
+
+      width:
+        0;
+
+      height:
+        100%;
+
+      border-radius:
+        999px;
+
+      background:
+
+        linear-gradient(
+          90deg,
+          #8f6746,
+          #e3c099
+        );
+
+      transition:
+        width .4s ease;
+
+    }
+
+
+    /* =========================
+       SECTION
+       ========================= */
+
+    .section-head {
+
+      margin-top:
+        34px;
+
+      margin-bottom:
+        16px;
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
+
+    }
+
+
+    .section-title {
+
+      font-family:
+        Georgia, serif;
+
+      font-size:
+        14px;
+
+      letter-spacing:
+        2px;
+
+    }
+
+
+    .section-sub {
+
+      font-size:
+        11px;
+
+      color:
+        var(--muted);
+
+    }
+
+
+    /* =========================
+       CARD GRID
+       ========================= */
+
+    .card-grid {
+
+      display:
+        grid;
+
+      grid-template-columns:
+        repeat(2, 1fr);
+
+      gap:
+        13px;
+
+    }
+
+
+    .collection-card {
+
+      position:
+        relative;
+
+      min-height:
+        250px;
+
+      border-radius:
+        19px;
+
+      overflow:
+        hidden;
+
+      border:
+        1px solid
+        var(--line);
+
+      background:
+
+        linear-gradient(
+          145deg,
+          #171717,
+          #0c0c0c
+        );
+
+    }
+
+
+    .collection-card.collected {
+
+      border-color:
+        rgba(215,177,132,.23);
+
+    }
+
+
+    .card-image {
+
+      height:
+        155px;
+
+      width:
+        100%;
+
+      background:
+
+        radial-gradient(
+          circle at 50% 20%,
+          rgba(215,177,132,.16),
+          transparent 45%
+        ),
+
+        #101010;
+
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        center;
+
+      overflow:
+        hidden;
+
+      position:
+        relative;
+
+    }
+
+
+    .card-image img {
+
+      width:
+        100%;
+
+      height:
+        100%;
+
+      object-fit:
+        cover;
+
+      display:
+        block;
+
+    }
+
+
+    .card-placeholder {
+
+      width:
+        64px;
+
+      height:
+        64px;
+
+      border-radius:
+        50%;
+
+      border:
+        1px solid
+        rgba(215,177,132,.2);
+
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        center;
+
+      color:
+        var(--gold);
+
+      font-size:
+        26px;
+
+    }
+
+
+    .card-body {
+
+      padding:
+        15px;
+
+    }
+
+
+    .card-edition {
+
+      font-size:
+        9px;
+
+      letter-spacing:
+        2px;
+
+      color:
+        var(--gold);
+
+      min-height:
+        14px;
+
+    }
+
+
+    .card-name {
+
+      margin-top:
+        6px;
+
+      font-family:
+        Georgia,
+        "Noto Serif TC",
+        serif;
+
+      font-size:
+        16px;
+
+      line-height:
+        1.4;
+
+    }
+
+
+    .card-meta {
+
+      margin-top:
+        10px;
+
+      color:
+        var(--muted);
+
+      font-size:
+        10px;
+
+      line-height:
+        1.7;
+
+    }
+
+
+    .memory-button {
+
+      width:
+        100%;
+
+      margin-top:
+        12px;
+
+      padding:
+        10px;
+
+      border-radius:
+        10px;
+
+      border:
+        1px solid
+        rgba(215,177,132,.25);
+
+      background:
+        rgba(215,177,132,.06);
+
+      color:
+        var(--gold-soft);
+
+      font-size:
+        11px;
+
+    }
+
+
+    /* =========================
+       LOCKED CARD
+       ========================= */
+
+    .locked-card {
+
+      min-height:
+        250px;
+
+      border:
+        1px solid
+        rgba(255,255,255,.055);
+
+      border-radius:
+        19px;
+
+      background:
+
+        linear-gradient(
+          145deg,
+          #101010,
+          #090909
+        );
+
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
+      justify-content:
+        center;
+
+      align-items:
+        center;
+
+      position:
+        relative;
+
+      overflow:
+        hidden;
+
+    }
+
+
+    .locked-card::before {
+
+      content: "";
+
+      position:
+        absolute;
+
+      width:
+        170px;
+
+      height:
+        170px;
+
+      border:
+        1px solid
+        rgba(255,255,255,.025);
+
+      border-radius:
+        50%;
+
+    }
+
+
+    .lock-symbol {
+
+      font-family:
+        Georgia, serif;
+
+      font-size:
+        34px;
+
+      color:
+        #3f3f3f;
+
+      z-index:
+        1;
+
+    }
+
+
+    .locked-title {
+
+      margin-top:
+        14px;
+
+      font-family:
+        Georgia, serif;
+
+      font-size:
+        15px;
+
+      letter-spacing:
+        4px;
+
+      color:
+        #666;
+
+      z-index:
+        1;
+
+    }
+
+
+    .locked-text {
+
+      margin-top:
+        7px;
+
+      color:
+        #484848;
+
+      font-size:
+        9px;
+
+      letter-spacing:
+        3px;
+
+      z-index:
+        1;
+
+    }
+
+
+    /* =========================
+       EMPTY / LOADING
+       ========================= */
+
+    .empty,
+    .loading {
+
+      grid-column:
+        1 / -1;
+
+      border:
+        1px dashed
+        var(--line);
+
+      border-radius:
+        18px;
+
+      padding:
+        45px 20px;
+
+      color:
+        var(--muted);
+
+      text-align:
+        center;
+
+      font-size:
+        13px;
+
+      line-height:
+        1.9;
+
+    }
+
+
+    /* =========================
+       DETAIL MODAL
+       ========================= */
+
+    .modal-mask {
+
+      position:
+        fixed;
+
+      inset:
+        0;
+
+      background:
+        rgba(0,0,0,.82);
+
+      backdrop-filter:
+        blur(8px);
+
+      z-index:
+        100;
+
+      display:
+        none;
+
+      justify-content:
+        center;
+
+      align-items:
+        flex-end;
+
+    }
+
+
+    .modal-mask.show {
+
+      display:
+        flex;
+
+    }
+
+
+    .detail-modal {
+
+      width:
+        min(100%, 720px);
+
+      max-height:
+        92vh;
+
+      overflow-y:
+        auto;
+
+      background:
+        #101010;
+
+      border-top:
+        1px solid
+        rgba(215,177,132,.3);
+
+      border-radius:
+        26px 26px 0 0;
+
+      padding:
+
+        14px
+        20px
+        calc(
+          25px +
+          env(safe-area-inset-bottom)
+        );
+
+    }
+
+
+    .handle {
+
+      width:
+        42px;
+
+      height:
+        4px;
+
+      border-radius:
+        999px;
+
+      background:
+        #444;
+
+      margin:
+        0 auto 18px;
+
+    }
+
+
+    .detail-image {
+
+      height:
+        260px;
+
+      border-radius:
+        17px;
+
+      overflow:
+        hidden;
+
+      background:
+
+        radial-gradient(
+          circle at 50% 20%,
+          rgba(215,177,132,.16),
+          transparent 50%
+        ),
+
+        #0a0a0a;
+
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        center;
+
+    }
+
+
+    .detail-image img {
+
+      width:
+        100%;
+
+      height:
+        100%;
+
+      object-fit:
+        cover;
+
+    }
+
+
+    .detail-edition {
+
+      color:
+        var(--gold);
+
+      letter-spacing:
+        3px;
+
+      font-size:
+        9px;
+
+      margin-top:
+        20px;
+
+    }
+
+
+    .detail-title {
+
+      margin-top:
+        8px;
+
+      font-family:
+        Georgia,
+        "Noto Serif TC",
+        serif;
+
+      font-size:
+        27px;
+
+    }
+
+
+    .detail-line {
+
+      border-top:
+        1px solid
+        var(--line);
+
+      margin:
+        20px 0;
+
+    }
+
+
+    .detail-row {
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      gap:
+        20px;
+
+      margin:
+        14px 0;
+
+      font-size:
+        12px;
+
+    }
+
+
+    .detail-label {
+
+      color:
+        var(--muted);
+
+    }
+
+
+    .detail-value {
+
+      text-align:
+        right;
+
+      color:
+        var(--text);
+
+    }
+
+
+    .detail-action {
+
+      width:
+        100%;
+
+      margin-top:
+        18px;
+
+      border:
+        0;
+
+      border-radius:
+        13px;
+
+      padding:
+        14px;
+
+      background:
+
+        linear-gradient(
+          135deg,
+          #e3c099,
+          #a87b55
+        );
+
+      color:
+        #080808;
+
+      font-weight:
+        700;
+
+    }
+
+
+    .close-button {
+
+      width:
+        100%;
+
+      margin-top:
+        10px;
+
+      border:
+        1px solid
+        var(--line);
+
+      border-radius:
+        13px;
+
+      padding:
+        13px;
+
+      background:
+        transparent;
+
+      color:
+        var(--muted);
+
+    }
+
+
+    /* =========================
+       TOAST
+       ========================= */
+
+    .toast {
+
+      position:
+        fixed;
+
+      left:
+        50%;
+
+      bottom:
+        calc(
+          25px +
+          env(safe-area-inset-bottom)
+        );
+
+      transform:
+        translate(-50%, 30px);
+
+      opacity:
+        0;
+
+      background:
+        #f2dfc6;
+
+      color:
+        #111;
+
+      padding:
+        12px 18px;
+
+      border-radius:
+        999px;
+
+      z-index:
+        999;
+
+      font-size:
+        12px;
+
+      transition:
+        .25s;
+
+      pointer-events:
+        none;
+
+      white-space:
+        nowrap;
+
+      max-width:
+        calc(100% - 40px);
+
+    }
+
+
+    .toast.show {
+
+      opacity:
+        1;
+
+      transform:
+        translate(-50%, 0);
+
+    }
+
+
+    @media (max-width: 390px) {
+
+      .card-grid {
+        gap:
+          9px;
+      }
+
+      .collection-card,
+      .locked-card {
+
+        min-height:
+          230px;
+
+      }
+
+      .card-image {
+        height:
+          140px;
+      }
+
+      .card-name {
+        font-size:
+          14px;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <main class="page">
+
+
+    <div class="topbar">
+
+      <button
+        class="back"
+        onclick="goHome()"
+      >
+        ← 會員中心
+      </button>
+
+
+      <div class="brand">
+
+        <div class="brand-small">
+          ♡ PRIVATE MEMBERS
+        </div>
+
+        <div class="brand-name">
+          Whale Love Club
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="eyebrow">
+      CARD COLLECTION
+    </div>
+
+
+    <h1>
+      卡片收藏
+    </h1>
+
+
+    <div class="subtitle">
+
+      每一張卡，
+      都代表我們一起留下的一段故事 ♡
+
+    </div>
+
+
+
+    <section class="collection-summary">
+
+
+      <div class="summary-top">
+
+        <div>
+
+          <div class="summary-label">
+            COLLECTION PROGRESS
+          </div>
+
+          <div
+            class="summary-count"
+            id="collectionCount"
+          >
+            0 / 0
+          </div>
+
+        </div>
+
+
+        <div
+          class="summary-label"
+          id="collectionPercent"
+        >
+          0%
+        </div>
+
+      </div>
+
+
+      <div class="progress">
+
+        <div
+          class="progress-fill"
+          id="progressFill"
+        ></div>
+
+      </div>
+
+
+    </section>
+
+
+
+    <div class="section-head">
+
+      <div class="section-title">
+        MY COLLECTION
+      </div>
+
+      <div
+        class="section-sub"
+        id="lockedCount"
+      >
+        0 LOCKED
+      </div>
+
+    </div>
+
+
+
+    <div
+      class="card-grid"
+      id="cardGrid"
+    >
+
+      <div class="loading">
+        正在讀取卡片收藏...
+      </div>
+
+    </div>
+
+
+  </main>
+
+
+
+  <!-- 卡片詳情 -->
+
+  <div
+    class="modal-mask"
+    id="modalMask"
+  >
+
+    <div class="detail-modal">
+
+
+      <div class="handle"></div>
+
+
+      <div
+        class="detail-image"
+        id="detailImage"
+      ></div>
+
+
+      <div
+        class="detail-edition"
+        id="detailEdition"
+      >
+      </div>
+
+
+      <div
+        class="detail-title"
+        id="detailTitle"
+      >
+      </div>
+
+
+      <div class="detail-line"></div>
+
+
+      <div class="detail-row">
+
+        <div class="detail-label">
+          COLLECTED
+        </div>
+
+        <div
+          class="detail-value"
+          id="detailCollected"
+        >
+          -
+        </div>
+
+      </div>
+
+
+      <div class="detail-row">
+
+        <div class="detail-label">
+          RELEASE
+        </div>
+
+        <div
+          class="detail-value"
+          id="detailRelease"
+        >
+          -
+        </div>
+
+      </div>
+
+
+      <div class="detail-row">
+
+        <div class="detail-label">
+          REWARD
+        </div>
+
+        <div
+          class="detail-value"
+          id="detailReward"
+        >
+          -
+        </div>
+
+      </div>
+
+
+      <div class="detail-row">
+
+        <div class="detail-label">
+          STATUS
+        </div>
+
+        <div
+          class="detail-value"
+          id="detailRewardStatus"
+        >
+          -
+        </div>
+
+      </div>
+
+
+      <button
+        class="detail-action"
+        id="memoryButton"
+        onclick="openMemory()"
+      >
+        查看回憶 ♡
+      </button>
+
+
+      <button
+        class="close-button"
+        onclick="closeDetail()"
+      >
+        關閉
+      </button>
+
+
+    </div>
+
+  </div>
+
+
+
+  <div
+    class="toast"
+    id="toast"
+  ></div>
+
+
+
+<script>
+
+
+  /*
+   * 請換成 index.html
+   * 使用中的同一個 LIFF ID
+   */
+
+  const LIFF_ID =
+    '2011857712-lXq9lJFT';
+
+
+  let idToken =
+    '';
+
+
+  let currentMemoryId =
+    '';
+
+
+  let cardData =
+    [];
+
+
+
+  /* =========================
+     INIT
+     ========================= */
+
+  async function init() {
+
+    try {
+
+
+      await liff.init({
+
+        liffId:
+          LIFF_ID
+
+      });
+
+
+      if (!liff.isLoggedIn()) {
+
+        liff.login({
+
+          redirectUri:
+            window.location.href
+
+        });
+
+        return;
+
+      }
+
+
+      idToken =
+        liff.getIDToken();
+
+
+      if (!idToken) {
+
+        throw new Error(
+          '無法取得 LINE 登入資訊'
+        );
+
+      }
+
+
+      await loadCollection();
+
+
+    } catch (error) {
+
+
+      console.error(error);
+
+
+      document
+        .getElementById(
+          'cardGrid'
+        )
+        .innerHTML = `
+
+          <div class="empty">
+
+            無法載入卡片收藏<br>
+
+            ${escapeHtml(
+              error.message ||
+              '請稍後再試'
+            )}
+
+          </div>
+
+        `;
+
+    }
+
+  }
+
+
+
+  /* =========================
+     LOAD
+     ========================= */
+
+  async function loadCollection() {
+
+
+    const params =
+      new URLSearchParams({
+
+        idToken:
+          idToken
+
+      });
+
+
+    const response =
+      await fetch(
+
+        '/api/collection?' +
+        params.toString()
+
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+
+      if (
+
+        String(
+          data.message || ''
+        )
+          .toLowerCase()
+          .includes('expired')
+
+      ) {
+
+        refreshLogin();
+
+        return;
+
+      }
+
+
+      throw new Error(
+
+        data.message ||
+        '讀取收藏失敗'
+
+      );
+
+    }
+
+
+    cardData =
+      data.cards || [];
+
+
+    renderSummary(data);
+
+    renderCards(cardData);
+
+  }
+
+
+
+  /* =========================
+     SUMMARY
+     ========================= */
+
+  function renderSummary(data) {
+
+
+    const total =
+      Number(data.total || 0);
+
+
+    const collected =
+      Number(
+        data.collected || 0
+      );
+
+
+    const locked =
+      Number(
+        data.locked || 0
+      );
+
+
+    const percent =
+      total > 0
+        ? Math.round(
+            collected /
+            total *
+            100
+          )
+        : 0;
+
+
+    document
+      .getElementById(
+        'collectionCount'
+      )
+      .textContent =
+      `${collected} / ${total}`;
+
+
+    document
+      .getElementById(
+        'collectionPercent'
+      )
+      .textContent =
+      `${percent}%`;
+
+
+    document
+      .getElementById(
+        'lockedCount'
+      )
+      .textContent =
+      `${locked} LOCKED`;
+
+
+    document
+      .getElementById(
+        'progressFill'
+      )
+      .style
+      .width =
+      `${percent}%`;
+
+  }
+
+
+
+  /* =========================
+     CARDS
+     ========================= */
+
+  function renderCards(cards) {
+
+
+    const grid =
+      document.getElementById(
+        'cardGrid'
+      );
+
+
+    if (!cards.length) {
+
+
+      grid.innerHTML = `
+
+        <div class="empty">
+
+          收藏冊目前還沒有卡片 ♡<br>
+
+          之後建立節日限定 NFC 卡，
+          就會出現在這裡。
+
+        </div>
+
+      `;
+
+
+      return;
+
+    }
+
+
+    grid.innerHTML =
+      cards
+        .map(
+          (card, index) => {
+
+
+            if (
+              !card.collected
+            ) {
+
+
+              return `
+
+                <div class="locked-card">
+
+                  <div class="lock-symbol">
+                    ?
+                  </div>
+
+                  <div class="locked-title">
+                    ???
+                  </div>
+
+                  <div class="locked-text">
+                    LOCKED
+                  </div>
+
+                </div>
+
+              `;
+
+            }
+
+
+            const image =
+              card.cardImageUrl
+
+                ? `
+
+                  <img
+                    src="${escapeAttribute(
+                      card.cardImageUrl
+                    )}"
+                    alt="card"
+                    onerror="
+                      this.parentElement.innerHTML =
+                      '<div class=&quot;card-placeholder&quot;>♠</div>'
+                    "
+                  >
+
+                `
+
+                : `
+
+                  <div class="card-placeholder">
+                    ♠
+                  </div>
+
+                `;
+
+
+            return `
+
+              <div
+                class="collection-card collected"
+                onclick="openDetail(${index})"
+              >
+
+                <div class="card-image">
+
+                  ${image}
+
+                </div>
+
+
+                <div class="card-body">
+
+
+                  <div class="card-edition">
+
+                    ${escapeHtml(
+                      card.edition ||
+                      'LIMITED EDITION'
+                    )}
+
+                  </div>
+
+
+                  <div class="card-name">
+
+                    ${escapeHtml(
+                      card.cardName ||
+                      'Whale Love Card'
+                    )}
+
+                  </div>
+
+
+                  <div class="card-meta">
+
+                    ${
+                      card.collectedAt
+
+                      ? `Collected · ${
+                          escapeHtml(
+                            card.collectedAt
+                          )
+                        }`
+
+                      : 'Collected'
+                    }
+
+                  </div>
+
+
+                </div>
+
+              </div>
+
+            `;
+
+          }
+        )
+        .join('');
+
+  }
+
+
+
+  /* =========================
+     DETAIL
+     ========================= */
+
+  function openDetail(index) {
+
+
+    const card =
+      cardData[index];
+
+
+    if (
+      !card ||
+      !card.collected
+    ) {
+      return;
+    }
+
+
+    currentMemoryId =
+      card.memoryId || '';
+
+
+    const detailImage =
+      document.getElementById(
+        'detailImage'
+      );
+
+
+    if (card.cardImageUrl) {
+
+
+      detailImage.innerHTML = `
+
+        <img
+          src="${escapeAttribute(
+            card.cardImageUrl
+          )}"
+          alt="card"
+        >
+
+      `;
+
+
+    } else {
+
+
+      detailImage.innerHTML = `
+
+        <div class="card-placeholder">
+          ♠
+        </div>
+
+      `;
+
+    }
+
+
+    document
+      .getElementById(
+        'detailEdition'
+      )
+      .textContent =
+
+      card.edition ||
+      'LIMITED EDITION';
+
+
+    document
+      .getElementById(
+        'detailTitle'
+      )
+      .textContent =
+
+      card.cardName ||
+      'Whale Love Card';
+
+
+    document
+      .getElementById(
+        'detailCollected'
+      )
+      .textContent =
+
+      card.collectedAt ||
+      '-';
+
+
+    document
+      .getElementById(
+        'detailRelease'
+      )
+      .textContent =
+
+      card.releaseDate ||
+      '-';
+
+
+    document
+      .getElementById(
+        'detailReward'
+      )
+      .textContent =
+
+      rewardText(card);
+
+
+    document
+      .getElementById(
+        'detailRewardStatus'
+      )
+      .textContent =
+
+      card.rewardClaimed
+        ? 'REDEEMED'
+        : 'AVAILABLE';
+
+
+    const memoryButton =
+      document.getElementById(
+        'memoryButton'
+      );
+
+
+    memoryButton.style.display =
+
+      currentMemoryId
+        ? 'block'
+        : 'none';
+
+
+    document
+      .getElementById(
+        'modalMask'
+      )
+      .classList
+      .add('show');
+
+  }
+
+
+
+  function closeDetail() {
+
+
+    document
+      .getElementById(
+        'modalMask'
+      )
+      .classList
+      .remove('show');
+
+
+    currentMemoryId =
+      '';
+
+  }
+
+
+
+  /* =========================
+     MEMORY
+     ========================= */
+
+  function openMemory() {
+
+
+    if (!currentMemoryId) {
+      return;
+    }
+
+
+    /*
+     * 下一階段我們會建立：
+     *
+     * memory.html?id=MEM-XXXX
+     *
+     * 現在先不要跳 404
+     */
+
+    showToast(
+      '回憶相簿功能下一步開放 ♡'
+    );
+
+  }
+
+
+
+  /* =========================
+     HELPERS
+     ========================= */
+
+  function rewardText(card) {
+
+
+    const type =
+      String(
+        card.rewardType || ''
+      );
+
+
+    const amount =
+      Number(
+        card.rewardAmount || 0
+      );
+
+
+    if (!type) {
+      return 'SPECIAL CARD';
+    }
+
+
+    if (
+      type === 'LOVE_POINTS'
+    ) {
+
+      return (
+        'Love Points +' +
+        amount
+      );
+
+    }
+
+
+    if (
+      type === 'MASSAGE_POINTS'
+    ) {
+
+      return (
+        'Massage +' +
+        amount
+      );
+
+    }
+
+
+    if (
+      type === 'COUPON'
+    ) {
+
+      return (
+        'Coupon ×' +
+        amount
+      );
+
+    }
+
+
+    return (
+      type +
+      (
+        amount
+          ? ' +' + amount
+          : ''
+      )
+    );
+
+  }
+
+
+
+  function goHome() {
+
+    window.location.href =
+      '/';
+
+  }
+
+
+
+  function refreshLogin() {
+
+
+    try {
+
+      liff.logout();
+
+    } catch (error) {}
+
+
+    liff.login({
+
+      redirectUri:
+        window.location.href
+
+    });
+
+  }
+
+
+
+  function showToast(message) {
+
+
+    const toast =
+      document.getElementById(
+        'toast'
+      );
+
+
+    toast.textContent =
+      message;
+
+
+    toast.classList.add(
+      'show'
+    );
+
+
+    setTimeout(
+      () => {
+
+        toast
+          .classList
+          .remove(
+            'show'
+          );
+
+      },
+      2400
+    );
+
+  }
+
+
+
+  function escapeHtml(value) {
+
+    return String(
+      value ?? ''
+    )
+
+      .replaceAll(
+        '&',
+        '&amp;'
+      )
+
+      .replaceAll(
+        '<',
+        '&lt;'
+      )
+
+      .replaceAll(
+        '>',
+        '&gt;'
+      )
+
+      .replaceAll(
+        '"',
+        '&quot;'
+      )
+
+      .replaceAll(
+        "'",
+        '&#039;'
+      );
+
+  }
+
+
+
+  function escapeAttribute(value) {
+
+    return escapeHtml(value);
+
+  }
+
+
+
+  init();
+
+</script>
+
+
+</body>
+
+</html>
