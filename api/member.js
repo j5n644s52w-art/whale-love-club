@@ -110,14 +110,21 @@ async function handler(req, res) {
       await lineResponse.json();
 
 
-    if (!lineResponse.ok) {
+if (!lineResponse.ok) {
 
-      return res.status(401).json({
-        success: false,
-        message:
-          'LINE verification failed'
-      });
-    }
+  console.error(
+    'LINE verification failed:',
+    lineData
+  );
+
+  return res.status(401).json({
+    success: false,
+    message:
+      lineData.error_description ||
+      lineData.error ||
+      'LINE verification failed'
+  });
+}
 
 
     if (
