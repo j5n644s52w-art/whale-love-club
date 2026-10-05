@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <title>Our Memory | Whale Love Club</title>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #070707;
+      --card: #111;
+      --line: rgba(255,255,255,.08);
+      --text: #f7f3ee;
+      --muted: #96918b;
+      --gold: #d8b184;
+      --gold-soft: #f0d5b2;
+    }
+
+    body {
+
+      margin: 0;
+
+      min-height: 100vh;
+
+      background:
+        radial-gradient(
+          circle at 50% -5%,
+          rgba(216,177,132,.15),
+          transparent 28%
+        ),
+        #070707;
+
+      color: var(--text);
+
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "PingFang TC",
+        "Noto Sans TC",
+        sans-serif;
+
+      padding-bottom:
+        calc(
+          45px +
+          env(safe-area-inset-bottom)
+        );
+
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .page {
+
+      width: min(100%, 760px);
+
+      margin: 0 auto;
+
+      padding:
+        calc(
+          20px +
+          env(safe-area-inset-top)
+        )
+        18px
+        40px;
+
+    }
+
+    /* HEADER */
+
+    .topbar {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      margin-bottom: 24px;
+
+    }
+
+    .back {
+
+      border: 0;
+
+      background: transparent;
+
+      color: var(--muted);
+
+      padding: 8px 0;
+
+      font-size: 14px;
+
+    }
+
+    .brand {
+      text-align: right;
+    }
+
+    .brand-small {
+
+      color: var(--gold);
+
+      font-size: 10px;
+
+      letter-spacing: 3px;
+
+    }
+
+    .brand-name {
+
+      margin-top: 4px;
+
+      font-family: Georgia, serif;
+
+      font-size: 15px;
+
+    }
+
+    /* COVER */
+
+    .cover {
+
+      position: relative;
+
+      height: 420px;
+
+      border-radius: 25px;
+
+      overflow: hidden;
+
+      border:
+        1px solid var(--line);
+
+      background:
+        radial-gradient(
+          circle at 50% 25%,
+          rgba(216,177,132,.18),
+          transparent 45%
+        ),
+        #101010;
+
+      display: flex;
+
+      justify-content: center;
+
+      align-items: center;
+
+    }
+
+    .cover img {
+
+      width: 100%;
+
+      height: 100%;
+
+      object-fit: cover;
+
+      display: block;
+
+    }
+
+    .cover-placeholder {
+
+      width: 85px;
+
+      height: 85px;
+
+      border-radius: 50%;
+
+      border:
+        1px solid
+        rgba(216,177,132,.25);
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-family: Georgia, serif;
+
+      font-size: 32px;
+
+      color: var(--gold);
+
+    }
+
+    .cover-overlay {
+
+      position: absolute;
+
+      inset: 0;
+
+      background:
+        linear-gradient(
+          to bottom,
+          transparent 48%,
+          rgba(0,0,0,.82) 100%
+        );
+
+      pointer-events: none;
+
+    }
+
+    .cover-label {
+
+      position: absolute;
+
+      left: 20px;
+
+      right: 20px;
+
+      bottom: 20px;
+
+    }
+
+    .cover-date {
+
+      font-size: 10px;
+
+      color: var(--gold-soft);
+
+      letter-spacing: 3px;
+
+      margin-bottom: 7px;
+
+    }
+
+    .cover-title {
+
+      font-family:
+        Georgia,
+        "Noto Serif TC",
+        serif;
+
+      font-size: 29px;
+
+      line-height: 1.25;
+
+    }
+
+    /* INFO */
+
+    .memory-info {
+
+      padding: 27px 4px 4px;
+
+    }
+
+    .eyebrow {
+
+      color: var(--gold);
+
+      font-size: 9px;
+
+      letter-spacing: 4px;
+
+      margin-bottom: 11px;
+
+    }
+
+    .location {
+
+      color: var(--muted);
+
+      font-size: 12px;
+
+      line-height: 1.7;
+
+    }
+
+    .location span {
+      color: var(--gold);
+    }
+
+    .story {
+
+      margin-top: 25px;
+
+      padding-top: 23px;
+
+      border-top:
+        1px solid var(--line);
+
+      font-family:
+        Georgia,
+        "Noto Serif TC",
+        serif;
+
+      font-size: 16px;
+
+      line-height: 2;
+
+      white-space: pre-wrap;
+
+      color: #e4dfd9;
+
+    }
+
+    /* PHOTO TITLE */
+
+    .photo-head {
+
+      margin-top: 39px;
+
+      margin-bottom: 17px;
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+    }
+
+    .photo-title {
+
+      font-family: Georgia, serif;
+
+      font-size: 14px;
+
+      letter-spacing: 2px;
+
+    }
+
+    .photo-count {
+
+      color: var(--muted);
+
+      font-size: 10px;
+
+      letter-spacing: 1px;
+
+    }
+
+    /* PHOTO GRID */
+
+    .photos {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, 1fr);
+
+      gap: 9px;
+
+    }
+
+    .photo {
+
+      position: relative;
+
+      border-radius: 15px;
+
+      overflow: hidden;
+
+      background: #111;
+
+      border:
+        1px solid var(--line);
+
+      min-height: 190px;
+
+    }
+
+    .photo:nth-child(3n+1) {
+
+      grid-column:
+        1 / -1;
+
+      min-height: 310px;
+
+    }
+
+    .photo img {
+
+      width: 100%;
+
+      height: 100%;
+
+      min-height: inherit;
+
+      object-fit: cover;
+
+      display: block;
+
+    }
+
+    .photo-caption {
+
+      position: absolute;
+
+      bottom: 0;
+
+      left: 0;
+
+      right: 0;
+
+      padding:
+        35px 13px 12px;
+
+      background:
+        linear-gradient(
+          transparent,
+          rgba(0,0,0,.78)
+        );
+
+      font-size: 11px;
+
+      line-height: 1.5;
+
+      color: #eee;
+
+    }
+
+    /* ENDING */
+
+    .ending {
+
+      margin-top: 42px;
+
+      text-align: center;
+
+      color: var(--muted);
+
+      padding: 29px 10px;
+
+      border-top:
+        1px solid var(--line);
+
+    }
+
+    .ending-heart {
+
+      color: var(--gold);
+
+      font-family: Georgia, serif;
+
+      font-size: 23px;
+
+      margin-bottom: 8px;
+
+    }
+
+    .ending-text {
+
+      font-family: Georgia, serif;
+
+      font-size: 12px;
+
+      letter-spacing: 2px;
+
+    }
+
+    /* STATUS */
+
+    .loading,
+    .empty {
+
+      margin-top: 50px;
+
+      border:
+        1px dashed var(--line);
+
+      border-radius: 18px;
+
+      padding: 50px 22px;
+
+      color: var(--muted);
+
+      text-align: center;
+
+      font-size: 13px;
+
+      line-height: 1.9;
+
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 430px) {
+
+      .cover {
+        height: 360px;
+      }
+
+      .cover-title {
+        font-size: 26px;
+      }
+
+      .photo {
+        min-height: 165px;
+      }
+
+      .photo:nth-child(3n+1) {
+        min-height: 260px;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+  <main class="page">
+
+
+    <div class="topbar">
+
+      <button
+        class="back"
+        onclick="goBack()"
+      >
+        ← 回憶相簿
+      </button>
+
+
+      <div class="brand">
+
+        <div class="brand-small">
+          ♡ PRIVATE MEMORY
+        </div>
+
+        <div class="brand-name">
+          Whale Love Club
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="loading"
+      class="loading"
+    >
+      正在翻開這段回憶...
+    </div>
+
+
+    <div
+      id="errorBox"
+      class="empty hidden"
+    ></div>
+
+
+    <div
+      id="content"
+      class="hidden"
+    >
+
+
+      <!-- COVER -->
+
+      <section
+        class="cover"
+        id="cover"
+      >
+
+        <div class="cover-placeholder">
+          ♡
+        </div>
+
+        <div class="cover-overlay"></div>
+
+
+        <div class="cover-label">
+
+          <div
+            class="cover-date"
+            id="coverDate"
+          ></div>
+
+          <div
+            class="cover-title"
+            id="coverTitle"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- INFO -->
+
+      <section class="memory-info">
+
+        <div class="eyebrow">
+          OUR STORY
+        </div>
+
+
+        <div
+          class="location"
+          id="location"
+        ></div>
+
+
+        <div
+          class="story"
+          id="story"
+        ></div>
+
+      </section>
+
+
+      <!-- PHOTOS -->
+
+      <div class="photo-head">
+
+        <div class="photo-title">
+          MOMENTS
+        </div>
+
+        <div
+          class="photo-count"
+          id="photoCount"
+        >
+          0 PHOTOS
+        </div>
+
+      </div>
+
+
+      <div
+        class="photos"
+        id="photos"
+      ></div>
+
+
+      <div class="ending">
+
+        <div class="ending-heart">
+          ♡
+        </div>
+
+        <div class="ending-text">
+          TO BE CONTINUED
+        </div>
+
+      </div>
+
+
+    </div>
+
+
+  </main>
+
+
+
+<script>
+
+  /*
+   * 請換成目前使用中的
+   * Developing LIFF ID
+   */
+  const LIFF_ID =
+    '2011857712-lXq9lJFT';
+
+
+  let idToken = '';
+
+
+
+  /* =========================================
+     INIT
+     ========================================= */
+
+  async function init() {
+
+    try {
+
+      /*
+       * 取得網址中的 Memory ID
+       */
+      const params =
+        new URLSearchParams(
+          window.location.search
+        );
+
+
+      const memoryId =
+        params.get('id');
+
+
+      if (!memoryId) {
+
+        throw new Error(
+          '找不到這段回憶'
+        );
+
+      }
+
+
+      /*
+       * 初始化 LINE
+       */
+      await liff.init({
+        liffId: LIFF_ID
+      });
+
+
+      if (!liff.isLoggedIn()) {
+
+        liff.login({
+          redirectUri:
+            window.location.href
+        });
+
+        return;
+
+      }
+
+
+      idToken =
+        liff.getIDToken();
+
+
+      if (!idToken) {
+
+        throw new Error(
+          '無法取得 LINE 登入資訊'
+        );
+
+      }
+
+
+      /*
+       * 讀取回憶
+       */
+      await loadMemory(
+        memoryId
+      );
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      showError(
+        error.message ||
+        '無法載入這段回憶'
+      );
+
+    }
+
+  }
+
+
+
+  /* =========================================
+     LOAD MEMORY
+     ========================================= */
+
+  async function loadMemory(
+    memoryId
+  ) {
+
+    const query =
+      new URLSearchParams({
+
+        idToken:
+          idToken,
+
+        memoryId:
+          memoryId
+
+      });
+
+
+    const response =
+      await fetch(
+
+        '/api/memories?' +
+        query.toString()
+
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+
+      const message =
+        String(
+          data.message || ''
+        );
+
+
+      if (
+        message
+          .toLowerCase()
+          .includes('expired')
+      ) {
+
+        refreshLogin();
+
+        return;
+
+      }
+
+
+      if (
+        message ===
+        'Memory is locked'
+      ) {
+
+        throw new Error(
+          '這段回憶還沒有解鎖 ♡'
+        );
+
+      }
+
+
+      throw new Error(
+        message ||
+        '讀取回憶失敗'
+      );
+
+    }
+
+
+    renderMemory(
+      data.memory
+    );
+
+  }
+
+
+
+  /* =========================================
+     RENDER
+     ========================================= */
+
+  function renderMemory(
+    memory
+  ) {
+
+    if (!memory) {
+
+      showError(
+        '找不到這段回憶'
+      );
+
+      return;
+
+    }
+
+
+    document
+      .getElementById(
+        'loading'
+      )
+      .classList
+      .add('hidden');
+
+
+    document
+      .getElementById(
+        'content'
+      )
+      .classList
+      .remove('hidden');
+
+
+    /*
+     * 標題
+     */
+    document
+      .getElementById(
+        'coverTitle'
+      )
+      .textContent =
+
+      memory.title ||
+      'Our Memory';
+
+
+    /*
+     * 日期
+     */
+    document
+      .getElementById(
+        'coverDate'
+      )
+      .textContent =
+
+      prettyDate(
+        memory.eventDate
+      );
+
+
+    /*
+     * 地點
+     */
+    const location =
+      document.getElementById(
+        'location'
+      );
+
+
+    if (memory.location) {
+
+      location.innerHTML =
+
+        `<span>♡</span> ${
+          escapeHtml(
+            memory.location
+          )
+        }`;
+
+    } else {
+
+      location.style.display =
+        'none';
+
+    }
+
+
+    /*
+     * 故事
+     */
+    const story =
+      document.getElementById(
+        'story'
+      );
+
+
+    if (memory.description) {
+
+      story.textContent =
+        memory.description;
+
+    } else {
+
+      story.textContent =
+        '這一天，也成為了我們故事的一部分。';
+
+    }
+
+
+    /*
+     * Cover
+     */
+    const cover =
+      document.getElementById(
+        'cover'
+      );
+
+
+    if (memory.coverImageUrl) {
+
+      const img =
+        document.createElement(
+          'img'
+        );
+
+
+      img.src =
+        memory.coverImageUrl;
+
+
+      img.alt =
+        'memory cover';
+
+
+      img.onerror =
+        function() {
+
+          img.remove();
+
+        };
+
+
+      cover.insertBefore(
+        img,
+        cover.firstChild
+      );
+
+    }
+
+
+    /*
+     * Photos
+     */
+    renderPhotos(
+      memory.photos || []
+    );
+
+  }
+
+
+
+  /* =========================================
+     PHOTOS
+     ========================================= */
+
+  function renderPhotos(
+    photos
+  ) {
+
+    const container =
+      document.getElementById(
+        'photos'
+      );
+
+
+    document
+      .getElementById(
+        'photoCount'
+      )
+      .textContent =
+
+      `${photos.length} ${
+        photos.length === 1
+          ? 'PHOTO'
+          : 'PHOTOS'
+      }`;
+
+
+    if (!photos.length) {
+
+      container.innerHTML = `
+
+        <div
+          class="empty"
+          style="
+            grid-column: 1 / -1;
+            margin-top: 0;
+          "
+        >
+
+          這段回憶目前還沒有照片 ♡
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      photos
+        .map(photo => {
+
+          return `
+
+            <div class="photo">
+
+              <img
+
+                src="${escapeAttribute(
+                  photo.imageUrl
+                )}"
+
+                alt="memory photo"
+
+                loading="lazy"
+
+              >
+
+
+              ${
+                photo.caption
+
+                  ? `
+
+                    <div class="photo-caption">
+
+                      ${escapeHtml(
+                        photo.caption
+                      )}
+
+                    </div>
+
+                  `
+
+                  : ''
+              }
+
+            </div>
+
+          `;
+
+        })
+        .join('');
+
+  }
+
+
+
+  /* =========================================
+     DATE
+     ========================================= */
+
+  function prettyDate(value) {
+
+    if (!value) {
+      return '';
+    }
+
+
+    const parts =
+      String(value)
+        .replaceAll('-', '/')
+        .split('/');
+
+
+    if (
+      parts.length < 3
+    ) {
+
+      return value;
+
+    }
+
+
+    return (
+
+      parts[0] +
+      ' · ' +
+      String(parts[1])
+        .padStart(2, '0') +
+      ' · ' +
+      String(parts[2])
+        .padStart(2, '0')
+
+    );
+
+  }
+
+
+
+  /* =========================================
+     ERROR
+     ========================================= */
+
+  function showError(message) {
+
+    document
+      .getElementById(
+        'loading'
+      )
+      .classList
+      .add('hidden');
+
+
+    const box =
+      document.getElementById(
+        'errorBox'
+      );
+
+
+    box.classList.remove(
+      'hidden'
+    );
+
+
+    box.innerHTML = `
+
+      ♡<br><br>
+
+      ${escapeHtml(
+        message
+      )}
+
+    `;
+
+  }
+
+
+
+  /* =========================================
+     BACK
+     ========================================= */
+
+  function goBack() {
+
+    window.location.href =
+      '/memories.html';
+
+  }
+
+
+
+  /* =========================================
+     LOGIN
+     ========================================= */
+
+  function refreshLogin() {
+
+    try {
+
+      liff.logout();
+
+    } catch (error) {}
+
+
+    liff.login({
+
+      redirectUri:
+        window.location.href
+
+    });
+
+  }
+
+
+
+  /* =========================================
+     SAFE HTML
+     ========================================= */
+
+  function escapeHtml(value) {
+
+    return String(
+      value ?? ''
+    )
+
+      .replaceAll(
+        '&',
+        '&amp;'
+      )
+
+      .replaceAll(
+        '<',
+        '&lt;'
+      )
+
+      .replaceAll(
+        '>',
+        '&gt;'
+      )
+
+      .replaceAll(
+        '"',
+        '&quot;'
+      )
+
+      .replaceAll(
+        "'",
+        '&#039;'
+      );
+
+  }
+
+
+  function escapeAttribute(value) {
+
+    return escapeHtml(
+      value
+    );
+
+  }
+
+
+
+  init();
+
+</script>
+
+
+</body>
+
+</html>
