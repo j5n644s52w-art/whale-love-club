@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <title>回憶相簿 | Whale Love Club</title>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #070707;
+      --card: #111111;
+      --line: rgba(255,255,255,.08);
+      --text: #f7f3ee;
+      --muted: #96918b;
+      --gold: #d8b184;
+      --gold-soft: #f0d5b2;
+    }
+
+
+    body {
+
+      margin: 0;
+      min-height: 100vh;
+
+      background:
+
+        radial-gradient(
+          circle at 50% -5%,
+          rgba(216,177,132,.17),
+          transparent 30%
+        ),
+
+        #070707;
+
+      color: var(--text);
+
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "PingFang TC",
+        "Noto Sans TC",
+        sans-serif;
+
+      padding-bottom:
+        calc(
+          40px +
+          env(safe-area-inset-bottom)
+        );
+
+    }
+
+
+    button {
+      font: inherit;
+      cursor: pointer;
+    }
+
+
+    .page {
+
+      width: min(100%, 760px);
+
+      margin: 0 auto;
+
+      padding:
+
+        calc(
+          20px +
+          env(safe-area-inset-top)
+        )
+
+        18px
+        40px;
+
+    }
+
+
+    /* =========================
+       HEADER
+       ========================= */
+
+    .topbar {
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      margin-bottom: 28px;
+
+    }
+
+
+    .back {
+
+      border: 0;
+      background: transparent;
+
+      color: var(--muted);
+
+      padding: 8px 0;
+
+      font-size: 14px;
+
+    }
+
+
+    .brand {
+      text-align: right;
+    }
+
+
+    .brand-small {
+
+      color: var(--gold);
+
+      font-size: 10px;
+
+      letter-spacing: 3px;
+
+    }
+
+
+    .brand-name {
+
+      font-family: Georgia, serif;
+
+      margin-top: 4px;
+
+      font-size: 15px;
+
+    }
+
+
+    /* =========================
+       TITLE
+       ========================= */
+
+    .eyebrow {
+
+      color: var(--gold);
+
+      font-size: 10px;
+
+      letter-spacing: 4px;
+
+      margin-bottom: 10px;
+
+    }
+
+
+    h1 {
+
+      margin: 0;
+
+      font-family:
+        Georgia,
+        "Noto Serif TC",
+        serif;
+
+      font-weight: 400;
+
+      font-size: 31px;
+
+      letter-spacing: 2px;
+
+    }
+
+
+    .subtitle {
+
+      margin-top: 8px;
+
+      color: var(--muted);
+
+      font-size: 13px;
+
+      line-height: 1.8;
+
+    }
+
+
+    /* =========================
+       SUMMARY
+       ========================= */
+
+    .summary {
+
+      margin-top: 27px;
+
+      padding: 20px;
+
+      border-radius: 20px;
+
+      border:
+        1px solid
+        rgba(216,177,132,.2);
+
+      background:
+
+        linear-gradient(
+          145deg,
+          rgba(216,177,132,.08),
+          rgba(255,255,255,.015)
+        );
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: flex-end;
+
+    }
+
+
+    .summary-small {
+
+      font-size: 10px;
+
+      letter-spacing: 3px;
+
+      color: var(--muted);
+
+    }
+
+
+    .summary-number {
+
+      margin-top: 7px;
+
+      font-family: Georgia, serif;
+
+      font-size: 29px;
+
+      color: var(--gold-soft);
+
+    }
+
+
+    .summary-heart {
+
+      font-family: Georgia, serif;
+
+      font-size: 30px;
+
+      color: var(--gold);
+
+    }
+
+
+    /* =========================
+       SECTION
+       ========================= */
+
+    .section-head {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      margin-top: 34px;
+
+      margin-bottom: 17px;
+
+    }
+
+
+    .section-title {
+
+      font-family: Georgia, serif;
+
+      font-size: 14px;
+
+      letter-spacing: 2px;
+
+    }
+
+
+    .section-sub {
+
+      color: var(--muted);
+
+      font-size: 11px;
+
+    }
+
+
+    /* =========================
+       TIMELINE
+       ========================= */
+
+    .timeline {
+
+      position: relative;
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 20px;
+
+    }
+
+
+    .memory {
+
+      position: relative;
+
+      overflow: hidden;
+
+      border-radius: 21px;
+
+      border: 1px solid var(--line);
+
+      background:
+
+        linear-gradient(
+          145deg,
+          #151515,
+          #0b0b0b
+        );
+
+      cursor: pointer;
+
+      transition:
+        transform .15s ease,
+        border-color .15s ease;
+
+    }
+
+
+    .memory:active {
+
+      transform:
+        scale(.985);
+
+    }
+
+
+    .memory-cover {
+
+      position: relative;
+
+      height: 230px;
+
+      overflow: hidden;
+
+      background:
+
+        radial-gradient(
+          circle at 50% 30%,
+          rgba(216,177,132,.15),
+          transparent 45%
+        ),
+
+        #101010;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+    }
+
+
+    .memory-cover img {
+
+      width: 100%;
+
+      height: 100%;
+
+      object-fit: cover;
+
+      display: block;
+
+    }
+
+
+    .cover-placeholder {
+
+      width: 74px;
+
+      height: 74px;
+
+      border-radius: 50%;
+
+      border:
+        1px solid
+        rgba(216,177,132,.2);
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-family: Georgia, serif;
+
+      font-size: 26px;
+
+      color: var(--gold);
+
+    }
+
+
+    .date-badge {
+
+      position: absolute;
+
+      top: 14px;
+
+      left: 14px;
+
+      min-width: 63px;
+
+      padding: 9px 11px;
+
+      border-radius: 12px;
+
+      background:
+        rgba(7,7,7,.75);
+
+      backdrop-filter:
+        blur(10px);
+
+      border:
+        1px solid
+        rgba(255,255,255,.08);
+
+      text-align: center;
+
+    }
+
+
+    .date-month {
+
+      font-size: 9px;
+
+      letter-spacing: 2px;
+
+      color: var(--gold);
+
+    }
+
+
+    .date-day {
+
+      margin-top: 2px;
+
+      font-family: Georgia, serif;
+
+      font-size: 22px;
+
+    }
+
+
+    .date-year {
+
+      margin-top: 2px;
+
+      font-size: 9px;
+
+      letter-spacing: 2px;
+
+      color: var(--muted);
+
+    }
+
+
+    .memory-body {
+
+      padding: 18px;
+
+    }
+
+
+    .memory-location {
+
+      color: var(--gold);
+
+      font-size: 10px;
+
+      letter-spacing: 1.5px;
+
+      margin-bottom: 7px;
+
+    }
+
+
+    .memory-title {
+
+      font-family:
+        Georgia,
+        "Noto Serif TC",
+        serif;
+
+      font-size: 21px;
+
+      line-height: 1.45;
+
+    }
+
+
+    .memory-description {
+
+      margin-top: 10px;
+
+      color: var(--muted);
+
+      font-size: 12px;
+
+      line-height: 1.8;
+
+      display: -webkit-box;
+
+      -webkit-line-clamp: 2;
+
+      -webkit-box-orient: vertical;
+
+      overflow: hidden;
+
+    }
+
+
+    .memory-footer {
+
+      margin-top: 16px;
+
+      padding-top: 14px;
+
+      border-top:
+        1px solid
+        var(--line);
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+    }
+
+
+    .unlocked {
+
+      color: var(--muted);
+
+      font-size: 10px;
+
+      letter-spacing: 1px;
+
+    }
+
+
+    .view {
+
+      color: var(--gold-soft);
+
+      font-size: 11px;
+
+    }
+
+
+    /* =========================
+       EMPTY / LOADING
+       ========================= */
+
+    .loading,
+    .empty {
+
+      border:
+        1px dashed
+        var(--line);
+
+      border-radius: 18px;
+
+      padding: 46px 22px;
+
+      text-align: center;
+
+      color: var(--muted);
+
+      font-size: 13px;
+
+      line-height: 1.9;
+
+    }
+
+
+    .empty-heart {
+
+      font-family: Georgia, serif;
+
+      font-size: 29px;
+
+      color: #4e443b;
+
+      margin-bottom: 12px;
+
+    }
+
+
+    /* =========================
+       TOAST
+       ========================= */
+
+    .toast {
+
+      position: fixed;
+
+      left: 50%;
+
+      bottom:
+        calc(
+          25px +
+          env(safe-area-inset-bottom)
+        );
+
+      transform:
+        translate(-50%, 30px);
+
+      opacity: 0;
+
+      background: #f2dfc6;
+
+      color: #111;
+
+      padding: 12px 18px;
+
+      border-radius: 999px;
+
+      z-index: 999;
+
+      font-size: 12px;
+
+      transition: .25s;
+
+      pointer-events: none;
+
+      max-width:
+        calc(100% - 40px);
+
+      text-align: center;
+
+    }
+
+
+    .toast.show {
+
+      opacity: 1;
+
+      transform:
+        translate(-50%, 0);
+
+    }
+
+
+    @media (max-width: 430px) {
+
+      .memory-cover {
+        height: 210px;
+      }
+
+      h1 {
+        font-size: 29px;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <main class="page">
+
+
+    <div class="topbar">
+
+      <button
+        class="back"
+        onclick="goHome()"
+      >
+        ← 會員中心
+      </button>
+
+
+      <div class="brand">
+
+        <div class="brand-small">
+          ♡ PRIVATE MEMBERS
+        </div>
+
+        <div class="brand-name">
+          Whale Love Club
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="eyebrow">
+      OUR MEMORIES
+    </div>
+
+
+    <h1>
+      回憶相簿
+    </h1>
+
+
+    <div class="subtitle">
+
+      有些日子值得被記住。<br>
+      每一張卡片，都可能打開一段只屬於我們的故事。
+
+    </div>
+
+
+
+    <section class="summary">
+
+      <div>
+
+        <div class="summary-small">
+          UNLOCKED MEMORIES
+        </div>
+
+        <div
+          class="summary-number"
+          id="memoryCount"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="summary-heart">
+        ♡
+      </div>
+
+    </section>
+
+
+
+    <div class="section-head">
+
+      <div class="section-title">
+        MEMORY TIMELINE
+      </div>
+
+      <div
+        class="section-sub"
+        id="memoryLabel"
+      >
+        0 MEMORIES
+      </div>
+
+    </div>
+
+
+
+    <div
+      class="timeline"
+      id="timeline"
+    >
+
+      <div class="loading">
+        正在翻開我們的回憶...
+      </div>
+
+    </div>
+
+
+  </main>
+
+
+
+  <div
+    class="toast"
+    id="toast"
+  ></div>
+
+
+
+<script>
+
+  /*
+   * 換成你 index.html
+   * 使用中的同一組 LIFF ID
+   */
+  const LIFF_ID =
+    '你的Developing_LIFF_ID';
+
+
+  let idToken = '';
+
+
+
+  /* =========================================
+     初始化
+     ========================================= */
+
+  async function init() {
+
+    try {
+
+      await liff.init({
+        liffId: LIFF_ID
+      });
+
+
+      if (!liff.isLoggedIn()) {
+
+        liff.login({
+          redirectUri:
+            window.location.href
+        });
+
+        return;
+
+      }
+
+
+      idToken =
+        liff.getIDToken();
+
+
+      if (!idToken) {
+
+        throw new Error(
+          '無法取得 LINE 登入資訊'
+        );
+
+      }
+
+
+      await loadMemories();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      document
+        .getElementById(
+          'timeline'
+        )
+        .innerHTML = `
+
+          <div class="empty">
+
+            無法載入回憶相簿<br>
+
+            ${escapeHtml(
+              error.message ||
+              '請稍後再試'
+            )}
+
+          </div>
+
+        `;
+
+    }
+
+  }
+
+
+
+  /* =========================================
+     讀取回憶
+     ========================================= */
+
+  async function loadMemories() {
+
+    const params =
+      new URLSearchParams({
+
+        idToken:
+          idToken
+
+      });
+
+
+    const response =
+      await fetch(
+
+        '/api/memories?' +
+        params.toString()
+
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+
+      if (
+        String(
+          data.message || ''
+        )
+          .toLowerCase()
+          .includes('expired')
+      ) {
+
+        refreshLogin();
+
+        return;
+
+      }
+
+
+      throw new Error(
+        data.message ||
+        '讀取回憶失敗'
+      );
+
+    }
+
+
+    renderSummary(
+      data.total || 0
+    );
+
+
+    renderMemories(
+      data.memories || []
+    );
+
+  }
+
+
+
+  /* =========================================
+     數量
+     ========================================= */
+
+  function renderSummary(total) {
+
+    total =
+      Number(total || 0);
+
+
+    document
+      .getElementById(
+        'memoryCount'
+      )
+      .textContent =
+      total;
+
+
+    document
+      .getElementById(
+        'memoryLabel'
+      )
+      .textContent =
+      `${total} ${
+        total === 1
+          ? 'MEMORY'
+          : 'MEMORIES'
+      }`;
+
+  }
+
+
+
+  /* =========================================
+     顯示回憶
+     ========================================= */
+
+  function renderMemories(memories) {
+
+    const timeline =
+      document.getElementById(
+        'timeline'
+      );
+
+
+    if (!memories.length) {
+
+      timeline.innerHTML = `
+
+        <div class="empty">
+
+          <div class="empty-heart">
+            ♡
+          </div>
+
+          目前還沒有解鎖的回憶。<br>
+
+          等第一張限定 NFC 卡被解鎖後，<br>
+
+          屬於你們的故事就會從這裡開始。
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    timeline.innerHTML =
+      memories
+        .map(memory => {
+
+          const date =
+            parseDate(
+              memory.eventDate
+            );
+
+
+          const cover =
+            memory.coverImageUrl
+
+              ? `
+
+                <img
+                  src="${escapeAttribute(
+                    memory.coverImageUrl
+                  )}"
+                  alt="memory"
+                  loading="lazy"
+                  onerror="
+                    this.parentElement.innerHTML =
+                    '<div class=&quot;cover-placeholder&quot;>♡</div>'
+                  "
+                >
+
+              `
+
+              : `
+
+                <div class="cover-placeholder">
+                  ♡
+                </div>
+
+              `;
+
+
+          return `
+
+            <article
+
+              class="memory"
+
+              onclick="
+                openMemory(
+                  '${escapeJs(
+                    memory.memoryId
+                  )}'
+                )
+              "
+
+            >
+
+
+              <div class="memory-cover">
+
+                ${cover}
+
+
+                ${
+                  date
+
+                  ? `
+
+                    <div class="date-badge">
+
+                      <div class="date-month">
+                        ${date.month}
+                      </div>
+
+                      <div class="date-day">
+                        ${date.day}
+                      </div>
+
+                      <div class="date-year">
+                        ${date.year}
+                      </div>
+
+                    </div>
+
+                  `
+
+                  : ''
+                }
+
+
+              </div>
+
+
+              <div class="memory-body">
+
+
+                ${
+                  memory.location
+
+                  ? `
+
+                    <div class="memory-location">
+                      ♡ ${escapeHtml(
+                        memory.location
+                      )}
+                    </div>
+
+                  `
+
+                  : ''
+                }
+
+
+                <div class="memory-title">
+
+                  ${escapeHtml(
+                    memory.title ||
+                    'Our Memory'
+                  )}
+
+                </div>
+
+
+                ${
+                  memory.description
+
+                  ? `
+
+                    <div class="memory-description">
+
+                      ${escapeHtml(
+                        memory.description
+                      )}
+
+                    </div>
+
+                  `
+
+                  : ''
+                }
+
+
+                <div class="memory-footer">
+
+                  <div class="unlocked">
+
+                    ${
+                      memory.relatedCardId
+
+                        ? 'UNLOCKED BY NFC CARD'
+
+                        : 'PRIVATE MEMORY'
+                    }
+
+                  </div>
+
+
+                  <div class="view">
+                    查看回憶 →
+                  </div>
+
+                </div>
+
+
+              </div>
+
+
+            </article>
+
+          `;
+
+        })
+        .join('');
+
+  }
+
+
+
+  /* =========================================
+     打開單篇回憶
+     ========================================= */
+
+  function openMemory(memoryId) {
+
+    /*
+     * 下一步會建立 memory.html
+     */
+
+    window.location.href =
+
+      '/memory.html?id=' +
+
+      encodeURIComponent(
+        memoryId
+      );
+
+  }
+
+
+
+  /* =========================================
+     日期
+     ========================================= */
+
+  function parseDate(value) {
+
+    if (!value) {
+      return null;
+    }
+
+
+    const parts =
+      String(value)
+        .replaceAll('-', '/')
+        .split('/');
+
+
+    if (
+      parts.length < 3
+    ) {
+      return null;
+    }
+
+
+    const year =
+      parts[0];
+
+
+    const monthNumber =
+      Number(parts[1]);
+
+
+    const day =
+      String(
+        parts[2]
+      )
+      .padStart(
+        2,
+        '0'
+      );
+
+
+    const months = [
+      'JAN',
+      'FEB',
+      'MAR',
+      'APR',
+      'MAY',
+      'JUN',
+      'JUL',
+      'AUG',
+      'SEP',
+      'OCT',
+      'NOV',
+      'DEC'
+    ];
+
+
+    if (
+      monthNumber < 1 ||
+      monthNumber > 12
+    ) {
+      return null;
+    }
+
+
+    return {
+
+      year:
+        year,
+
+      month:
+        months[
+          monthNumber - 1
+        ],
+
+      day:
+        day
+
+    };
+
+  }
+
+
+
+  /* =========================================
+     回會員中心
+     ========================================= */
+
+  function goHome() {
+
+    window.location.href =
+      '/';
+
+  }
+
+
+
+  /* =========================================
+     LINE Token 過期
+     ========================================= */
+
+  function refreshLogin() {
+
+    try {
+
+      liff.logout();
+
+    } catch (error) {}
+
+
+    liff.login({
+
+      redirectUri:
+        window.location.href
+
+    });
+
+  }
+
+
+
+  /* =========================================
+     Toast
+     ========================================= */
+
+  function showToast(message) {
+
+    const toast =
+      document.getElementById(
+        'toast'
+      );
+
+
+    toast.textContent =
+      message;
+
+
+    toast.classList.add(
+      'show'
+    );
+
+
+    setTimeout(
+      () => {
+
+        toast
+          .classList
+          .remove(
+            'show'
+          );
+
+      },
+      2400
+    );
+
+  }
+
+
+
+  /* =========================================
+     安全處理
+     ========================================= */
+
+  function escapeHtml(value) {
+
+    return String(
+      value ?? ''
+    )
+
+      .replaceAll(
+        '&',
+        '&amp;'
+      )
+
+      .replaceAll(
+        '<',
+        '&lt;'
+      )
+
+      .replaceAll(
+        '>',
+        '&gt;'
+      )
+
+      .replaceAll(
+        '"',
+        '&quot;'
+      )
+
+      .replaceAll(
+        "'",
+        '&#039;'
+      );
+
+  }
+
+
+
+  function escapeAttribute(value) {
+
+    return escapeHtml(
+      value
+    );
+
+  }
+
+
+
+  function escapeJs(value) {
+
+    return String(
+      value ?? ''
+    )
+      .replaceAll(
+        '\\',
+        '\\\\'
+      )
+      .replaceAll(
+        "'",
+        "\\'"
+      )
+      .replaceAll(
+        '\n',
+        ''
+      )
+      .replaceAll(
+        '\r',
+        ''
+      );
+
+  }
+
+
+
+  init();
+
+</script>
+
+
+</body>
+
+</html>
