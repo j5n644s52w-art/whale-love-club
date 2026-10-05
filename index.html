@@ -11,6 +11,7 @@
 
   <title>Whale Love Club</title>
 
+  <!-- LINE LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
   <style>
@@ -25,12 +26,17 @@
       min-height: 100%;
       background: #0b0b0d;
       color: #ffffff;
+
       font-family:
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
         "Noto Sans TC",
         sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
     }
 
     .app {
@@ -44,6 +50,10 @@
         20px
         calc(50px + env(safe-area-inset-bottom));
     }
+
+    /* =========================
+       Header
+       ========================= */
 
     .brand {
       margin-bottom: 8px;
@@ -65,6 +75,10 @@
       font-size: 12px;
       letter-spacing: 2px;
     }
+
+    /* =========================
+       Member Card
+       ========================= */
 
     .member-card {
       height: 205px;
@@ -117,6 +131,10 @@
       letter-spacing: 2px;
     }
 
+    /* =========================
+       Points
+       ========================= */
+
     .points {
       margin: 32px 0 22px;
       text-align: center;
@@ -133,6 +151,10 @@
       font-size: 45px;
       font-weight: 300;
     }
+
+    /* =========================
+       Menu
+       ========================= */
 
     .grid {
       display: grid;
@@ -165,98 +187,50 @@
       font-size: 12px;
     }
 
-    .line-status {
-      min-height: 55px;
-      margin-top: 30px;
-
-      color: #777;
-      font-size: 11px;
-      line-height: 1.8;
-      letter-spacing: 1.5px;
-      text-align: center;
-    }
-
     /* =========================
-       Admin Binding
+       Admin
        ========================= */
 
-    .admin-bind {
+    .admin-panel {
       display: none;
 
       margin-top: 20px;
-      padding: 20px;
+      padding: 16px 18px;
 
-      border: 1px solid #242426;
-      border-radius: 17px;
+      border: 1px solid #29292c;
+      border-radius: 15px;
 
       background: #111113;
     }
 
-    .admin-title {
-      margin-bottom: 6px;
-
-      font-size: 14px;
-      letter-spacing: 1px;
+    .admin-label {
+      color: #999;
+      font-size: 10px;
+      letter-spacing: 2px;
     }
 
-    .admin-description {
-      margin-bottom: 15px;
-
-      color: #777;
-      font-size: 11px;
-      line-height: 1.6;
-    }
-
-    .bind-input {
-      width: 100%;
-      height: 44px;
-
-      padding: 0 14px;
-
-      border: 1px solid #333;
-      border-radius: 10px;
-      outline: none;
-
-      background: #0b0b0d;
-      color: #fff;
-
-      font-size: 14px;
-    }
-
-    .bind-button {
-      width: 100%;
-      height: 44px;
-
-      margin-top: 10px;
-
-      border: 0;
-      border-radius: 10px;
-
-      background: #ffffff;
-      color: #111;
-
+    .admin-text {
+      margin-top: 5px;
       font-size: 13px;
-      font-weight: 600;
-
-      cursor: pointer;
     }
 
-    .bind-button:disabled {
-      opacity: 0.5;
-    }
+    /* =========================
+       Status
+       ========================= */
 
-    .bind-result {
-      min-height: 20px;
-      margin-top: 12px;
+    .status {
+      min-height: 45px;
+      margin-top: 27px;
 
-      color: #888;
+      color: #666;
       font-size: 11px;
-      line-height: 1.6;
+      line-height: 1.8;
+      letter-spacing: 1.3px;
       text-align: center;
     }
 
     .footer {
-      margin-top: 25px;
+      margin-top: 20px;
 
       color: #444;
       font-size: 10px;
@@ -271,6 +245,8 @@
 
   <main class="app">
 
+    <!-- Header -->
+
     <div class="brand">
       PRIVATE MEMBERS CLUB
     </div>
@@ -284,11 +260,20 @@
     </div>
 
 
+    <!-- Member Card -->
+
     <section class="member-card">
 
       <div class="card-top">
-        <span>♡ WLC</span>
-        <span>MEMBER</span>
+
+        <span>
+          ♡ WLC
+        </span>
+
+        <span id="card-role">
+          ...
+        </span>
+
       </div>
 
       <div>
@@ -297,14 +282,14 @@
           class="member-name"
           id="member-name"
         >
-          LIFETIME MEMBER
+          LOADING...
         </div>
 
         <div
           class="member-number"
           id="member-number"
         >
-          WLC001
+          ---
         </div>
 
       </div>
@@ -313,11 +298,13 @@
         class="level"
         id="member-level"
       >
-        LIFETIME VIP · SINCE 2026
+        LOADING MEMBER DATA
       </div>
 
     </section>
 
+
+    <!-- Love Points -->
 
     <section class="points">
 
@@ -329,96 +316,115 @@
         class="points-number"
         id="love-points"
       >
-        520
+        —
       </div>
 
     </section>
 
+
+    <!-- Menu -->
 
     <section class="grid">
 
       <div class="menu">
-        <div class="icon">💆</div>
-        <div class="menu-title">Massage</div>
+
+        <div class="icon">
+          💆
+        </div>
+
+        <div class="menu-title">
+          Massage
+        </div>
+
         <div
           class="menu-value"
           id="massage-points"
         >
-          3 POINTS
+          — POINTS
         </div>
+
       </div>
 
+
       <div class="menu">
-        <div class="icon">🎟️</div>
-        <div class="menu-title">Love Coupon</div>
+
+        <div class="icon">
+          🎟️
+        </div>
+
+        <div class="menu-title">
+          Love Coupon
+        </div>
+
         <div class="menu-value">
           MY COUPONS
         </div>
+
       </div>
 
+
       <div class="menu">
-        <div class="icon">🎁</div>
-        <div class="menu-title">Gift Box</div>
+
+        <div class="icon">
+          🎁
+        </div>
+
+        <div class="menu-title">
+          Gift Box
+        </div>
+
         <div class="menu-value">
           MY GIFTS
         </div>
+
       </div>
 
+
       <div class="menu">
-        <div class="icon">♠️</div>
-        <div class="menu-title">Collection</div>
+
+        <div class="icon">
+          ♠️
+        </div>
+
+        <div class="menu-title">
+          Collection
+        </div>
+
         <div class="menu-value">
           NFC CARDS
         </div>
+
       </div>
 
     </section>
 
 
+    <!-- ADMIN 專用區 -->
+
+    <section
+      id="admin-panel"
+      class="admin-panel"
+    >
+
+      <div class="admin-label">
+        ADMIN MODE
+      </div>
+
+      <div class="admin-text">
+        管理員帳號已驗證 ✓
+      </div>
+
+    </section>
+
+
+    <!-- Status -->
+
     <div
-      id="line-status"
-      class="line-status"
+      id="status"
+      class="status"
     >
       CONNECTING TO LINE...
     </div>
-
-
-    <!-- 管理員第一次綁定 -->
-    <section
-      id="admin-bind"
-      class="admin-bind"
-    >
-
-      <div class="admin-title">
-        ADMIN SETUP
-      </div>
-
-      <div class="admin-description">
-        第一次設定管理員帳號。請輸入你的管理員綁定碼。
-      </div>
-
-      <input
-        id="bind-code"
-        class="bind-input"
-        type="password"
-        placeholder="Admin Bind Code"
-        autocomplete="off"
-      >
-
-      <button
-        id="bind-button"
-        class="bind-button"
-        type="button"
-      >
-        綁定 ADMIN001
-      </button>
-
-      <div
-        id="bind-result"
-        class="bind-result"
-      ></div>
-
-    </section>
 
 
     <div class="footer">
@@ -431,16 +437,17 @@
   <script>
 
     /* =========================================
-       請保留你自己的 Developing LIFF ID
+       ★ 只需要修改這裡
        ========================================= */
 
     const LIFF_ID =
       '2011857712-lXq9lJFT';
 
 
-    let currentIdToken = null;
 
-
+    /* =========================================
+       安全顯示文字
+       ========================================= */
 
     function escapeHtml(value) {
 
@@ -455,10 +462,14 @@
 
 
 
+    /* =========================================
+       狀態
+       ========================================= */
+
     function setStatus(message) {
 
       document
-        .getElementById('line-status')
+        .getElementById('status')
         .innerHTML =
           message;
     }
@@ -466,14 +477,146 @@
 
 
     /* =========================================
-       LINE 身分驗證
+       取得加入年份
        ========================================= */
 
-    async function verifyLine(idToken) {
+    function getJoinYear(joinDate) {
+
+      if (!joinDate) {
+        return '';
+      }
+
+      const match =
+        String(joinDate)
+          .match(/\d{4}/);
+
+      return match
+        ? match[0]
+        : '';
+    }
+
+
+
+    /* =========================================
+       更新會員畫面
+       ========================================= */
+
+    function renderMember(member) {
+
+      document
+        .getElementById(
+          'member-name'
+        )
+        .textContent =
+          member.name ||
+          'MEMBER';
+
+
+      document
+        .getElementById(
+          'member-number'
+        )
+        .textContent =
+          member.memberNo ||
+          '---';
+
+
+      document
+        .getElementById(
+          'love-points'
+        )
+        .textContent =
+          member.lovePoints ?? 0;
+
+
+      document
+        .getElementById(
+          'massage-points'
+        )
+        .textContent =
+          (member.massagePoints ?? 0)
+          + ' POINTS';
+
+
+      const role =
+        String(
+          member.role || 'MEMBER'
+        ).toUpperCase();
+
+
+      document
+        .getElementById(
+          'card-role'
+        )
+        .textContent =
+          role;
+
+
+      const year =
+        getJoinYear(
+          member.joinDate
+        );
+
+
+      let levelText =
+        member.level ||
+        'MEMBER';
+
+
+      if (year) {
+
+        levelText +=
+          ' · SINCE ' +
+          year;
+
+      }
+
+
+      document
+        .getElementById(
+          'member-level'
+        )
+        .textContent =
+          levelText;
+
+
+      /* 管理員才看得到 */
+
+      if (role === 'ADMIN') {
+
+        document
+          .getElementById(
+            'admin-panel'
+          )
+          .style.display =
+            'block';
+
+      } else {
+
+        document
+          .getElementById(
+            'admin-panel'
+          )
+          .style.display =
+            'none';
+
+      }
+
+    }
+
+
+
+    /* =========================================
+       呼叫 Member API
+       ========================================= */
+
+    async function getMemberData(
+      idToken
+    ) {
 
       const response =
         await fetch(
-          '/api/verify-line',
+          '/api/member',
           {
             method: 'POST',
 
@@ -484,14 +627,28 @@
 
             body:
               JSON.stringify({
-                idToken: idToken
+                idToken:
+                  idToken
               })
           }
         );
 
 
-      const data =
-        await response.json();
+      let data;
+
+
+      try {
+
+        data =
+          await response.json();
+
+      } catch (error) {
+
+        throw new Error(
+          'Member API response error'
+        );
+
+      }
 
 
       if (
@@ -501,172 +658,62 @@
 
         throw new Error(
           data.message ||
-          'LINE verification failed'
+          'Unable to load member'
         );
+
       }
 
 
-      return data;
+      return data.member;
+
     }
 
 
 
     /* =========================================
-       綁定管理員
+       LINE MINI App 初始化
        ========================================= */
 
-    async function bindAdmin() {
-
-      const button =
-        document.getElementById(
-          'bind-button'
-        );
-
-      const resultBox =
-        document.getElementById(
-          'bind-result'
-        );
-
-      const bindCode =
-        document
-          .getElementById('bind-code')
-          .value
-          .trim();
-
-
-      if (!bindCode) {
-
-        resultBox.innerText =
-          '請輸入管理員綁定碼';
-
-        return;
-      }
-
-
-      if (!currentIdToken) {
-
-        resultBox.innerText =
-          'LINE 身分尚未準備完成';
-
-        return;
-      }
-
-
-      button.disabled = true;
-
-      button.innerText =
-        '綁定中...';
-
-      resultBox.innerText = '';
-
+    async function initApp() {
 
       try {
 
-        const response =
-          await fetch(
-            '/api/bind-admin',
-            {
-              method: 'POST',
-
-              headers: {
-                'Content-Type':
-                  'application/json'
-              },
-
-              body:
-                JSON.stringify({
-                  idToken:
-                    currentIdToken,
-
-                  bindCode:
-                    bindCode
-                })
-            }
-          );
-
-
-        const data =
-          await response.json();
-
+        /* 1. LIFF SDK */
 
         if (
-          !response.ok ||
-          !data.success
-        ) {
-
-          throw new Error(
-            data.message ||
-            'Admin binding failed'
-          );
-        }
-
-
-        resultBox.innerHTML =
-          'ADMIN001 BOUND ✓' +
-          '<br>' +
-          '管理員帳號綁定成功';
-
-
-        document
-          .getElementById(
-            'bind-code'
-          )
-          .value = '';
-
-
-        button.innerText =
-          'BOUND ✓';
-
-
-      } catch (error) {
-
-        resultBox.innerHTML =
-          'BINDING ERROR' +
-          '<br>' +
-          escapeHtml(
-            error.message
-          );
-
-
-        button.disabled = false;
-
-        button.innerText =
-          '綁定 ADMIN001';
-      }
-    }
-
-
-
-    /* =========================================
-       啟動 LINE
-       ========================================= */
-
-    async function initLINE() {
-
-      try {
-
-        if (
-          typeof liff === 'undefined'
+          typeof liff ===
+          'undefined'
         ) {
 
           throw new Error(
             'LIFF SDK is not available'
           );
+
         }
 
 
+        /* 2. 初始化 */
+
         await liff.init({
-          liffId: LIFF_ID
+          liffId:
+            LIFF_ID
         });
 
 
-        if (!liff.isLoggedIn()) {
+        /* 3. LINE Login */
+
+        if (
+          !liff.isLoggedIn()
+        ) {
 
           liff.login();
 
           return;
+
         }
 
+
+        /* 4. ID Token */
 
         const idToken =
           liff.getIDToken();
@@ -677,77 +724,71 @@
           throw new Error(
             'ID token is not available'
           );
+
         }
 
 
-        currentIdToken =
-          idToken;
-
-
         setStatus(
-          'VERIFYING LINE IDENTITY...'
+          'LOADING MEMBER PROFILE...'
         );
 
 
-        const result =
-          await verifyLine(
+        /* 5. 後端驗證 + 查會員 */
+
+        const member =
+          await getMemberData(
             idToken
           );
 
 
-        const name =
-          result.user &&
-          result.user.name
-            ? result.user.name
-            : 'LINE MEMBER';
+        /* 6. 顯示真正資料 */
+
+        renderMember(
+          member
+        );
 
 
         setStatus(
           'LINE CONNECTED ✓' +
           '<br>' +
-          escapeHtml(name) +
-          '<br>' +
-          'IDENTITY VERIFIED ✓'
-        );
-
-
-        /*
-         * 身分確認後
-         * 顯示第一次 ADMIN 綁定區
-         */
-        document
-          .getElementById(
-            'admin-bind'
+          escapeHtml(
+            member.memberNo
+          ) +
+          ' · ' +
+          escapeHtml(
+            member.role
           )
-          .style.display =
-            'block';
+      );
 
 
       } catch (error) {
 
+        console.error(
+          'Whale Love Club Error:',
+          error
+        );
+
+
         setStatus(
-          'LINE CONNECTION ERROR' +
+          'MEMBER CONNECTION ERROR' +
           '<br>' +
           escapeHtml(
-            error.message
+            error.message ||
+            'Unknown error'
           )
         );
+
       }
+
     }
 
 
 
-    document
-      .getElementById(
-        'bind-button'
-      )
-      .addEventListener(
-        'click',
-        bindAdmin
-      );
+    /* =========================================
+       啟動
+       ========================================= */
 
-
-    initLINE();
+    initApp();
 
   </script>
 
