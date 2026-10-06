@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 
 <head>
   <meta charset="UTF-8">
@@ -11,809 +11,1786 @@
 
   <title>Whale Love Club</title>
 
-  <!-- LINE LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
 
-    html,
+    :root {
+      --pink: #f7b8cf;
+      --pink-light: #fde7ef;
+      --pink-dark: #e989ad;
+
+      --blue: #a9daf5;
+      --blue-light: #e5f6ff;
+      --blue-dark: #78b9df;
+
+      --cream: #fffaf7;
+      --yellow: #ffe68a;
+      --purple: #d9c7ff;
+
+      --brown: #654545;
+      --brown-soft: #8a6969;
+
+      --white: #ffffff;
+
+      --shadow:
+        0 8px 0 rgba(101,69,69,.10),
+        0 13px 25px rgba(196,133,158,.13);
+    }
+
+
     body {
       margin: 0;
-      padding: 0;
-      min-height: 100%;
-      background: #0b0b0d;
-      color: #ffffff;
+      min-height: 100vh;
 
       font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
+        "Arial Rounded MT Bold",
+        "PingFang TC",
         "Noto Sans TC",
         sans-serif;
+
+      color: var(--brown);
+
+      background:
+        radial-gradient(
+          circle at 12% 9%,
+          rgba(255,255,255,.9) 0 5px,
+          transparent 6px
+        ),
+        linear-gradient(
+          135deg,
+          #ffe6ef 0%,
+          #fff2f6 37%,
+          #e8f7ff 70%,
+          #dff4ff 100%
+        );
+
+      padding-bottom:
+        calc(35px + env(safe-area-inset-bottom));
+
+      overflow-x: hidden;
     }
 
-    body {
-      min-height: 100vh;
+
+    button {
+      font: inherit;
     }
 
-    .app {
-      width: 100%;
-      max-width: 430px;
-      min-height: 100vh;
+
+    .page {
+      width: min(100%, 720px);
+
       margin: 0 auto;
 
       padding:
-        calc(28px + env(safe-area-inset-top))
-        20px
-        calc(50px + env(safe-area-inset-bottom));
+        calc(22px + env(safe-area-inset-top))
+        17px
+        45px;
+
+      position: relative;
     }
 
-    /* =========================
-       Header
-       ========================= */
 
-    .brand {
-      margin-bottom: 8px;
-      color: #888;
-      font-size: 12px;
-      letter-spacing: 3px;
+    /* ========================================
+       背景裝飾
+       ======================================== */
+
+    .bubble {
+      position: fixed;
+
+      border-radius: 50%;
+
+      border:
+        4px solid rgba(255,255,255,.75);
+
+      box-shadow:
+        inset 0 0 0 2px rgba(101,69,69,.08);
+
+      z-index: -1;
     }
 
-    h1 {
-      margin: 0;
-      font-size: 26px;
-      font-weight: 500;
-      letter-spacing: 1px;
+
+    .bubble.b1 {
+      width: 105px;
+      height: 105px;
+
+      background: rgba(247,184,207,.72);
+
+      top: -25px;
+      left: -30px;
     }
 
-    .subtitle {
-      margin-top: 5px;
-      color: #777;
-      font-size: 12px;
+
+    .bubble.b2 {
+      width: 92px;
+      height: 92px;
+
+      background: rgba(169,218,245,.72);
+
+      top: 170px;
+      right: -38px;
+    }
+
+
+    .bubble.b3 {
+      width: 125px;
+      height: 125px;
+
+      background: rgba(169,218,245,.7);
+
+      bottom: 120px;
+      left: -58px;
+    }
+
+
+    .bubble.b4 {
+      width: 100px;
+      height: 100px;
+
+      background: rgba(247,184,207,.7);
+
+      bottom: -20px;
+      right: -35px;
+    }
+
+
+    /* ========================================
+       HEADER
+       ======================================== */
+
+    .topbar {
+      display: flex;
+
+      justify-content: space-between;
+      align-items: center;
+
+      margin-bottom: 18px;
+    }
+
+
+    .brand-small {
+      font-size: 10px;
+
       letter-spacing: 2px;
+
+      color: var(--pink-dark);
     }
 
-    /* =========================
-       Member Card
-       ========================= */
 
-    .member-card {
-      height: 205px;
-      margin-top: 30px;
-      padding: 25px;
+    .brand-title {
+      margin-top: 3px;
+
+      font-size: 20px;
+      font-weight: 900;
+
+      color: var(--brown);
+    }
+
+
+    .mini-heart {
+      width: 47px;
+      height: 47px;
+
+      border-radius: 50%;
+
+      background: var(--white);
+
+      border: 3px solid var(--brown);
 
       display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      align-items: center;
+      justify-content: center;
 
-      border: 1px solid #333;
-      border-radius: 22px;
+      box-shadow: var(--shadow);
+
+      font-size: 20px;
+      color: var(--pink-dark);
+    }
+
+
+    /* ========================================
+       WELCOME
+       ======================================== */
+
+    .welcome {
+      margin-bottom: 17px;
+    }
+
+
+    .hello {
+      font-size: 13px;
+
+      color: var(--brown-soft);
+    }
+
+
+    .welcome-title {
+      margin-top: 4px;
+
+      font-size: 29px;
+
+      font-weight: 900;
+
+      line-height: 1.25;
+    }
+
+
+    .welcome-title span {
+      color: var(--pink-dark);
+    }
+
+
+    /* ========================================
+       VIP CARD
+       ======================================== */
+
+    .member-card {
+      position: relative;
+
+      overflow: hidden;
+
+      padding: 21px;
+
+      min-height: 215px;
+
+      border-radius: 27px;
+
+      border:
+        3px solid var(--brown);
 
       background:
         linear-gradient(
           135deg,
-          #222,
-          #090909
+          #ffc4d9 0%,
+          #ffd8b5 20%,
+          #fff29c 37%,
+          #c9f0c4 53%,
+          #b9e8ff 70%,
+          #dac9ff 86%,
+          #ffc7de 100%
         );
 
-      box-shadow:
-        0 20px 50px
-        rgba(0, 0, 0, 0.45);
+      box-shadow: var(--shadow);
     }
+
+
+    .member-card::after {
+      content: "";
+
+      position: absolute;
+
+      width: 170px;
+      height: 170px;
+
+      border-radius: 50%;
+
+      right: -55px;
+      top: -60px;
+
+      background:
+        rgba(255,255,255,.34);
+
+      border:
+        3px solid rgba(255,255,255,.55);
+    }
+
 
     .card-top {
       display: flex;
+
       justify-content: space-between;
 
-      color: #aaa;
-      font-size: 12px;
-      letter-spacing: 2px;
+      align-items: flex-start;
+
+      position: relative;
+
+      z-index: 2;
     }
+
+
+    .vip-badge {
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 6px;
+
+      background: #fff;
+
+      border:
+        3px solid var(--brown);
+
+      border-radius: 999px;
+
+      padding: 7px 12px;
+
+      font-size: 12px;
+
+      font-weight: 900;
+    }
+
+
+    .vip-star {
+      color: #f4b620;
+
+      font-size: 18px;
+    }
+
+
+    .card-heart {
+      font-size: 26px;
+      color: var(--pink-dark);
+    }
+
 
     .member-name {
-      font-size: 23px;
-      letter-spacing: 2px;
+      position: relative;
+
+      z-index: 2;
+
+      margin-top: 25px;
+
+      font-size: 29px;
+
+      font-weight: 900;
+
+      color: var(--brown);
     }
+
+
+    .member-meta {
+      position: relative;
+
+      z-index: 2;
+
+      margin-top: 7px;
+
+      font-size: 12px;
+
+      line-height: 1.7;
+
+      color:
+        rgba(101,69,69,.82);
+    }
+
 
     .member-number {
-      margin-top: 5px;
-      color: #888;
-      font-size: 12px;
-      letter-spacing: 2px;
-    }
+      margin-top: 18px;
 
-    .level {
-      color: #aaa;
+      position: relative;
+
+      z-index: 2;
+
+      display: inline-block;
+
+      background:
+        rgba(255,255,255,.72);
+
+      padding:
+        7px 11px;
+
+      border-radius: 10px;
+
       font-size: 11px;
-      letter-spacing: 2px;
+
+      letter-spacing: 1px;
+
+      border:
+        2px dashed
+        rgba(101,69,69,.42);
     }
 
-    /* =========================
-       Points
-       ========================= */
+
+    /* ========================================
+       POINTS
+       ======================================== */
+
+    .section-title {
+      margin:
+        29px 0 13px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 7px;
+
+      font-size: 17px;
+
+      font-weight: 900;
+    }
+
+
+    .section-title .sparkle {
+      color: #efb427;
+    }
+
 
     .points {
-      margin: 32px 0 22px;
-      text-align: center;
-    }
-
-    .points-label {
-      color: #777;
-      font-size: 11px;
-      letter-spacing: 3px;
-    }
-
-    .points-number {
-      margin-top: 4px;
-      font-size: 45px;
-      font-weight: 300;
-    }
-
-    /* =========================
-       Menu
-       ========================= */
-
-    .grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+
+      grid-template-columns:
+        1fr 1fr;
+
       gap: 12px;
     }
 
-    .menu {
-      min-height: 110px;
-      padding: 20px 17px;
 
-      border: 1px solid #242426;
+    .point-card {
+      border:
+        3px solid var(--brown);
+
+      border-radius: 22px;
+
+      padding:
+        17px;
+
+      box-shadow: var(--shadow);
+
+      position: relative;
+
+      overflow: hidden;
+    }
+
+
+    .point-card.pink {
+      background: #ffe2ed;
+    }
+
+
+    .point-card.blue {
+      background: #dcf3ff;
+    }
+
+
+    .point-icon {
+      width: 45px;
+      height: 45px;
+
+      border-radius: 15px;
+
+      background: white;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border:
+        2px solid
+        rgba(101,69,69,.75);
+
+      font-size: 22px;
+
+      margin-bottom: 12px;
+    }
+
+
+    .point-label {
+      font-size: 11px;
+
+      color: var(--brown-soft);
+    }
+
+
+    .point-value {
+      margin-top: 3px;
+
+      font-size: 28px;
+
+      font-weight: 900;
+    }
+
+
+    .point-unit {
+      font-size: 11px;
+
+      margin-left: 2px;
+
+      color: var(--brown-soft);
+    }
+
+
+    /* ========================================
+       NAVIGATION
+       ======================================== */
+
+    .menu-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, 1fr);
+
+      gap: 12px;
+    }
+
+
+    .menu-card {
+      min-height: 165px;
+
+      border:
+        3px solid var(--brown);
+
+      border-radius: 24px;
+
+      padding: 16px;
+
+      box-shadow: var(--shadow);
+
+      cursor: pointer;
+
+      transition:
+        transform .13s ease;
+
+      position: relative;
+
+      overflow: hidden;
+    }
+
+
+    .menu-card:active {
+      transform: scale(.97);
+    }
+
+
+    .menu-ledger {
+      background:
+        #ffe3ec;
+    }
+
+
+    .menu-collection {
+      background:
+        #e4f5ff;
+    }
+
+
+    .menu-memories {
+      background:
+        #ffe6f0;
+    }
+
+
+    .menu-ticket {
+      background:
+        #eaf7ff;
+    }
+
+
+    .menu-icon {
+      width: 67px;
+      height: 67px;
+
+      border:
+        3px solid var(--brown);
+
+      border-radius: 22px;
+
+      background:
+        rgba(255,255,255,.88);
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      font-size: 32px;
+
+      box-shadow:
+        0 5px 0
+        rgba(101,69,69,.08);
+    }
+
+
+    .menu-name {
+      margin-top: 12px;
+
+      font-size: 18px;
+
+      font-weight: 900;
+    }
+
+
+    .menu-sub {
+      margin-top: 3px;
+
+      font-size: 10px;
+
+      color: var(--brown-soft);
+
+      letter-spacing: .5px;
+    }
+
+
+    .corner-star {
+      position: absolute;
+
+      right: 11px;
+      top: 10px;
+
+      color: #efb427;
+
+      font-size: 20px;
+    }
+
+
+    /* ========================================
+       COUPON PREVIEW
+       ======================================== */
+
+    .coupon-box {
+      border:
+        3px dashed
+        var(--pink-dark);
+
+      background:
+        rgba(255,255,255,.68);
+
+      border-radius: 22px;
+
+      padding:
+        17px;
+
+      display: flex;
+
+      gap: 14px;
+
+      align-items: center;
+
+      box-shadow: var(--shadow);
+    }
+
+
+    .coupon-icon {
+      min-width: 54px;
+      width: 54px;
+      height: 54px;
+
       border-radius: 17px;
 
-      background: #151517;
+      background: var(--pink-light);
+
+      border:
+        2px solid var(--brown);
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 26px;
     }
 
-    .icon {
-      margin-bottom: 14px;
-      font-size: 24px;
-    }
 
-    .menu-title {
+    .coupon-title {
+      font-weight: 900;
+
       font-size: 14px;
     }
 
-    .menu-value {
-      margin-top: 5px;
-      color: #777;
-      font-size: 12px;
-    }
 
-    /* =========================
-       Admin
-       ========================= */
+    .coupon-text {
+      margin-top: 4px;
 
-    .admin-panel {
-      display: none;
+      color: var(--brown-soft);
 
-      margin-top: 20px;
-      padding: 16px 18px;
-
-      border: 1px solid #29292c;
-      border-radius: 15px;
-
-      background: #111113;
-    }
-
-    .admin-label {
-      color: #999;
-      font-size: 10px;
-      letter-spacing: 2px;
-    }
-
-    .admin-text {
-      margin-top: 5px;
-      font-size: 13px;
-    }
-
-    /* =========================
-       Status
-       ========================= */
-
-    .status {
-      min-height: 45px;
-      margin-top: 27px;
-
-      color: #666;
       font-size: 11px;
-      line-height: 1.8;
-      letter-spacing: 1.3px;
-      text-align: center;
+
+      line-height: 1.5;
     }
+
+
+    /* ========================================
+       FOOTER
+       ======================================== */
 
     .footer {
-      margin-top: 20px;
-
-      color: #444;
-      font-size: 10px;
-      letter-spacing: 2px;
       text-align: center;
+
+      margin-top: 34px;
+
+      color: var(--brown-soft);
+
+      font-size: 10px;
+
+      letter-spacing: 2px;
     }
+
+
+    .footer-heart {
+      font-size: 17px;
+
+      color: var(--pink-dark);
+
+      margin-bottom: 5px;
+    }
+
+
+    /* ========================================
+       LOADING / ERROR
+       ======================================== */
+
+    .loading-screen {
+      position: fixed;
+
+      inset: 0;
+
+      z-index: 999;
+
+      background:
+        linear-gradient(
+          135deg,
+          #ffe6ef,
+          #e3f5ff
+        );
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+      justify-content: center;
+
+      color: var(--brown);
+    }
+
+
+    .loading-logo {
+      width: 78px;
+      height: 78px;
+
+      border-radius: 26px;
+
+      background: white;
+
+      border:
+        3px solid var(--brown);
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 34px;
+
+      box-shadow: var(--shadow);
+
+      animation:
+        float 1.4s ease-in-out infinite;
+    }
+
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform:
+          translateY(0);
+      }
+
+      50% {
+        transform:
+          translateY(-8px);
+      }
+
+    }
+
+
+    .loading-text {
+      margin-top: 16px;
+
+      font-size: 13px;
+
+      font-weight: 900;
+    }
+
+
+    .error-box {
+      margin-top: 25px;
+
+      padding: 25px 18px;
+
+      border:
+        3px dashed var(--pink-dark);
+
+      border-radius: 22px;
+
+      background:
+        rgba(255,255,255,.78);
+
+      text-align: center;
+
+      line-height: 1.8;
+    }
+
+
+    .hidden {
+      display: none !important;
+    }
+
+
+    @media (max-width: 390px) {
+
+      .welcome-title {
+        font-size: 26px;
+      }
+
+      .member-name {
+        font-size: 26px;
+      }
+
+      .menu-card {
+        min-height: 150px;
+      }
+
+      .menu-icon {
+        width: 60px;
+        height: 60px;
+
+        font-size: 28px;
+      }
+
+    }
+
   </style>
+
 </head>
 
 
 <body>
 
-  <main class="app">
+  <!-- 背景泡泡 -->
 
-    <!-- Header -->
+  <div class="bubble b1"></div>
+  <div class="bubble b2"></div>
+  <div class="bubble b3"></div>
+  <div class="bubble b4"></div>
 
-    <div class="brand">
-      PRIVATE MEMBERS CLUB
+
+
+  <!-- Loading -->
+
+  <div
+    class="loading-screen"
+    id="loadingScreen"
+  >
+
+    <div class="loading-logo">
+      ♡
     </div>
 
-    <h1>
-      ♡ Whale Love Club
-    </h1>
-
-    <div class="subtitle">
-      MEMBERS ONLY
+    <div class="loading-text">
+      Whale Love Club 載入中...
     </div>
 
+  </div>
 
-    <!-- Member Card -->
+
+
+  <main
+    class="page hidden"
+    id="mainPage"
+  >
+
+
+    <!-- HEADER -->
+
+    <header class="topbar">
+
+      <div>
+
+        <div class="brand-small">
+          ♡ PRIVATE MEMBERS
+        </div>
+
+        <div class="brand-title">
+          Whale Love Club
+        </div>
+
+      </div>
+
+
+      <div class="mini-heart">
+        ♡
+      </div>
+
+    </header>
+
+
+
+    <!-- WELCOME -->
+
+    <section class="welcome">
+
+      <div class="hello">
+        Welcome back ♡
+      </div>
+
+      <div class="welcome-title">
+
+        歡迎回來，
+        <span id="welcomeName">
+          Member
+        </span>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- MEMBER CARD -->
 
     <section class="member-card">
 
       <div class="card-top">
 
-        <span>
-          ♡ WLC
-        </span>
+        <div class="vip-badge">
 
-        <span id="card-role">
-          ...
-        </span>
+          <span class="vip-star">
+            ★
+          </span>
 
-      </div>
+          <span id="memberLevel">
+            VIP MEMBER
+          </span>
 
-      <div>
-
-        <div
-          class="member-name"
-          id="member-name"
-        >
-          LOADING...
         </div>
 
-        <div
-          class="member-number"
-          id="member-number"
-        >
-          ---
+
+        <div class="card-heart">
+          ♡
         </div>
 
       </div>
+
 
       <div
-        class="level"
-        id="member-level"
+        class="member-name"
+        id="memberName"
       >
-        LOADING MEMBER DATA
+        Whale Love Member
+      </div>
+
+
+      <div class="member-meta">
+
+        <span id="memberRole">
+          PRIVATE MEMBER
+        </span>
+
+        <br>
+
+        Joined
+        <span id="joinDate">
+          -
+        </span>
+
+      </div>
+
+
+      <div
+        class="member-number"
+        id="memberNo"
+      >
+        MEMBER NO. ----
       </div>
 
     </section>
 
 
-    <!-- Love Points -->
+
+    <!-- POINTS -->
+
+    <div class="section-title">
+
+      <span class="sparkle">
+        ✦
+      </span>
+
+      我的會員點數
+
+    </div>
+
 
     <section class="points">
 
-      <div class="points-label">
-        LOVE POINTS
+
+      <div class="point-card pink">
+
+        <div class="point-icon">
+          ♡
+        </div>
+
+        <div class="point-label">
+          LOVE POINTS
+        </div>
+
+        <div>
+
+          <span
+            class="point-value"
+            id="lovePoints"
+          >
+            0
+          </span>
+
+          <span class="point-unit">
+            pts
+          </span>
+
+        </div>
+
       </div>
 
-      <div
-        class="points-number"
-        id="love-points"
-      >
-        —
-      </div>
-
-    </section>
 
 
-    <!-- Menu -->
+      <div class="point-card blue">
 
-    <section class="grid">
-
-      <div class="menu">
-
-        <div class="icon">
+        <div class="point-icon">
           💆
         </div>
 
-        <div class="menu-title">
-          Massage
+        <div class="point-label">
+          MASSAGE
         </div>
 
-        <div
-          class="menu-value"
-          id="massage-points"
-        >
-          — POINTS
-        </div>
+        <div>
 
-      </div>
+          <span
+            class="point-value"
+            id="massagePoints"
+          >
+            0
+          </span>
 
+          <span class="point-unit">
+            次
+          </span>
 
-      <div class="menu">
-
-        <div class="icon">
-          🎟️
-        </div>
-
-        <div class="menu-title">
-          Love Coupon
-        </div>
-
-        <div class="menu-value">
-          MY COUPONS
         </div>
 
       </div>
 
 
-      <div class="menu">
+    </section>
 
-        <div class="icon">
+
+
+    <!-- COUPON -->
+
+    <div class="section-title">
+
+      <span class="sparkle">
+        ✦
+      </span>
+
+      我的專屬福利
+
+    </div>
+
+
+    <section class="coupon-box">
+
+      <div class="coupon-icon">
+        🎟
+      </div>
+
+
+      <div>
+
+        <div class="coupon-title">
+          Whale Love Coupon
+        </div>
+
+        <div class="coupon-text">
+          節日卡片、專屬票券與驚喜獎勵，
+          之後都會收藏在你的會員中心 ♡
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- MAIN MENU -->
+
+    <div class="section-title">
+
+      <span class="sparkle">
+        ✦
+      </span>
+
+      我們的小世界
+
+    </div>
+
+
+    <section class="menu-grid">
+
+
+      <!-- LEDGER -->
+
+      <div
+        class="menu-card menu-ledger"
+        onclick="goLedger()"
+      >
+
+        <div class="corner-star">
+          ✦
+        </div>
+
+        <div class="menu-icon">
+          🐷
+        </div>
+
+        <div class="menu-name">
+          記帳本
+        </div>
+
+        <div class="menu-sub">
+          OUR LEDGER
+        </div>
+
+      </div>
+
+
+
+      <!-- COLLECTION -->
+
+      <div
+        class="menu-card menu-collection"
+        onclick="goCollection()"
+      >
+
+        <div class="corner-star">
+          ✧
+        </div>
+
+        <div class="menu-icon">
+          💌
+        </div>
+
+        <div class="menu-name">
+          卡片蒐藏
+        </div>
+
+        <div class="menu-sub">
+          CARD COLLECTION
+        </div>
+
+      </div>
+
+
+
+      <!-- MEMORIES -->
+
+      <div
+        class="menu-card menu-memories"
+        onclick="goMemories()"
+      >
+
+        <div class="corner-star">
+          ♡
+        </div>
+
+        <div class="menu-icon">
+          📷
+        </div>
+
+        <div class="menu-name">
+          回憶相簿
+        </div>
+
+        <div class="menu-sub">
+          OUR MEMORIES
+        </div>
+
+      </div>
+
+
+
+      <!-- FUTURE NFC -->
+
+      <div
+        class="menu-card menu-ticket"
+        onclick="comingSoon()"
+      >
+
+        <div class="corner-star">
+          ✦
+        </div>
+
+        <div class="menu-icon">
           🎁
         </div>
 
-        <div class="menu-title">
-          Gift Box
+        <div class="menu-name">
+          驚喜盒子
         </div>
 
-        <div class="menu-value">
-          MY GIFTS
-        </div>
-
-      </div>
-
-
-      <div class="menu">
-
-        <div class="icon">
-          ♠️
-        </div>
-
-        <div class="menu-title">
-          Collection
-        </div>
-
-        <div class="menu-value">
-          NFC CARDS
+        <div class="menu-sub">
+          SPECIAL GIFTS
         </div>
 
       </div>
+
 
     </section>
 
 
-    <!-- ADMIN 專用區 -->
 
-    <section
-      id="admin-panel"
-      class="admin-panel"
-    >
+    <footer class="footer">
 
-      <div class="admin-label">
-        ADMIN MODE
+      <div class="footer-heart">
+        ♡
       </div>
 
-      <div class="admin-text">
-        管理員帳號已驗證 ✓
-      </div>
+      WHALE LOVE CLUB
 
-    </section>
+      <br>
 
+      PRIVATE MEMBERS ONLY
 
-    <!-- Status -->
+    </footer>
 
-    <div
-      id="status"
-      class="status"
-    >
-      CONNECTING TO LINE...
-    </div>
-
-
-    <div class="footer">
-      WHALE LOVE CLUB · PRIVATE MEMBERSHIP
-    </div>
 
   </main>
 
 
-  <script>
 
-    /* =========================================
-       ★ 只需要修改這裡
-       ========================================= */
+  <!-- ERROR -->
 
-    const LIFF_ID =
-      '2011857712-lXq9lJFT';
+  <div
+    class="page hidden"
+    id="errorPage"
+  >
 
+    <div class="error-box">
 
+      <div
+        style="
+          font-size:32px;
+          margin-bottom:10px;
+        "
+      >
+        ♡
+      </div>
 
-    /* =========================================
-       安全顯示文字
-       ========================================= */
+      <strong>
+        MEMBER CONNECTION ERROR
+      </strong>
 
-    function escapeHtml(value) {
+      <br><br>
 
-      const div =
-        document.createElement('div');
+      <span id="errorMessage">
+        無法取得會員資料
+      </span>
 
-      div.textContent =
-        String(value || '');
+    </div>
 
-      return div.innerHTML;
-    }
+  </div>
 
 
 
-    /* =========================================
-       狀態
-       ========================================= */
+<script>
 
-    function setStatus(message) {
+  /*
+   * ★★★
+   * 換成目前 index.html
+   * 原本使用的同一組 LIFF ID
+   * ★★★
+   */
 
-      document
-        .getElementById('status')
-        .innerHTML =
-          message;
-    }
+  const LIFF_ID =
+    '2011857712-lXq9lJFT';
 
 
+  let idToken = '';
 
-    /* =========================================
-       取得加入年份
-       ========================================= */
 
-    function getJoinYear(joinDate) {
 
-      if (!joinDate) {
-        return '';
-      }
+  /* ======================================
+     INIT
+     ====================================== */
 
-      const match =
-        String(joinDate)
-          .match(/\d{4}/);
+  async function init() {
 
-      return match
-        ? match[0]
-        : '';
-    }
+    try {
 
+      await liff.init({
 
+        liffId:
+          LIFF_ID
 
-    /* =========================================
-       更新會員畫面
-       ========================================= */
+      });
 
-    function renderMember(member) {
 
-      document
-        .getElementById(
-          'member-name'
-        )
-        .textContent =
-          member.name ||
-          'MEMBER';
+      if (!liff.isLoggedIn()) {
 
+        liff.login({
 
-      document
-        .getElementById(
-          'member-number'
-        )
-        .textContent =
-          member.memberNo ||
-          '---';
+          redirectUri:
+            window.location.href
 
-
-      document
-        .getElementById(
-          'love-points'
-        )
-        .textContent =
-          member.lovePoints ?? 0;
-
-
-      document
-        .getElementById(
-          'massage-points'
-        )
-        .textContent =
-          (member.massagePoints ?? 0)
-          + ' POINTS';
-
-
-      const role =
-        String(
-          member.role || 'MEMBER'
-        ).toUpperCase();
-
-
-      document
-        .getElementById(
-          'card-role'
-        )
-        .textContent =
-          role;
-
-
-      const year =
-        getJoinYear(
-          member.joinDate
-        );
-
-
-      let levelText =
-        member.level ||
-        'MEMBER';
-
-
-      if (year) {
-
-        levelText +=
-          ' · SINCE ' +
-          year;
-
-      }
-
-
-      document
-        .getElementById(
-          'member-level'
-        )
-        .textContent =
-          levelText;
-
-
-      /* 管理員才看得到 */
-
-      if (role === 'ADMIN') {
-
-        document
-          .getElementById(
-            'admin-panel'
-          )
-          .style.display =
-            'block';
-
-      } else {
-
-        document
-          .getElementById(
-            'admin-panel'
-          )
-          .style.display =
-            'none';
-
-      }
-
-    }
-
-
-
-    /* =========================================
-       呼叫 Member API
-       ========================================= */
-
-    async function getMemberData(
-      idToken
-    ) {
-
-      const response =
-        await fetch(
-          '/api/member',
-          {
-            method: 'POST',
-
-            headers: {
-              'Content-Type':
-                'application/json'
-            },
-
-            body:
-              JSON.stringify({
-                idToken:
-                  idToken
-              })
-          }
-        );
-
-
-      let data;
-
-
-      try {
-
-        data =
-          await response.json();
-
-      } catch (error) {
-
-        throw new Error(
-          'Member API response error'
-        );
-
-      }
-
-
-      if (
-        !response.ok ||
-        !data.success
-      ) {
-
-        throw new Error(
-          data.message ||
-          'Unable to load member'
-        );
-
-      }
-
-
-      return data.member;
-
-    }
-
-
-
-    /* =========================================
-       LINE MINI App 初始化
-       ========================================= */
-
-    async function initApp() {
-
-      try {
-
-        /* 1. LIFF SDK */
-
-        if (
-          typeof liff ===
-          'undefined'
-        ) {
-
-          throw new Error(
-            'LIFF SDK is not available'
-          );
-
-        }
-
-
-        /* 2. 初始化 */
-
-        await liff.init({
-          liffId:
-            LIFF_ID
         });
 
+        return;
 
-        /* 3. LINE Login */
-
-        if (
-          !liff.isLoggedIn()
-        ) {
-
-          liff.login();
-
-          return;
-
-        }
+      }
 
 
-        /* 4. ID Token */
-
-        const idToken =
-          liff.getIDToken();
+      idToken =
+        liff.getIDToken();
 
 
-        if (!idToken) {
+      if (!idToken) {
 
-          throw new Error(
-            'ID token is not available'
-          );
+        throw new Error(
+          '無法取得 LINE 登入資訊'
+        );
 
-        }
+      }
 
 
-        setStatus(
-          'LOADING MEMBER PROFILE...'
+      const member =
+        await loadMember();
+
+
+      renderMember(member);
+
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      const message =
+        String(
+          error.message ||
+          '無法取得會員資料'
         );
 
 
-        /* 5. 後端驗證 + 查會員 */
+      /*
+       * LINE Token 過期
+       */
+      if (
+        message
+          .toLowerCase()
+          .includes('expired')
+      ) {
 
-        const member =
-          await getMemberData(
-            idToken
-          );
+        refreshLogin();
+
+        return;
+
+      }
 
 
-        /* 6. 顯示真正資料 */
+      showError(message);
 
-        renderMember(
-          member
-        );
+    }
+
+  }
 
 
-        setStatus(
-          'LINE CONNECTED ✓' +
-          '<br>' +
-          escapeHtml(
-            member.memberNo
-          ) +
-          ' · ' +
-          escapeHtml(
-            member.role
-          )
+
+  /* ======================================
+     MEMBER API
+     ====================================== */
+
+  async function loadMember() {
+
+    let response;
+
+
+    /*
+     * 先使用 POST。
+     * 這也是 Whale Love Club
+     * 其他 API 使用的方式。
+     */
+    response =
+      await fetch(
+        '/api/member',
+        {
+
+          method:
+            'POST',
+
+          headers: {
+
+            'Content-Type':
+              'application/json'
+
+          },
+
+          body:
+            JSON.stringify({
+
+              idToken:
+                idToken
+
+            })
+
+        }
       );
 
 
-} catch (error) {
+    /*
+     * 如果目前的 member.js
+     * 只接受 GET，就自動改用 GET。
+     */
+    if (
+      response.status === 405
+    ) {
 
-  console.error(
-    'Whale Love Club Error:',
-    error
-  );
+      const params =
+        new URLSearchParams({
 
-  const message =
-    error.message || 'Unknown error';
+          idToken:
+            idToken
 
-  // LINE ID Token 已過期
-  if (
-    message.includes('IdToken expired')
-  ) {
+        });
 
-    setStatus(
-      'LINE SESSION EXPIRED' +
-      '<br>' +
-      '正在重新登入...'
+
+      response =
+        await fetch(
+
+          '/api/member?' +
+          params.toString()
+
+        );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+      throw new Error(
+
+        data.message ||
+        'Member account is not bound'
+
+      );
+
+    }
+
+
+    /*
+     * 相容兩種 response：
+     *
+     * {
+     *   success:true,
+     *   member:{...}
+     * }
+     *
+     * 或
+     *
+     * {
+     *   success:true,
+     *   memberNo:...
+     * }
+     */
+
+    return (
+      data.member ||
+      data
     );
+
+  }
+
+
+
+  /* ======================================
+     RENDER MEMBER
+     ====================================== */
+
+  function renderMember(member) {
+
+    const name =
+      member.name ||
+      'Whale Love Member';
+
+
+    const memberNo =
+      member.memberNo ||
+      '-';
+
+
+    const level =
+      member.level ||
+      'VIP MEMBER';
+
+
+    const role =
+      String(
+        member.role ||
+        'MEMBER'
+      )
+        .toUpperCase();
+
+
+    const lovePoints =
+      Number(
+        member.lovePoints || 0
+      );
+
+
+    const massagePoints =
+      Number(
+        member.massagePoints || 0
+      );
+
+
+    document
+      .getElementById(
+        'welcomeName'
+      )
+      .textContent =
+      name;
+
+
+    document
+      .getElementById(
+        'memberName'
+      )
+      .textContent =
+      name;
+
+
+    document
+      .getElementById(
+        'memberLevel'
+      )
+      .textContent =
+      level;
+
+
+    document
+      .getElementById(
+        'memberNo'
+      )
+      .textContent =
+      'MEMBER NO. ' +
+      memberNo;
+
+
+    document
+      .getElementById(
+        'lovePoints'
+      )
+      .textContent =
+      lovePoints
+        .toLocaleString(
+          'zh-TW'
+        );
+
+
+    document
+      .getElementById(
+        'massagePoints'
+      )
+      .textContent =
+      massagePoints
+        .toLocaleString(
+          'zh-TW'
+        );
+
+
+    document
+      .getElementById(
+        'memberRole'
+      )
+      .textContent =
+
+      role === 'ADMIN'
+
+        ? 'ADMIN MODE'
+
+        : 'PRIVATE MEMBER';
+
+
+    document
+      .getElementById(
+        'joinDate'
+      )
+      .textContent =
+      formatDate(
+        member.joinDate
+      );
+
+
+    /*
+     * 關閉 Loading
+     */
+    document
+      .getElementById(
+        'loadingScreen'
+      )
+      .classList
+      .add('hidden');
+
+
+    document
+      .getElementById(
+        'mainPage'
+      )
+      .classList
+      .remove('hidden');
+
+  }
+
+
+
+  /* ======================================
+     NAVIGATION
+     ====================================== */
+
+  function goLedger() {
+
+    window.location.href =
+      '/ledger.html';
+
+  }
+
+
+  function goCollection() {
+
+    window.location.href =
+      '/collection.html';
+
+  }
+
+
+  function goMemories() {
+
+    window.location.href =
+      '/memories.html';
+
+  }
+
+
+  function comingSoon() {
+
+    alert(
+      '驚喜盒子會和 NFC 限定卡一起開放 ♡'
+    );
+
+  }
+
+
+
+  /* ======================================
+     ERROR
+     ====================================== */
+
+  function showError(message) {
+
+    document
+      .getElementById(
+        'loadingScreen'
+      )
+      .classList
+      .add('hidden');
+
+
+    document
+      .getElementById(
+        'mainPage'
+      )
+      .classList
+      .add('hidden');
+
+
+    document
+      .getElementById(
+        'errorPage'
+      )
+      .classList
+      .remove('hidden');
+
+
+    document
+      .getElementById(
+        'errorMessage'
+      )
+      .textContent =
+      message;
+
+  }
+
+
+
+  /* ======================================
+     TOKEN
+     ====================================== */
+
+  function refreshLogin() {
 
     try {
 
       liff.logout();
 
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (error) {}
 
-    liff.login();
 
-    return;
+    liff.login({
+
+      redirectUri:
+        window.location.href
+
+    });
+
   }
 
-  setStatus(
-    'MEMBER CONNECTION ERROR' +
-    '<br>' +
-    escapeHtml(message)
-  );
 
-}
+
+  /* ======================================
+     DATE
+     ====================================== */
+
+  function formatDate(value) {
+
+    if (!value) {
+      return '-';
+    }
+
+
+    const date =
+      new Date(value);
+
+
+    if (
+      !isNaN(
+        date.getTime()
+      )
+    ) {
+
+      return date
+        .toLocaleDateString(
+          'zh-TW'
+        );
 
     }
 
 
+    return String(value);
 
-    /* =========================================
-       啟動
-       ========================================= */
+  }
 
-    initApp();
 
-  </script>
+
+  init();
+
+</script>
+
 
 </body>
 
