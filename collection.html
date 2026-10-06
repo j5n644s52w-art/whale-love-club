@@ -1,4 +1,3 @@
-<script>
 <!DOCTYPE html>
 <html lang="zh-Hant">
 
@@ -1042,106 +1041,66 @@
       width:
         100%;
 
-  /*
-   * 跟 index.html、ledger.html
-   * 使用同一組 LIFF ID
-   */
-  const LIFF_ID =
-    '2011857712-lXq9lJFT';
       margin-top:
         18px;
 
       border:
         0;
 
-  let idToken = '';
       border-radius:
         13px;
 
-  let currentMemoryId = '';
       padding:
         14px;
 
-  let cardData = [];
       background:
 
-  let cacheKey = '';
         linear-gradient(
           135deg,
           #e3c099,
           #a87b55
         );
 
-  let hasCachedData = false;
       color:
         #080808;
 
       font-weight:
         700;
 
-  /* =========================================
-     初始化
-     ========================================= */
     }
 
-  async function init() {
 
-    try {
     .close-button {
 
-      /*
-       * 1. 初始化 LIFF
-       */
-      await liff.init({
-        liffId: LIFF_ID
-      });
       width:
         100%;
 
       margin-top:
         10px;
 
-      /*
-       * 2. 如果沒登入 LINE
-       */
-      if (!liff.isLoggedIn()) {
       border:
         1px solid
         var(--line);
 
-        liff.login({
-          redirectUri:
-            window.location.href
-        });
       border-radius:
         13px;
 
-        return;
-      }
       padding:
         13px;
 
       background:
         transparent;
 
-      /*
-       * 3. 取得 LINE ID Token
-       */
-      idToken =
-        liff.getIDToken();
       color:
         var(--muted);
 
     }
 
 
-      if (!idToken) {
     /* =========================
        TOAST
        ========================= */
 
-        throw new Error(
-          '無法取得 LINE 登入資訊'
     .toast {
 
       position:
@@ -1154,93 +1113,52 @@
         calc(
           25px +
           env(safe-area-inset-bottom)
-);
+        );
 
-      }
       transform:
         translate(-50%, 30px);
 
       opacity:
         0;
 
-      /*
-       * 4. 取得目前 LINE 身分
-       *
-       * 只用來建立「本機快取代號」
-       * 不會顯示在頁面。
-       */
-      const decoded =
-        liff.getDecodedIDToken();
       background:
         #f2dfc6;
 
       color:
         #111;
 
-      const lineSub =
-        decoded?.sub || 'unknown';
       padding:
         12px 18px;
 
       border-radius:
         999px;
 
-      /*
-       * 每個 LINE 帳號有自己的快取
-       * 避免 ADMIN 與 MEMBER
-       * 在同一台裝置看到彼此資料。
-       */
-      cacheKey =
-        await makeCacheKey(
-          lineSub
-        );
       z-index:
         999;
 
       font-size:
         12px;
 
-      /*
-       * 5. 先讀手機上次保存的收藏
-       *
-       * 如果有：
-       * → 馬上顯示
-       *
-       * 不必等 Apps Script
-       */
-      const cached =
-        loadCachedCollection();
       transition:
         .25s;
 
       pointer-events:
         none;
 
-      if (cached) {
       white-space:
         nowrap;
 
-        hasCachedData = true;
       max-width:
         calc(100% - 40px);
 
-        cardData =
-          cached.cards || [];
     }
 
 
-        renderSummary(
-          cached,
-          true
-        );
     .toast.show {
 
       opacity:
         1;
 
-        renderCards(
-          cardData
-        );
       transform:
         translate(-50%, 0);
 
@@ -1252,27 +1170,21 @@
       .card-grid {
         gap:
           9px;
-}
+      }
 
       .collection-card,
       .locked-card {
 
-      /*
-       * 6. 背景抓最新資料
-       */
-      await loadCollection();
         min-height:
           230px;
 
       }
 
-    } catch (error) {
       .card-image {
         height:
           140px;
       }
 
-      console.error(error);
       .card-name {
         font-size:
           14px;
@@ -1280,42 +1192,19 @@
 
     }
 
-      /*
-       * 如果已有快取，
-       * 即使伺服器暫時慢，
-       * 也不要把畫面清掉。
-       */
-      if (hasCachedData) {
   </style>
 
-        showToast(
-          '目前顯示上次更新的收藏 ♡'
-        );
 </head>
 
-        return;
-      }
 
 <body>
 
-      document
-        .getElementById(
-          'cardGrid'
-        )
-        .innerHTML = `
 
-          <div class="empty">
   <main class="page">
 
-            無法載入卡片收藏<br>
 
-            ${escapeHtml(
-              error.message ||
-              '請稍後再試'
-            )}
     <div class="topbar">
 
-          </div>
       <button
         class="back"
         onclick="goHome()"
@@ -1323,12 +1212,9 @@
         ← 會員中心
       </button>
 
-        `;
 
-    }
       <div class="brand">
 
-  }
         <div class="brand-small">
           ♡ PRIVATE MEMBERS
         </div>
@@ -1339,26 +1225,10 @@
 
       </div>
 
-  /* =========================================
-     讀取最新收藏
-     ========================================= */
     </div>
 
-  async function loadCollection() {
 
-    /*
-     * 沒有快取時才顯示 Loading。
-     *
-     * 有快取時就繼續顯示舊資料，
-     * 背景更新即可。
-     */
-    if (!hasCachedData) {
 
-      document
-        .getElementById(
-          'cardGrid'
-        )
-        .innerHTML = `
     <div class="eyebrow">
       CARD COLLECTION
     </div>
@@ -1378,8 +1248,6 @@
 
 
 
-          <div class="loading">
-            正在讀取卡片收藏...
     <section class="collection-summary">
 
 
@@ -1389,9 +1257,8 @@
 
           <div class="summary-label">
             COLLECTION PROGRESS
-</div>
+          </div>
 
-        `;
           <div
             class="summary-count"
             id="collectionCount"
@@ -1399,11 +1266,9 @@
             0 / 0
           </div>
 
-    }
         </div>
 
 
-    try {
         <div
           class="summary-label"
           id="collectionPercent"
@@ -1411,21 +1276,11 @@
           0%
         </div>
 
-      const params =
-        new URLSearchParams({
       </div>
 
-          idToken:
-            idToken,
 
-          /*
-           * 防止瀏覽器使用舊 API 結果
-           */
-          t:
-            Date.now()
       <div class="progress">
 
-        });
         <div
           class="progress-fill"
           id="progressFill"
@@ -1433,27 +1288,13 @@
 
       </div>
 
-      /*
-       * 最多等 20 秒。
-       *
-       * 如果 Apps Script 偶爾冷啟動很慢，
-       * 有快取的情況下仍然可以正常使用。
-       */
-      const response =
-        await fetchWithTimeout(
 
-          '/api/collection?' +
-          params.toString(),
     </section>
 
-          20000
 
-        );
 
     <div class="section-head">
 
-      const data =
-        await response.json();
       <div class="section-title">
         MY COLLECTION
       </div>
@@ -1465,14 +1306,9 @@
         0 LOCKED
       </div>
 
-      if (!data.success) {
     </div>
 
 
-        const message =
-          String(
-            data.message || ''
-          );
 
     <div
       class="card-grid"
@@ -1673,56 +1509,28 @@
 
         return;
 
-        /*
-         * Token 過期
-         */
-        if (
-          message
-            .toLowerCase()
-            .includes('expired')
-        ) {
       }
 
-          refreshLogin();
 
-          return;
       idToken =
         liff.getIDToken();
 
-        }
 
       if (!idToken) {
 
-throw new Error(
-          message ||
-          '讀取收藏失敗'
+        throw new Error(
           '無法取得 LINE 登入資訊'
-);
+        );
 
-}
+      }
 
 
-      /*
-       * 最新資料回來
-       */
-      cardData =
-        data.cards || [];
       await loadCollection();
 
 
-      /*
-       * 更新畫面
-       */
-      renderSummary(
-        data,
-        false
-      );
     } catch (error) {
 
 
-      renderCards(
-        cardData
-      );
       console.error(error);
 
 
@@ -1773,22 +1581,13 @@ throw new Error(
         '/api/collection?' +
         params.toString()
 
-      /*
-       * 儲存在手機
-       *
-       * 下次打開頁面直接讀這份。
-       */
-      saveCachedCollection(
-        data
-);
+      );
 
 
-      hasCachedData = true;
     const data =
       await response.json();
 
 
-    } catch (error) {
     if (!data.success) {
 
 
@@ -1808,891 +1607,632 @@ throw new Error(
 
       }
 
-      console.error(error);
 
       throw new Error(
 
-      /*
-       * 如果有舊資料，
-       * API 失敗也不用整頁報錯。
-       */
-      if (hasCachedData) {
         data.message ||
         '讀取收藏失敗'
 
-        renderCachedStatus();
       );
 
-        showToast(
-          '更新稍慢，已顯示上次收藏'
-        );
     }
 
-        return;
 
-      }
     cardData =
       data.cards || [];
 
 
-      throw error;
     renderSummary(data);
 
-    }
     renderCards(cardData);
 
-}
+  }
 
 
 
-  /* =========================================
-     收藏進度
-     ========================================= */
   /* =========================
      SUMMARY
      ========================= */
 
   function renderSummary(data) {
 
-  function renderSummary(
-    data,
-    refreshing = false
-  ) {
 
-const total =
-      Number(
-        data.total || 0
-      );
+    const total =
       Number(data.total || 0);
 
 
-const collected =
-@@ -367,13 +1655,11 @@
-
-const percent =
-total > 0
-
-? Math.round(
-collected /
-total *
-100
-)
-
-: 0;
-
-
-@@ -398,12 +1684,7 @@
-'lockedCount'
-)
-.textContent =
-
-      refreshing
-
-        ? `${locked} LOCKED · 更新中`
-
-        : `${locked} LOCKED`;
-      `${locked} LOCKED`;
-
-
-document
-@@ -418,49 +1699,22 @@
-
-
-
-  function renderCachedStatus() {
-
-    const el =
-      document.getElementById(
-        'lockedCount'
+    const collected =
+      Number(
+        data.collected || 0
       );
 
 
-    if (
-      el.textContent.includes(
-        '更新中'
+    const locked =
+      Number(
+        data.locked || 0
+      );
+
+
+    const percent =
+      total > 0
+        ? Math.round(
+            collected /
+            total *
+            100
+          )
+        : 0;
+
+
+    document
+      .getElementById(
+        'collectionCount'
       )
-    ) {
+      .textContent =
+      `${collected} / ${total}`;
 
-      el.textContent =
-        el.textContent.replace(
-          ' · 更新中',
-          ''
-        );
 
-    }
+    document
+      .getElementById(
+        'collectionPercent'
+      )
+      .textContent =
+      `${percent}%`;
+
+
+    document
+      .getElementById(
+        'lockedCount'
+      )
+      .textContent =
+      `${locked} LOCKED`;
+
+
+    document
+      .getElementById(
+        'progressFill'
+      )
+      .style
+      .width =
+      `${percent}%`;
 
   }
 
 
 
-  /* =========================================
-     顯示所有卡片
-     ========================================= */
   /* =========================
      CARDS
      ========================= */
 
-function renderCards(cards) {
+  function renderCards(cards) {
 
 
-const grid =
-document.getElementById(
-'cardGrid'
-);
+    const grid =
+      document.getElementById(
+        'cardGrid'
+      );
 
 
-    /*
-     * 完全沒有卡片
-     */
-if (!cards.length) {
+    if (!cards.length) {
 
 
-grid.innerHTML = `
+      grid.innerHTML = `
 
-       <div class="empty">
-@@ -474,30 +1728,23 @@
+        <div class="empty">
 
-     `;
+          收藏冊目前還沒有卡片 ♡<br>
 
+          之後建立節日限定 NFC 卡，
+          就會出現在這裡。
 
-return;
+        </div>
 
-}
-
-
-    /*
-     * 產生卡片
-     */
-grid.innerHTML =
-cards
-.map(
-(card, index) => {
+      `;
 
 
-            /*
-             * =========================
-             * LOCKED
-             * =========================
-             */
+      return;
 
-if (
-!card.collected
-) {
+    }
 
 
-return `
+    grid.innerHTML =
+      cards
+        .map(
+          (card, index) => {
 
-               <div class="locked-card">
-@@ -521,32 +1768,20 @@
-}
+
+            if (
+              !card.collected
+            ) {
 
 
-            /*
-             * =========================
-             * 已收藏
-             * =========================
-             */
+              return `
 
-const image =
-card.cardImageUrl
+                <div class="locked-card">
 
-? `
+                  <div class="lock-symbol">
+                    ?
+                  </div>
 
-                 <img
+                  <div class="locked-title">
+                    ???
+                  </div>
 
-                   src="${escapeAttribute(
-                     card.cardImageUrl
-                   )}"
+                  <div class="locked-text">
+                    LOCKED
+                  </div>
 
-                   alt="card"
+                </div>
 
-                    loading="lazy"
+              `;
 
-                   onerror="
-                     this.parentElement.innerHTML =
-                     '<div class=&quot;card-placeholder&quot;>♠</div>'
-                   "
+            }
 
-                 >
 
-               `
-@@ -563,16 +1798,8 @@
-return `
+            const image =
+              card.cardImageUrl
 
-             <div
+                ? `
 
-                class="
-                  collection-card
-                  collected
-                "
+                  <img
+                    src="${escapeAttribute(
+                      card.cardImageUrl
+                    )}"
+                    alt="card"
+                    onerror="
+                      this.parentElement.innerHTML =
+                      '<div class=&quot;card-placeholder&quot;>♠</div>'
+                    "
+                  >
 
-                onclick="
-                  openDetail(${index})
-                "
+                `
 
+                : `
+
+                  <div class="card-placeholder">
+                    ♠
+                  </div>
+
+                `;
+
+
+            return `
+
+              <div
                 class="collection-card collected"
                 onclick="openDetail(${index})"
-             >
+              >
 
-               <div class="card-image">
-@@ -588,10 +1815,8 @@
-                 <div class="card-edition">
+                <div class="card-image">
 
-                   ${escapeHtml(
+                  ${image}
 
-                     card.edition ||
-                     'LIMITED EDITION'
+                </div>
 
-                   )}
 
-                 </div>
-@@ -600,10 +1825,8 @@
-                 <div class="card-name">
+                <div class="card-body">
 
-                   ${escapeHtml(
 
-                     card.cardName ||
-                     'Whale Love Card'
+                  <div class="card-edition">
 
-                   )}
+                    ${escapeHtml(
+                      card.edition ||
+                      'LIMITED EDITION'
+                    )}
 
-                 </div>
-@@ -614,13 +1837,13 @@
-                   ${
-                     card.collectedAt
+                  </div>
 
-                        ? `Collected · ${
-                            escapeHtml(
-                              card.collectedAt
-                            )
-                          }`
+
+                  <div class="card-name">
+
+                    ${escapeHtml(
+                      card.cardName ||
+                      'Whale Love Card'
+                    )}
+
+                  </div>
+
+
+                  <div class="card-meta">
+
+                    ${
+                      card.collectedAt
+
                       ? `Collected · ${
                           escapeHtml(
                             card.collectedAt
                           )
                         }`
 
-                        : 'Collected'
                       : 'Collected'
-                   }
+                    }
 
-                 </div>
-@@ -640,12 +1863,13 @@
-
+                  </div>
 
 
-  /* =========================================
-     卡片詳細資料
-     ========================================= */
+                </div>
+
+              </div>
+
+            `;
+
+          }
+        )
+        .join('');
+
+  }
+
+
+
   /* =========================
      DETAIL
      ========================= */
 
-function openDetail(index) {
+  function openDetail(index) {
 
 
-const card =
-cardData[index];
+    const card =
+      cardData[index];
 
-@@ -654,9 +1878,7 @@
-!card ||
-!card.collected
-) {
 
-return;
-
-}
-
-
-@@ -670,27 +1892,24 @@
-);
-
-
-    /*
-     * 卡面
-     */
-if (card.cardImageUrl) {
-
-
-detailImage.innerHTML = `
-
-       <img
-
-         src="${escapeAttribute(
-           card.cardImageUrl
-         )}"
-
-         alt="card"
-
-       >
-
-     `;
-
-
-} else {
-
-
-detailImage.innerHTML = `
-
-       <div class="card-placeholder">
-@@ -702,9 +1921,6 @@
-}
-
-
-    /*
-     * Edition
-     */
-document
-.getElementById(
-'detailEdition'
-@@ -715,9 +1931,6 @@
-'LIMITED EDITION';
-
-
-    /*
-     * 卡名
-     */
-document
-.getElementById(
-'detailTitle'
-@@ -728,9 +1941,6 @@
-'Whale Love Card';
-
-
-    /*
-     * 收藏日期
-     */
-document
-.getElementById(
-'detailCollected'
-@@ -741,9 +1951,6 @@
-'-';
-
-
-    /*
-     * 發行日期
-     */
-document
-.getElementById(
-'detailRelease'
-@@ -754,9 +1961,6 @@
-'-';
-
-
-    /*
-     * 獎勵
-     */
-document
-.getElementById(
-'detailReward'
-@@ -766,25 +1970,17 @@
-rewardText(card);
-
-
-    /*
-     * Reward 狀態
-     */
-document
-.getElementById(
-'detailRewardStatus'
-)
-.textContent =
-
-card.rewardClaimed
-
-? 'REDEEMED'
-
-: 'AVAILABLE';
-
-
-    /*
-     * 有 Memory 才顯示按鈕
-     */
-const memoryButton =
-document.getElementById(
-'memoryButton'
-@@ -794,15 +1990,10 @@
-memoryButton.style.display =
-
-currentMemoryId
-
-? 'block'
-
-: 'none';
-
-
-    /*
-     * 打開詳情
-     */
-document
-.getElementById(
-'modalMask'
-@@ -816,6 +2007,7 @@
-
-function closeDetail() {
-
-
-document
-.getElementById(
-'modalMask'
-@@ -824,32 +2016,31 @@
-.remove('show');
-
-
-    currentMemoryId = '';
-    currentMemoryId =
-      '';
-
-}
-
-
-
-  /* =========================================
-     回憶相簿
-     ========================================= */
-  /* =========================
-     MEMORY
-     ========================= */
-
-function openMemory() {
-
-
-if (!currentMemoryId) {
-return;
-}
-
-
-/*
-     * 下一階段建立 memory.html 後，
-     * 改成：
-     * 下一階段我們會建立：
-     *
-     * memory.html?id=MEM-XXXX
-    *
-     * window.location.href =
-     *   '/memory.html?id=' +
-     *   encodeURIComponent(
-     *     currentMemoryId
-     *   );
-     * 現在先不要跳 404
-    */
-
-showToast(
-@@ -860,12 +2051,13 @@
-
-
-
-  /* =========================================
-     Reward 文字
-     ========================================= */
-  /* =========================
-     HELPERS
-     ========================= */
-
-function rewardText(card) {
-
-
-const type =
-String(
-card.rewardType || ''
-@@ -879,15 +2071,12 @@
-
-
-if (!type) {
-
-return 'SPECIAL CARD';
-
-}
-
-
-if (
-      type ===
-      'LOVE_POINTS'
-      type === 'LOVE_POINTS'
-) {
-
-return (
-@@ -899,8 +2088,7 @@
-
-
-if (
-      type ===
-      'MASSAGE_POINTS'
-      type === 'MASSAGE_POINTS'
-) {
-
-return (
-@@ -912,8 +2100,7 @@
-
-
-if (
-      type ===
-      'COUPON'
-      type === 'COUPON'
-) {
-
-return (
-@@ -925,300 +2112,30 @@
-
-
-return (
-
-type +
-
-(
-amount
-? ' +' + amount
-: ''
-)
-
-);
-
-}
-
-
-
-  /* =========================================
-     本機快取
-     ========================================= */
-
-  async function makeCacheKey(
-    lineSub
-  ) {
-
-    const prefix =
-      'WLC_CARD_COLLECTION_V2';
-
-
-    try {
-
-      /*
-       * 不直接把 LINE User ID
-       * 當 localStorage key。
-       *
-       * 先 SHA-256。
-       */
-      const input =
-        new TextEncoder()
-          .encode(
-            lineSub
-          );
-
-
-      const digest =
-        await crypto
-          .subtle
-          .digest(
-            'SHA-256',
-            input
-          );
-
-
-      const hash =
-        Array
-          .from(
-            new Uint8Array(
-              digest
-            )
-          )
-          .map(
-            byte =>
-              byte
-                .toString(16)
-                .padStart(2, '0')
-          )
-          .join('');
-
-
-      return (
-        prefix +
-        '_' +
-        hash.substring(
-          0,
-          20
-        )
-      );
-
-
-    } catch (error) {
-
-      /*
-       * 極少數瀏覽器如果不支援
-       * Web Crypto，
-       * 使用共用 fallback。
-       */
-      return (
-        prefix +
-        '_FALLBACK'
-      );
-
-    }
-
-  }
-
-
-
-  function saveCachedCollection(
-    data
-  ) {
-
-    if (!cacheKey) {
+    if (
+      !card ||
+      !card.collected
+    ) {
       return;
     }
 
 
-    try {
+    currentMemoryId =
+      card.memoryId || '';
 
-      localStorage.setItem(
 
-        cacheKey,
-
-        JSON.stringify({
-
-          savedAt:
-            Date.now(),
-
-          data:
-            data
-
-        })
-
+    const detailImage =
+      document.getElementById(
+        'detailImage'
       );
 
-    } catch (error) {
 
-      console.warn(
-        'Cache save failed',
-        error
-      );
-
-    }
-
-  }
+    if (card.cardImageUrl) {
 
 
+      detailImage.innerHTML = `
 
-  function loadCachedCollection() {
-
-    if (!cacheKey) {
-      return null;
-    }
-
-
-    try {
-
-      const raw =
-        localStorage.getItem(
-          cacheKey
-        );
-
-
-      if (!raw) {
-        return null;
-      }
-
-
-      const cache =
-        JSON.parse(raw);
-
-
-      if (
-        !cache ||
-        !cache.data
-      ) {
-
-        return null;
-
-      }
-
-
-      /*
-       * 最多保存 30 天。
-       *
-       * 每次打開仍然會背景更新，
-       * 所以平常資料會一直保持最新。
-       */
-      const maxAge =
-        30 *
-        24 *
-        60 *
-        60 *
-        1000;
-
-
-      if (
-        Date.now() -
-        Number(
-          cache.savedAt || 0
-        )
+        <img
+          src="${escapeAttribute(
+            card.cardImageUrl
+          )}"
+          alt="card"
         >
-        maxAge
-      ) {
 
-        localStorage.removeItem(
-          cacheKey
-        );
-
-        return null;
-
-      }
+      `;
 
 
-      return cache.data;
+    } else {
 
 
-    } catch (error) {
+      detailImage.innerHTML = `
 
-      console.warn(
-        'Cache read failed',
-        error
-      );
+        <div class="card-placeholder">
+          ♠
+        </div>
 
-      return null;
+      `;
 
     }
+
+
+    document
+      .getElementById(
+        'detailEdition'
+      )
+      .textContent =
+
+      card.edition ||
+      'LIMITED EDITION';
+
+
+    document
+      .getElementById(
+        'detailTitle'
+      )
+      .textContent =
+
+      card.cardName ||
+      'Whale Love Card';
+
+
+    document
+      .getElementById(
+        'detailCollected'
+      )
+      .textContent =
+
+      card.collectedAt ||
+      '-';
+
+
+    document
+      .getElementById(
+        'detailRelease'
+      )
+      .textContent =
+
+      card.releaseDate ||
+      '-';
+
+
+    document
+      .getElementById(
+        'detailReward'
+      )
+      .textContent =
+
+      rewardText(card);
+
+
+    document
+      .getElementById(
+        'detailRewardStatus'
+      )
+      .textContent =
+
+      card.rewardClaimed
+        ? 'REDEEMED'
+        : 'AVAILABLE';
+
+
+    const memoryButton =
+      document.getElementById(
+        'memoryButton'
+      );
+
+
+    memoryButton.style.display =
+
+      currentMemoryId
+        ? 'block'
+        : 'none';
+
+
+    document
+      .getElementById(
+        'modalMask'
+      )
+      .classList
+      .add('show');
 
   }
 
 
 
-  /* =========================================
-     Fetch timeout
-     ========================================= */
-
-  async function fetchWithTimeout(
-    url,
-    timeout
-  ) {
-
-    const controller =
-      new AbortController();
+  function closeDetail() {
 
 
-    const timer =
-      setTimeout(
-        () => {
+    document
+      .getElementById(
+        'modalMask'
+      )
+      .classList
+      .remove('show');
 
-          controller.abort();
 
-        },
-        timeout
+    currentMemoryId =
+      '';
+
+  }
+
+
+
+  /* =========================
+     MEMORY
+     ========================= */
+
+  function openMemory() {
+
+
+    if (!currentMemoryId) {
+      return;
+    }
+
+
+    /*
+     * 下一階段我們會建立：
+     *
+     * memory.html?id=MEM-XXXX
+     *
+     * 現在先不要跳 404
+     */
+
+    showToast(
+      '回憶相簿功能下一步開放 ♡'
+    );
+
+  }
+
+
+
+  /* =========================
+     HELPERS
+     ========================= */
+
+  function rewardText(card) {
+
+
+    const type =
+      String(
+        card.rewardType || ''
       );
+
+
+    const amount =
+      Number(
+        card.rewardAmount || 0
+      );
+
+
+    if (!type) {
+      return 'SPECIAL CARD';
+    }
+
+
+    if (
+      type === 'LOVE_POINTS'
+    ) {
+
+      return (
+        'Love Points +' +
+        amount
+      );
+
+    }
+
+
+    if (
+      type === 'MASSAGE_POINTS'
+    ) {
+
+      return (
+        'Massage +' +
+        amount
+      );
+
+    }
+
+
+    if (
+      type === 'COUPON'
+    ) {
+
+      return (
+        'Coupon ×' +
+        amount
+      );
+
+    }
+
+
+    return (
+      type +
+      (
+        amount
+          ? ' +' + amount
+          : ''
+      )
+    );
+
+  }
+
+
+
+  function goHome() {
+
+    window.location.href =
+      '/';
+
+  }
+
+
+
+  function refreshLogin() {
 
 
     try {
 
-      return await fetch(
-        url,
-        {
+      liff.logout();
 
-          signal:
-            controller.signal,
-
-          cache:
-            'no-store'
-
-        }
-      );
+    } catch (error) {}
 
 
-    } catch (error) {
+    liff.login({
 
-      if (
-        error.name ===
-        'AbortError'
-      ) {
+      redirectUri:
+        window.location.href
 
-        throw new Error(
-          '伺服器讀取時間過久'
-        );
-
-      }
-
-
-      throw error;
-
-
-    } finally {
-
-      clearTimeout(
-        timer
-      );
-  function goHome() {
-
-    }
-    window.location.href =
-      '/';
-
-}
-
-
-
-  /* =========================================
-     LINE Token 更新
-     ========================================= */
-
-function refreshLogin() {
-
-
-try {
-
-liff.logout();
-@@ -1237,25 +2154,9 @@
-
-
-
-  /* =========================================
-     返回會員中心
-     ========================================= */
-
-  function goHome() {
-
-    window.location.href =
-      '/';
+    });
 
   }
 
 
 
-  /* =========================================
-     Toast
-     ========================================= */
-
-function showToast(message) {
+  function showToast(message) {
 
 
-const toast =
-document.getElementById(
-'toast'
-@@ -1288,10 +2189,6 @@
+    const toast =
+      document.getElementById(
+        'toast'
+      );
 
 
+    toast.textContent =
+      message;
 
-  /* =========================================
-     HTML 安全處理
-     ========================================= */
 
-function escapeHtml(value) {
-
-return String(
-@@ -1329,18 +2226,17 @@
-
-function escapeAttribute(value) {
-
-    return escapeHtml(
-      value
+    toast.classList.add(
+      'show'
     );
+
+
+    setTimeout(
+      () => {
+
+        toast
+          .classList
+          .remove(
+            'show'
+          );
+
+      },
+      2400
+    );
+
+  }
+
+
+
+  function escapeHtml(value) {
+
+    return String(
+      value ?? ''
+    )
+
+      .replaceAll(
+        '&',
+        '&amp;'
+      )
+
+      .replaceAll(
+        '<',
+        '&lt;'
+      )
+
+      .replaceAll(
+        '>',
+        '&gt;'
+      )
+
+      .replaceAll(
+        '"',
+        '&quot;'
+      )
+
+      .replaceAll(
+        "'",
+        '&#039;'
+      );
+
+  }
+
+
+
+  function escapeAttribute(value) {
+
     return escapeHtml(value);
 
-}
+  }
 
 
 
-  /* =========================================
-     START
-     ========================================= */
-
-init();
+  init();
 
 </script>
 
