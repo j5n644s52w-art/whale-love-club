@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
-
 <head>
   <meta charset="UTF-8">
 
@@ -9,7 +8,7 @@
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
   >
 
-  <title>記帳本 | Whale Love Club</title>
+  <title>我們的記帳本 | Whale Love Club</title>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
@@ -564,11 +563,11 @@
     </div>
 
     <h1>
-      記帳本
+      我們的記帳本
     </h1>
 
     <div class="subtitle">
-      記錄收入與支出 ♡
+      記錄一起生活的每一筆收入與支出 ♡
     </div>
 
 
@@ -664,3 +663,1240 @@
       </div>
 
       <div
+        class="section-sub"
+        id="recordCount"
+      >
+        0 筆
+      </div>
+
+    </div>
+
+
+    <div
+      id="entries"
+      class="entries"
+    >
+
+      <div class="loading">
+        正在讀取記帳資料...
+      </div>
+
+    </div>
+
+  </main>
+
+
+
+  <!-- 新增紀錄 -->
+
+  <div
+    class="modal-mask"
+    id="modalMask"
+  >
+
+    <div class="modal">
+
+      <div class="modal-handle"></div>
+
+      <div class="modal-title">
+        新增紀錄 ♡
+      </div>
+
+
+      <div class="type-tabs">
+
+        <button
+          id="expenseTab"
+          class="type-tab active"
+          onclick="setType('EXPENSE')"
+        >
+          支出
+        </button>
+
+        <button
+          id="incomeTab"
+          class="type-tab"
+          onclick="setType('INCOME')"
+        >
+          收入
+        </button>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          金額
+        </label>
+
+        <input
+          class="input"
+          id="amount"
+          type="number"
+          min="1"
+          inputmode="decimal"
+          placeholder="例如 1280"
+        >
+
+      </div>
+
+
+      <div class="two-cols">
+
+        <div class="field">
+
+          <label>
+            分類
+          </label>
+
+          <select
+            class="input"
+            id="category"
+          >
+
+            <option value="餐飲">
+              餐飲
+            </option>
+
+            <option value="交通">
+              交通
+            </option>
+
+            <option value="購物">
+              購物
+            </option>
+
+            <option value="旅遊">
+              旅遊
+            </option>
+
+            <option value="約會">
+              約會
+            </option>
+
+            <option value="禮物">
+              禮物
+            </option>
+
+            <option value="生活">
+              生活
+            </option>
+
+            <option value="約會基金">
+              約會基金
+            </option>
+
+            <option value="其他">
+              其他
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            日期
+          </label>
+
+          <input
+            class="input"
+            id="entryDate"
+            type="date"
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          項目名稱
+        </label>
+
+        <input
+          class="input"
+          id="title"
+          type="text"
+          maxlength="60"
+          placeholder="例如：燒肉晚餐"
+        >
+
+      </div>
+
+
+      <div class="two-cols">
+
+        <div class="field">
+
+          <label>
+            誰付款
+          </label>
+
+          <select
+            class="input"
+            id="paidBy"
+          >
+
+            <option value="ADMIN001">
+              會員 A
+            </option>
+
+            <option value="WLC001">
+              會員 B
+            </option>
+
+            <option value="JOINT">
+              共同
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            花在誰身上
+          </label>
+
+          <select
+            class="input"
+            id="forWhom"
+          >
+
+            <option value="BOTH">
+              兩個人
+            </option>
+
+            <option value="ADMIN001">
+              會員 A
+            </option>
+
+            <option value="WLC001">
+              會員 B
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          備註
+        </label>
+
+        <textarea
+          class="input"
+          id="note"
+          maxlength="300"
+          placeholder="想記下來的事情..."
+        ></textarea>
+
+      </div>
+
+
+      <div class="form-actions">
+
+        <button
+          class="cancel"
+          onclick="closeModal()"
+        >
+          取消
+        </button>
+
+        <button
+          class="save"
+          id="saveButton"
+          onclick="saveEntry()"
+        >
+          儲存 ♡
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div
+    class="toast"
+    id="toast"
+  ></div>
+
+
+
+<script>
+
+  /*
+   * 把這裡換成 index.html 使用的同一個 LIFF ID
+   */
+  const LIFF_ID =
+    '2011857712-lXq9lJFT';
+
+
+  let idToken = '';
+
+  let selectedType =
+    'EXPENSE';
+
+
+  const now =
+    new Date();
+
+
+  let selectedYear =
+    now.getFullYear();
+
+
+  let selectedMonth =
+    now.getMonth() + 1;
+
+
+
+  const monthNames = [
+    'JANUARY',
+    'FEBRUARY',
+    'MARCH',
+    'APRIL',
+    'MAY',
+    'JUNE',
+    'JULY',
+    'AUGUST',
+    'SEPTEMBER',
+    'OCTOBER',
+    'NOVEMBER',
+    'DECEMBER'
+  ];
+
+
+
+  /* ==============================
+     初始化
+     ============================== */
+
+  async function init() {
+
+    try {
+
+      await liff.init({
+        liffId: LIFF_ID
+      });
+
+
+      if (!liff.isLoggedIn()) {
+
+        liff.login({
+          redirectUri:
+            window.location.href
+        });
+
+        return;
+      }
+
+
+      idToken =
+        liff.getIDToken();
+
+
+      if (!idToken) {
+
+        throw new Error(
+          '無法取得 LINE 登入資訊'
+        );
+
+      }
+
+
+      setToday();
+
+      updateMonthTitle();
+
+      await loadLedger();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      document
+        .getElementById('entries')
+        .innerHTML = `
+
+          <div class="empty">
+
+            無法載入記帳本<br>
+
+            ${escapeHtml(
+              error.message ||
+              '請稍後再試'
+            )}
+
+          </div>
+
+        `;
+
+    }
+
+  }
+
+
+
+  /* ==============================
+     讀取資料
+     ============================== */
+
+  async function loadLedger() {
+
+    document
+      .getElementById('entries')
+      .innerHTML = `
+
+        <div class="loading">
+          正在讀取記帳資料...
+        </div>
+
+      `;
+
+
+    const params =
+      new URLSearchParams({
+
+        idToken:
+          idToken,
+
+        year:
+          selectedYear,
+
+        month:
+          selectedMonth
+
+      });
+
+
+    const response =
+      await fetch(
+        '/api/ledger?' +
+        params.toString()
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+      if (
+        String(
+          data.message || ''
+        )
+          .toLowerCase()
+          .includes('expired')
+      ) {
+
+        return refreshLogin();
+
+      }
+
+
+      throw new Error(
+        data.message ||
+        '讀取失敗'
+      );
+
+    }
+
+
+    renderSummary(
+      data.summary || {}
+    );
+
+
+    renderEntries(
+      data.entries || []
+    );
+
+  }
+
+
+
+  /* ==============================
+     顯示摘要
+     ============================== */
+
+  function renderSummary(summary) {
+
+    document
+      .getElementById(
+        'incomeValue'
+      )
+      .textContent =
+      money(
+        summary.income || 0
+      );
+
+
+    document
+      .getElementById(
+        'expenseValue'
+      )
+      .textContent =
+      money(
+        summary.expense || 0
+      );
+
+
+    document
+      .getElementById(
+        'balanceValue'
+      )
+      .textContent =
+      money(
+        summary.balance || 0
+      );
+
+  }
+
+
+
+  /* ==============================
+     顯示紀錄
+     ============================== */
+
+  function renderEntries(entries) {
+
+    const container =
+      document.getElementById(
+        'entries'
+      );
+
+
+    document
+      .getElementById(
+        'recordCount'
+      )
+      .textContent =
+      `${entries.length} 筆`;
+
+
+    if (!entries.length) {
+
+      container.innerHTML = `
+
+        <div class="empty">
+
+          這個月還沒有任何紀錄 ♡<br>
+
+          點上方「新增一筆紀錄」開始記帳
+
+        </div>
+
+      `;
+
+      return;
+    }
+
+
+    container.innerHTML =
+      entries
+        .map(entry => {
+
+          const isIncome =
+            entry.type === 'INCOME';
+
+
+          const sign =
+            isIncome
+              ? '+'
+              : '-';
+
+
+          const amountClass =
+            isIncome
+              ? 'income'
+              : 'expense';
+
+
+          return `
+
+            <article class="entry">
+
+              <div>
+
+                <div class="entry-title">
+
+                  ${escapeHtml(
+                    entry.title
+                  )}
+
+                </div>
+
+
+                <div class="entry-meta">
+
+                  ${escapeHtml(
+                    entry.date
+                  )}
+
+                  ・
+
+                  ${escapeHtml(
+                    entry.category
+                  )}
+
+                  <br>
+
+                  付款：
+                  ${personName(
+                    entry.paidBy
+                  )}
+
+                  ・
+
+                  對象：
+                  ${forWhomName(
+                    entry.forWhom
+                  )}
+
+                </div>
+
+
+                ${
+                  entry.note
+
+                  ? `
+
+                    <div class="entry-note">
+
+                      ${escapeHtml(
+                        entry.note
+                      )}
+
+                    </div>
+
+                  `
+
+                  : ''
+                }
+
+              </div>
+
+
+              <div
+                class="
+                  entry-amount
+                  ${amountClass}
+                "
+              >
+
+                ${sign}${money(
+                  entry.amount
+                )}
+
+              </div>
+
+            </article>
+
+          `;
+
+        })
+        .join('');
+
+  }
+
+
+
+  /* ==============================
+     月份切換
+     ============================== */
+
+  async function changeMonth(step) {
+
+    selectedMonth += step;
+
+
+    if (selectedMonth === 13) {
+
+      selectedMonth = 1;
+
+      selectedYear++;
+
+    }
+
+
+    if (selectedMonth === 0) {
+
+      selectedMonth = 12;
+
+      selectedYear--;
+
+    }
+
+
+    updateMonthTitle();
+
+
+    try {
+
+      await loadLedger();
+
+    } catch (error) {
+
+      showToast(
+        error.message ||
+        '月份載入失敗'
+      );
+
+    }
+
+  }
+
+
+
+  function updateMonthTitle() {
+
+    document
+      .getElementById(
+        'monthTitle'
+      )
+      .textContent =
+      monthNames[
+        selectedMonth - 1
+      ];
+
+
+    document
+      .getElementById(
+        'yearTitle'
+      )
+      .textContent =
+      selectedYear;
+
+  }
+
+
+
+  /* ==============================
+     新增紀錄
+     ============================== */
+
+  function openModal() {
+
+    setToday();
+
+    document
+      .getElementById(
+        'modalMask'
+      )
+      .classList
+      .add('show');
+
+  }
+
+
+
+  function closeModal() {
+
+    document
+      .getElementById(
+        'modalMask'
+      )
+      .classList
+      .remove('show');
+
+  }
+
+
+
+  function setType(type) {
+
+    selectedType =
+      type;
+
+
+    document
+      .getElementById(
+        'expenseTab'
+      )
+      .classList
+      .toggle(
+        'active',
+        type === 'EXPENSE'
+      );
+
+
+    document
+      .getElementById(
+        'incomeTab'
+      )
+      .classList
+      .toggle(
+        'active',
+        type === 'INCOME'
+      );
+
+  }
+
+
+
+  async function saveEntry() {
+
+    const amount =
+      Number(
+        document
+          .getElementById(
+            'amount'
+          )
+          .value
+      );
+
+
+    const title =
+      document
+        .getElementById(
+          'title'
+        )
+        .value
+        .trim();
+
+
+    if (
+      !amount ||
+      amount <= 0
+    ) {
+
+      showToast(
+        '請輸入正確金額'
+      );
+
+      return;
+    }
+
+
+    if (!title) {
+
+      showToast(
+        '請輸入項目名稱'
+      );
+
+      return;
+    }
+
+
+    const entry = {
+
+      type:
+        selectedType,
+
+      amount:
+        amount,
+
+      category:
+        document
+          .getElementById(
+            'category'
+          )
+          .value,
+
+      title:
+        title,
+
+      paidBy:
+        document
+          .getElementById(
+            'paidBy'
+          )
+          .value,
+
+      forWhom:
+        document
+          .getElementById(
+            'forWhom'
+          )
+          .value,
+
+      date:
+        document
+          .getElementById(
+            'entryDate'
+          )
+          .value,
+
+      note:
+        document
+          .getElementById(
+            'note'
+          )
+          .value
+          .trim()
+
+    };
+
+
+    const button =
+      document.getElementById(
+        'saveButton'
+      );
+
+
+    button.disabled = true;
+
+    button.textContent =
+      '儲存中...';
+
+
+    try {
+
+      const response =
+        await fetch(
+          '/api/ledger',
+          {
+
+            method:
+              'POST',
+
+            headers: {
+
+              'Content-Type':
+                'application/json'
+
+            },
+
+            body:
+              JSON.stringify({
+
+                idToken:
+                  idToken,
+
+                entry:
+                  entry
+
+              })
+
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!data.success) {
+
+        if (
+          String(
+            data.message || ''
+          )
+            .toLowerCase()
+            .includes('expired')
+        ) {
+
+          return refreshLogin();
+
+        }
+
+
+        throw new Error(
+          data.message ||
+          '新增失敗'
+        );
+
+      }
+
+
+      closeModal();
+
+      resetForm();
+
+
+      showToast(
+        '已加入我們的帳本 ♡'
+      );
+
+
+      const date =
+        new Date(entry.date);
+
+
+      selectedYear =
+        date.getFullYear();
+
+
+      selectedMonth =
+        date.getMonth() + 1;
+
+
+      updateMonthTitle();
+
+
+      await loadLedger();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      showToast(
+        error.message ||
+        '新增失敗'
+      );
+
+    } finally {
+
+      button.disabled = false;
+
+      button.textContent =
+        '儲存 ♡';
+
+    }
+
+  }
+
+
+
+  /* ==============================
+     小工具
+     ============================== */
+
+  function resetForm() {
+
+    document
+      .getElementById(
+        'amount'
+      )
+      .value = '';
+
+
+    document
+      .getElementById(
+        'title'
+      )
+      .value = '';
+
+
+    document
+      .getElementById(
+        'note'
+      )
+      .value = '';
+
+
+    setType(
+      'EXPENSE'
+    );
+
+
+    setToday();
+
+  }
+
+
+
+  function setToday() {
+
+    const d =
+      new Date();
+
+
+    const year =
+      d.getFullYear();
+
+
+    const month =
+      String(
+        d.getMonth() + 1
+      ).padStart(
+        2,
+        '0'
+      );
+
+
+    const day =
+      String(
+        d.getDate()
+      ).padStart(
+        2,
+        '0'
+      );
+
+
+    document
+      .getElementById(
+        'entryDate'
+      )
+      .value =
+      `${year}-${month}-${day}`;
+
+  }
+
+
+
+  function money(value) {
+
+    return '$' +
+      Number(
+        value || 0
+      )
+        .toLocaleString(
+          'zh-TW'
+        );
+
+  }
+
+
+
+  function personName(value) {
+
+    const map = {
+
+      ADMIN001:
+        '會員 A',
+
+      WLC001:
+        '會員 B',
+
+      JOINT:
+        '共同'
+
+    };
+
+
+    return map[value] ||
+      escapeHtml(value || '-');
+
+  }
+
+
+
+  function forWhomName(value) {
+
+    const map = {
+
+      ADMIN001:
+        '會員 A',
+
+      WLC001:
+        '會員 B',
+
+      BOTH:
+        '兩個人'
+
+    };
+
+
+    return map[value] ||
+      escapeHtml(value || '-');
+
+  }
+
+
+
+  function escapeHtml(value) {
+
+    return String(
+      value ?? ''
+    )
+      .replaceAll(
+        '&',
+        '&amp;'
+      )
+      .replaceAll(
+        '<',
+        '&lt;'
+      )
+      .replaceAll(
+        '>',
+        '&gt;'
+      )
+      .replaceAll(
+        '"',
+        '&quot;'
+      )
+      .replaceAll(
+        "'",
+        '&#039;'
+      );
+
+  }
+
+
+
+  function showToast(message) {
+
+    const toast =
+      document.getElementById(
+        'toast'
+      );
+
+
+    toast.textContent =
+      message;
+
+
+    toast.classList.add(
+      'show'
+    );
+
+
+    setTimeout(
+      () => {
+
+        toast.classList.remove(
+          'show'
+        );
+
+      },
+      2400
+    );
+
+  }
+
+
+
+  function refreshLogin() {
+
+    try {
+
+      liff.logout();
+
+    } catch (error) {}
+
+
+    liff.login({
+
+      redirectUri:
+        window.location.href
+
+    });
+
+  }
+
+
+
+  function goHome() {
+
+    window.location.href =
+      '/';
+
+  }
+
+
+
+  init();
+
+</script>
+
+</body>
+</html>
