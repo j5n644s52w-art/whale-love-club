@@ -842,3 +842,202 @@
   box-shadow:
     0 5px 0 rgba(101,69,69,.07) !important;
 }
+/* ==================================================
+   CARD DETAIL
+   卡片收藏 → 點進卡片後的詳細頁
+   ================================================== */
+
+.cute-collection .modal-mask {
+  background: rgba(111, 79, 88, .28) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+
+/* 詳情底板 */
+
+.cute-collection .detail-modal {
+  background:
+    linear-gradient(
+      160deg,
+      #fff9fc 0%,
+      #fff0f6 48%,
+      #eaf7ff 100%
+    ) !important;
+
+  border-top:
+    4px solid #f4abc5 !important;
+
+  border-radius:
+    28px 28px 0 0 !important;
+
+  color: #654545 !important;
+
+  box-shadow:
+    0 -8px 30px rgba(177, 112, 139, .16) !important;
+}
+
+
+/* 上方拖曳小橫條 */
+
+.cute-collection .handle {
+  background: #efadc5 !important;
+
+  width: 48px !important;
+
+  height: 5px !important;
+}
+
+
+/* 卡片大圖區 */
+
+.cute-collection .detail-image {
+  background:
+    linear-gradient(
+      135deg,
+      #ffd9e7,
+      #fff1d2 48%,
+      #dff4ff
+    ) !important;
+
+  border:
+    3px solid #654545 !important;
+
+  border-radius:
+    22px !important;
+
+  box-shadow:
+    0 7px 0 rgba(101,69,69,.08) !important;
+}
+
+
+/* 沒圖片時的圖案 */
+
+.cute-collection .detail-image .card-placeholder {
+  background: #ffffff !important;
+
+  color: #e989ad !important;
+
+  border:
+    3px solid #654545 !important;
+
+  box-shadow:
+    0 5px 0 rgba(101,69,69,.07) !important;
+}
+
+
+/* LIMITED EDITION 小字 */
+
+.cute-collection .detail-edition {
+  color: #df759d !important;
+
+  font-weight: 900 !important;
+
+  letter-spacing: 2px !important;
+}
+
+
+/* 卡片名稱 */
+
+.cute-collection .detail-title {
+  color: #654545 !important;
+
+  font-family:
+    "Arial Rounded MT Bold",
+    "PingFang TC",
+    "Noto Sans TC",
+    sans-serif !important;
+
+  font-weight: 900 !important;
+}
+
+
+/* 分隔線 */
+
+.cute-collection .detail-line {
+  border-color:
+    #f1cbd8 !important;
+}
+
+
+/* COLLECTED / RELEASE / REWARD */
+
+.cute-collection .detail-row {
+  background:
+    rgba(255,255,255,.58) !important;
+
+  border:
+    2px solid rgba(101,69,69,.10) !important;
+
+  border-radius:
+    14px !important;
+
+  padding:
+    11px 13px !important;
+
+  margin:
+    9px 0 !important;
+}
+
+
+.cute-collection .detail-label {
+  color: #a17785 !important;
+
+  font-weight: 800 !important;
+
+  font-size: 10px !important;
+
+  letter-spacing: 1px !important;
+}
+
+
+.cute-collection .detail-value {
+  color: #654545 !important;
+
+  font-weight: 900 !important;
+}
+
+
+/* 查看回憶 */
+
+.cute-collection .detail-action {
+  background:
+    linear-gradient(
+      135deg,
+      #ffc4d9,
+      #c1ebff
+    ) !important;
+
+  color: #654545 !important;
+
+  border:
+    3px solid #654545 !important;
+
+  border-radius:
+    15px !important;
+
+  box-shadow:
+    0 6px 0 rgba(101,69,69,.09) !important;
+
+  font-weight:
+    900 !important;
+}
+
+
+/* 關閉 */
+
+.cute-collection .close-button {
+  background:
+    #ffffff !important;
+
+  color:
+    #8d6b75 !important;
+
+  border:
+    2px solid #654545 !important;
+
+  border-radius:
+    15px !important;
+
+  font-weight:
+    800 !important;
+}
