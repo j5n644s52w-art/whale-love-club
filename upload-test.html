@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <title>照片上傳測試 | Whale Love Club</title>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+
+      font-family:
+        "PingFang TC",
+        "Noto Sans TC",
+        sans-serif;
+
+      background:
+        linear-gradient(
+          135deg,
+          #ffe6ef,
+          #e4f6ff
+        );
+
+      color: #654545;
+
+      padding:
+        40px 20px;
+    }
+
+    .card {
+      max-width: 520px;
+
+      margin: 0 auto;
+
+      background: white;
+
+      border:
+        3px solid #654545;
+
+      border-radius:
+        26px;
+
+      padding:
+        25px;
+
+      box-shadow:
+        0 8px 0
+        rgba(101,69,69,.08);
+    }
+
+    h1 {
+      margin-top: 0;
+
+      font-size: 25px;
+    }
+
+    .sub {
+      color: #957575;
+
+      font-size: 13px;
+
+      line-height: 1.7;
+
+      margin-bottom: 25px;
+    }
+
+    .photo-preview {
+      width: 100%;
+      min-height: 230px;
+
+      border:
+        3px dashed #efabc4;
+
+      border-radius:
+        20px;
+
+      background:
+        #fff4f8;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      overflow: hidden;
+
+      margin-bottom: 18px;
+
+      color: #b48a98;
+    }
+
+    .photo-preview img {
+      width: 100%;
+      max-height: 420px;
+
+      object-fit: contain;
+
+      display: block;
+    }
+
+    input[type="file"] {
+      width: 100%;
+
+      margin-bottom: 15px;
+    }
+
+    button {
+      width: 100%;
+
+      border:
+        3px solid #654545;
+
+      border-radius:
+        15px;
+
+      padding:
+        14px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #ffc7db,
+          #bfeaff
+        );
+
+      color: #654545;
+
+      font-size: 15px;
+
+      font-weight: 900;
+
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .5;
+    }
+
+    .status {
+      margin-top: 20px;
+
+      padding: 14px;
+
+      border-radius: 15px;
+
+      background:
+        rgba(255,255,255,.75);
+
+      font-size: 13px;
+
+      line-height: 1.7;
+
+      word-break: break-word;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+  <div class="card">
+
+    <h1>
+      照片上傳測試 ♡
+    </h1>
+
+    <div class="sub">
+      選擇一張手機照片。<br>
+      測試成功後，照片會出現在
+      Google Drive → Whale Love Club Photos → Memories。
+    </div>
+
+
+    <div
+      class="photo-preview"
+      id="preview"
+    >
+      尚未選擇照片
+    </div>
+
+
+    <input
+      type="file"
+      id="photoInput"
+      accept="image/jpeg,image/png,image/webp,image/*"
+    >
+
+
+    <button
+      id="uploadButton"
+      onclick="uploadPhoto()"
+    >
+      上傳照片 ♡
+    </button>
+
+
+    <div
+      class="status"
+      id="status"
+    >
+      正在初始化 LINE...
+    </div>
+
+  </div>
+
+
+<script>
+
+  /*
+   * 請使用 index.html
+   * 現在正在使用的同一個 LIFF ID
+   */
+  const LIFF_ID =
+    '2011857712-lXq9lJFT';
+
+
+  let idToken = '';
+
+  let preparedPhoto = null;
+
+
+  /* =========================
+     INIT
+     ========================= */
+
+  async function init() {
+
+    try {
+
+      await liff.init({
+        liffId: LIFF_ID
+      });
+
+
+      if (!liff.isLoggedIn()) {
+
+        liff.login({
+          redirectUri:
+            window.location.href
+        });
+
+        return;
+      }
+
+
+      idToken =
+        liff.getIDToken();
+
+
+      if (!idToken) {
+
+        throw new Error(
+          '無法取得 LINE 登入資訊'
+        );
+      }
+
+
+      setStatus(
+        'LINE 登入成功，可以選擇照片 ♡'
+      );
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      setStatus(
+        '初始化失敗：' +
+        error.message
+      );
+    }
+
+  }
+
+
+
+  /* =========================
+     選照片
+     ========================= */
+
+  document
+    .getElementById('photoInput')
+    .addEventListener(
+      'change',
+      async function(event) {
+
+        const file =
+          event.target.files?.[0];
+
+
+        if (!file) {
+          return;
+        }
+
+
+        try {
+
+          setStatus(
+            '正在處理照片...'
+          );
+
+
+          preparedPhoto =
+            await prepareImage(file);
+
+
+          document
+            .getElementById('preview')
+            .innerHTML = `
+
+              <img
+                src="${preparedPhoto.previewUrl}"
+                alt="preview"
+              >
+
+            `;
+
+
+          const kb =
+            Math.round(
+              preparedPhoto.base64Data.length *
+              0.75 /
+              1024
+            );
+
+
+          setStatus(
+            '照片準備完成，約 ' +
+            kb +
+            ' KB'
+          );
+
+
+        } catch (error) {
+
+          console.error(error);
+
+          preparedPhoto = null;
+
+          setStatus(
+            '照片處理失敗：' +
+            error.message
+          );
+        }
+
+      }
+    );
+
+
+
+  /* =========================
+     壓縮照片
+     ========================= */
+
+  function prepareImage(file) {
+
+    return new Promise(
+      (resolve, reject) => {
+
+        const reader =
+          new FileReader();
+
+
+        reader.onload =
+          function() {
+
+            const image =
+              new Image();
+
+
+            image.onload =
+              function() {
+
+                const maxSize =
+                  1600;
+
+
+                let width =
+                  image.width;
+
+                let height =
+                  image.height;
+
+
+                if (
+                  width > maxSize ||
+                  height > maxSize
+                ) {
+
+                  const ratio =
+                    Math.min(
+                      maxSize / width,
+                      maxSize / height
+                    );
+
+
+                  width =
+                    Math.round(
+                      width * ratio
+                    );
+
+                  height =
+                    Math.round(
+                      height * ratio
+                    );
+                }
+
+
+                const canvas =
+                  document.createElement(
+                    'canvas'
+                  );
+
+
+                canvas.width =
+                  width;
+
+                canvas.height =
+                  height;
+
+
+                const ctx =
+                  canvas.getContext(
+                    '2d'
+                  );
+
+
+                ctx.drawImage(
+                  image,
+                  0,
+                  0,
+                  width,
+                  height
+                );
+
+
+                const dataUrl =
+                  canvas.toDataURL(
+                    'image/jpeg',
+                    0.82
+                  );
+
+
+                resolve({
+
+                  fileName:
+                    'WLC_' +
+                    Date.now() +
+                    '.jpg',
+
+                  mimeType:
+                    'image/jpeg',
+
+                  base64Data:
+                    dataUrl,
+
+                  previewUrl:
+                    dataUrl
+
+                });
+
+              };
+
+
+            image.onerror =
+              function() {
+
+                reject(
+                  new Error(
+                    '無法讀取圖片'
+                  )
+                );
+              };
+
+
+            image.src =
+              reader.result;
+
+          };
+
+
+        reader.onerror =
+          function() {
+
+            reject(
+              new Error(
+                '無法讀取檔案'
+              )
+            );
+          };
+
+
+        reader.readAsDataURL(
+          file
+        );
+
+      }
+    );
+
+  }
+
+
+
+  /* =========================
+     UPLOAD
+     ========================= */
+
+  async function uploadPhoto() {
+
+    if (!preparedPhoto) {
+
+      setStatus(
+        '請先選擇一張照片'
+      );
+
+      return;
+    }
+
+
+    const button =
+      document.getElementById(
+        'uploadButton'
+      );
+
+
+    button.disabled = true;
+
+    button.textContent =
+      '上傳中...';
+
+
+    try {
+
+      setStatus(
+        '正在上傳到 Google Drive...'
+      );
+
+
+      const response =
+        await fetch(
+          '/api/upload-photo',
+          {
+
+            method:
+              'POST',
+
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+
+            body:
+              JSON.stringify({
+
+                idToken:
+                  idToken,
+
+                fileName:
+                  preparedPhoto.fileName,
+
+                mimeType:
+                  preparedPhoto.mimeType,
+
+                base64Data:
+                  preparedPhoto.base64Data,
+
+                folderType:
+                  'Memories',
+
+                subfolderName:
+                  'UPLOAD_TEST'
+
+              })
+
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!data.success) {
+
+        throw new Error(
+          data.message ||
+          '上傳失敗'
+        );
+      }
+
+
+      setStatus(
+        '上傳成功 ♡\n' +
+        '檔名：' +
+        data.fileName +
+        '\nFile ID：' +
+        data.fileId
+      );
+
+
+      button.textContent =
+        '上傳成功 ♡';
+
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      setStatus(
+        '上傳失敗：' +
+        error.message
+      );
+
+
+      button.disabled = false;
+
+      button.textContent =
+        '重新上傳';
+
+    }
+
+  }
+
+
+
+  function setStatus(message) {
+
+    document
+      .getElementById('status')
+      .textContent =
+      message;
+
+  }
+
+
+  init();
+
+</script>
+
+</body>
+</html>
