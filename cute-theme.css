@@ -1,0 +1,844 @@
+/* ==================================================
+   WHALE LOVE CLUB
+   Cute Pink & Blue Theme
+   只修改視覺，不修改 display / position / JS 邏輯
+   ================================================== */
+
+
+/* ---------- 共用色彩 ---------- */
+
+.cute-ledger,
+.cute-collection,
+.cute-memories,
+.cute-memory {
+  --cute-brown: #654545;
+  --cute-muted: #977676;
+
+  --cute-pink: #f7b8cf;
+  --cute-pink-2: #ffe3ed;
+  --cute-pink-3: #fff1f6;
+
+  --cute-blue: #afe0fa;
+  --cute-blue-2: #e4f6ff;
+
+  --cute-yellow: #ffe58c;
+  --cute-white: #fffdfd;
+
+  color: var(--cute-brown) !important;
+
+  font-family:
+    "Arial Rounded MT Bold",
+    "PingFang TC",
+    "Noto Sans TC",
+    sans-serif !important;
+
+  background:
+    radial-gradient(
+      circle at 12% 8%,
+      rgba(255,255,255,.9) 0 5px,
+      transparent 6px
+    ),
+    linear-gradient(
+      135deg,
+      #ffe5ef 0%,
+      #fff3f7 45%,
+      #e2f5ff 100%
+    ) !important;
+}
+
+
+/* ---------- 共用 Header ---------- */
+
+.cute-ledger .topbar,
+.cute-collection .topbar,
+.cute-memories .topbar,
+.cute-memory .topbar {
+  background: rgba(255,255,255,.72) !important;
+  border: 2px solid rgba(101,69,69,.16) !important;
+  border-radius: 18px !important;
+  padding: 10px 14px !important;
+
+  box-shadow:
+    0 5px 0 rgba(101,69,69,.05) !important;
+}
+
+
+.cute-ledger .back,
+.cute-collection .back,
+.cute-memories .back,
+.cute-memory .back {
+  color: #d86e98 !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-ledger .brand-small,
+.cute-collection .brand-small,
+.cute-memories .brand-small,
+.cute-memory .brand-small {
+  color: #e98caf !important;
+}
+
+
+.cute-ledger .brand-name,
+.cute-collection .brand-name,
+.cute-memories .brand-name,
+.cute-memory .brand-name {
+  color: var(--cute-brown) !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-ledger .eyebrow,
+.cute-collection .eyebrow,
+.cute-memories .eyebrow,
+.cute-memory .eyebrow {
+  color: #e98caf !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-ledger h1,
+.cute-collection h1,
+.cute-memories h1 {
+  color: var(--cute-brown) !important;
+
+  font-family:
+    "Arial Rounded MT Bold",
+    "PingFang TC",
+    sans-serif !important;
+
+  font-weight: 900 !important;
+}
+
+
+.cute-ledger .subtitle,
+.cute-collection .subtitle,
+.cute-memories .subtitle {
+  color: var(--cute-muted) !important;
+}
+
+
+
+/* ==================================================
+   記帳本
+   ================================================== */
+
+.cute-ledger .month-control {
+  background: #ffffff !important;
+
+  border: 3px solid var(--cute-brown) !important;
+
+  border-radius: 22px !important;
+
+  box-shadow:
+    0 7px 0 rgba(101,69,69,.07) !important;
+}
+
+
+.cute-ledger .month-control button {
+  background: var(--cute-blue-2) !important;
+
+  color: var(--cute-brown) !important;
+
+  border: 2px solid var(--cute-brown) !important;
+}
+
+
+.cute-ledger #monthTitle {
+  color: #df759d !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-ledger #yearTitle {
+  color: var(--cute-muted) !important;
+}
+
+
+.cute-ledger .summary-card {
+  border: 3px solid var(--cute-brown) !important;
+
+  border-radius: 20px !important;
+
+  box-shadow:
+    0 6px 0 rgba(101,69,69,.07) !important;
+}
+
+
+.cute-ledger .summary-card:nth-child(1) {
+  background: #e2f6ed !important;
+}
+
+
+.cute-ledger .summary-card:nth-child(2) {
+  background: #ffe2ec !important;
+}
+
+
+.cute-ledger .summary-card:nth-child(3) {
+  background: #dff3ff !important;
+}
+
+
+.cute-ledger .summary-title {
+  color: var(--cute-muted) !important;
+  font-weight: 800 !important;
+}
+
+
+.cute-ledger .summary-value {
+  font-weight: 900 !important;
+}
+
+
+.cute-ledger .income {
+  color: #57a982 !important;
+}
+
+
+.cute-ledger .expense {
+  color: #df7196 !important;
+}
+
+
+.cute-ledger .balance {
+  color: #64a7cf !important;
+}
+
+
+.cute-ledger .add-button {
+  background:
+    linear-gradient(
+      135deg,
+      #ffc5da,
+      #bee9ff
+    ) !important;
+
+  color: var(--cute-brown) !important;
+
+  border: 3px solid var(--cute-brown) !important;
+
+  box-shadow:
+    0 7px 0 rgba(101,69,69,.08) !important;
+
+  font-weight: 900 !important;
+}
+
+
+.cute-ledger .section-title {
+  color: var(--cute-brown) !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-ledger .section-sub {
+  color: var(--cute-muted) !important;
+}
+
+
+.cute-ledger .entry {
+  background: #ffffff !important;
+
+  border: 3px solid var(--cute-brown) !important;
+
+  border-radius: 20px !important;
+
+  box-shadow:
+    0 5px 0 rgba(101,69,69,.06) !important;
+}
+
+
+.cute-ledger .entry:nth-child(odd) {
+  background: #fff0f5 !important;
+}
+
+
+.cute-ledger .entry:nth-child(even) {
+  background: #eaf7ff !important;
+}
+
+
+.cute-ledger .entry-title {
+  color: var(--cute-brown) !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-ledger .entry-meta,
+.cute-ledger .entry-note {
+  color: var(--cute-muted) !important;
+}
+
+
+.cute-ledger .modal {
+  background: #fff8fb !important;
+
+  border-top:
+    4px solid var(--cute-pink) !important;
+}
+
+
+.cute-ledger .modal-handle {
+  background: #efafc6 !important;
+}
+
+
+.cute-ledger .modal-title {
+  color: var(--cute-brown) !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-ledger .type-tabs {
+  background: var(--cute-blue-2) !important;
+
+  border: 2px solid var(--cute-brown) !important;
+}
+
+
+.cute-ledger .type-tab {
+  color: var(--cute-muted) !important;
+}
+
+
+.cute-ledger .type-tab.active {
+  background: #ffcfe0 !important;
+
+  color: var(--cute-brown) !important;
+
+  font-weight: 900 !important;
+}
+
+
+.cute-ledger .field label {
+  color: var(--cute-muted) !important;
+  font-weight: 800 !important;
+}
+
+
+.cute-ledger .input {
+  background: #ffffff !important;
+
+  color: var(--cute-brown) !important;
+
+  border: 2px solid #d9b5be !important;
+}
+
+
+.cute-ledger .save {
+  background:
+    linear-gradient(
+      135deg,
+      #ffc4d9,
+      #bde8ff
+    ) !important;
+
+  color: var(--cute-brown) !important;
+
+  border: 3px solid var(--cute-brown) !important;
+
+  font-weight: 900 !important;
+}
+
+
+.cute-ledger .cancel {
+  background: #ffffff !important;
+
+  color: var(--cute-muted) !important;
+
+  border: 2px solid var(--cute-brown) !important;
+}
+
+
+
+/* ==================================================
+   卡片收藏
+   ================================================== */
+
+.cute-collection .collection-summary {
+  background:
+    linear-gradient(
+      135deg,
+      #ffe0ec,
+      #ddf3ff
+    ) !important;
+
+  border: 3px solid var(--cute-brown) !important;
+
+  border-radius: 24px !important;
+
+  box-shadow:
+    0 7px 0 rgba(101,69,69,.07) !important;
+}
+
+
+.cute-collection .summary-label {
+  color: var(--cute-muted) !important;
+  font-weight: 800 !important;
+}
+
+
+.cute-collection .summary-count {
+  color: var(--cute-brown) !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-collection .progress {
+  background: #ffffff !important;
+
+  border: 2px solid var(--cute-brown) !important;
+
+  height: 10px !important;
+}
+
+
+.cute-collection .progress-fill {
+  background:
+    linear-gradient(
+      90deg,
+      #f4a6c3,
+      #8ed5f4
+    ) !important;
+}
+
+
+.cute-collection .section-title {
+  color: var(--cute-brown) !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-collection .section-sub {
+  color: var(--cute-muted) !important;
+}
+
+
+.cute-collection .collection-card {
+  background: #ffffff !important;
+
+  border: 3px solid var(--cute-brown) !important;
+
+  border-radius: 24px !important;
+
+  box-shadow:
+    0 7px 0 rgba(101,69,69,.07) !important;
+}
+
+
+.cute-collection .card-image {
+  background:
+    linear-gradient(
+      135deg,
+      #ffd8e6,
+      #dff4ff
+    ) !important;
+}
+
+
+.cute-collection .card-placeholder {
+  background: #fff !important;
+
+  border: 3px solid var(--cute-brown) !important;
+
+  color: #e98caf !important;
+}
+
+
+.cute-collection .card-edition {
+  color: #e98caf !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-collection .card-name {
+  color: var(--cute-brown) !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-collection .card-meta {
+  color: var(--cute-muted) !important;
+}
+
+
+.cute-collection .locked-card {
+  background:
+    repeating-linear-gradient(
+      135deg,
+      #fff0f5,
+      #fff0f5 12px,
+      #eaf7ff 12px,
+      #eaf7ff 24px
+    ) !important;
+
+  border:
+    3px dashed #b99a9f !important;
+
+  border-radius:
+    24px !important;
+
+  box-shadow:
+    0 5px 0 rgba(101,69,69,.05) !important;
+}
+
+
+.cute-collection .lock-symbol,
+.cute-collection .locked-title,
+.cute-collection .locked-text {
+  color: #a98c92 !important;
+}
+
+
+.cute-collection .detail-modal {
+  background: #fff9fb !important;
+
+  border-top:
+    4px solid var(--cute-pink) !important;
+}
+
+
+.cute-collection .detail-image {
+  background:
+    linear-gradient(
+      135deg,
+      #ffdbe8,
+      #dff4ff
+    ) !important;
+
+  border: 3px solid var(--cute-brown) !important;
+}
+
+
+.cute-collection .detail-edition {
+  color: #e98caf !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-collection .detail-title {
+  color: var(--cute-brown) !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-collection .detail-label {
+  color: var(--cute-muted) !important;
+}
+
+
+.cute-collection .detail-value {
+  color: var(--cute-brown) !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-collection .detail-action {
+  background:
+    linear-gradient(
+      135deg,
+      #ffc5d9,
+      #bce8ff
+    ) !important;
+
+  color: var(--cute-brown) !important;
+
+  border: 3px solid var(--cute-brown) !important;
+}
+
+
+
+/* ==================================================
+   回憶相簿首頁
+   ================================================== */
+
+.cute-memories .summary {
+  background:
+    linear-gradient(
+      135deg,
+      #ffdae8,
+      #dff4ff
+    ) !important;
+
+  border: 3px solid var(--cute-brown) !important;
+
+  border-radius: 24px !important;
+
+  box-shadow:
+    0 7px 0 rgba(101,69,69,.07) !important;
+}
+
+
+.cute-memories .summary-small {
+  color: var(--cute-muted) !important;
+  font-weight: 800 !important;
+}
+
+
+.cute-memories .summary-number {
+  color: var(--cute-brown) !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-memories .summary-heart {
+  color: #e98caf !important;
+}
+
+
+.cute-memories .section-title {
+  color: var(--cute-brown) !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-memories .section-sub {
+  color: var(--cute-muted) !important;
+}
+
+
+.cute-memories .memory {
+  background: #ffffff !important;
+
+  border: 3px solid var(--cute-brown) !important;
+
+  border-radius: 24px !important;
+
+  box-shadow:
+    0 8px 0 rgba(101,69,69,.07) !important;
+}
+
+
+.cute-memories .memory-cover {
+  background:
+    linear-gradient(
+      135deg,
+      #ffd9e7,
+      #dff4ff
+    ) !important;
+}
+
+
+.cute-memories .cover-placeholder {
+  background: #ffffff !important;
+
+  border: 3px solid var(--cute-brown) !important;
+
+  color: #e98caf !important;
+}
+
+
+.cute-memories .date-badge {
+  background:
+    rgba(255,255,255,.92) !important;
+
+  border:
+    2px solid var(--cute-brown) !important;
+
+  color:
+    var(--cute-brown) !important;
+}
+
+
+.cute-memories .date-month {
+  color: #e98caf !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-memories .date-day {
+  color: var(--cute-brown) !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-memories .date-year {
+  color: var(--cute-muted) !important;
+}
+
+
+.cute-memories .memory-location {
+  color: #e98caf !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-memories .memory-title {
+  color: var(--cute-brown) !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-memories .memory-description,
+.cute-memories .unlocked {
+  color: var(--cute-muted) !important;
+}
+
+
+.cute-memories .view {
+  color: #d96f98 !important;
+  font-weight: 900 !important;
+}
+
+
+
+/* ==================================================
+   單篇回憶
+   ================================================== */
+
+.cute-memory .cover {
+  background:
+    linear-gradient(
+      135deg,
+      #ffd9e7,
+      #dff4ff
+    ) !important;
+
+  border: 4px solid var(--cute-brown) !important;
+
+  border-radius: 26px !important;
+
+  box-shadow:
+    0 9px 0 rgba(101,69,69,.08) !important;
+}
+
+
+.cute-memory .cover-placeholder {
+  background: #ffffff !important;
+
+  border: 3px solid var(--cute-brown) !important;
+
+  color: #e98caf !important;
+}
+
+
+.cute-memory .cover-date {
+  color: #fff !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-memory .cover-title {
+  color: #fff !important;
+
+  font-family:
+    "Arial Rounded MT Bold",
+    "PingFang TC",
+    sans-serif !important;
+
+  font-weight: 900 !important;
+}
+
+
+.cute-memory .memory-info {
+  background:
+    rgba(255,255,255,.82) !important;
+
+  border:
+    3px solid var(--cute-brown) !important;
+
+  border-radius:
+    23px !important;
+
+  box-shadow:
+    0 7px 0 rgba(101,69,69,.06) !important;
+}
+
+
+.cute-memory .location {
+  color: var(--cute-muted) !important;
+}
+
+
+.cute-memory .location span {
+  color: #e98caf !important;
+}
+
+
+.cute-memory .story {
+  color: #765858 !important;
+
+  border-color:
+    #efd8e1 !important;
+}
+
+
+.cute-memory .photo-title {
+  color: var(--cute-brown) !important;
+  font-weight: 900 !important;
+}
+
+
+.cute-memory .photo-count {
+  color: var(--cute-muted) !important;
+}
+
+
+.cute-memory .photo {
+  background: #ffffff !important;
+
+  border:
+    4px solid #ffffff !important;
+
+  box-shadow:
+    0 5px 0 rgba(101,69,69,.09),
+    0 9px 20px rgba(209,133,162,.14) !important;
+}
+
+
+.cute-memory .photo-caption {
+  color: var(--cute-brown) !important;
+}
+
+
+.cute-memory .ending {
+  border-color:
+    #efabc4 !important;
+
+  color:
+    var(--cute-muted) !important;
+}
+
+
+.cute-memory .ending-heart {
+  color: #e98caf !important;
+}
+
+
+/* ---------- Loading / Empty ---------- */
+
+.cute-ledger .loading,
+.cute-ledger .empty,
+.cute-collection .loading,
+.cute-collection .empty,
+.cute-memories .loading,
+.cute-memories .empty,
+.cute-memory .loading,
+.cute-memory .empty {
+  background:
+    rgba(255,255,255,.72) !important;
+
+  border:
+    3px dashed #efa6c0 !important;
+
+  color:
+    var(--cute-muted) !important;
+}
+
+
+/* ---------- Toast ---------- */
+
+.cute-ledger .toast,
+.cute-collection .toast,
+.cute-memories .toast {
+  background: #ffffff !important;
+
+  color: var(--cute-brown) !important;
+
+  border:
+    2px solid var(--cute-brown) !important;
+
+  box-shadow:
+    0 5px 0 rgba(101,69,69,.07) !important;
+}
