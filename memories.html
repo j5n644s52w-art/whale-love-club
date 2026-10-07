@@ -301,6 +301,76 @@
 
     }
 
+    /* =========================
+   ADD MEMORY
+   ========================= */
+
+.add-memory-btn {
+
+  width: 100%;
+
+  margin-top: 18px;
+
+  padding: 16px 18px;
+
+  border-radius: 18px;
+
+  border:
+    1px solid
+    rgba(216,177,132,.28);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(216,177,132,.12),
+      rgba(255,255,255,.025)
+    );
+
+  color: var(--text);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  font-size: 14px;
+
+  letter-spacing: 1px;
+
+  transition:
+    transform .15s ease,
+    border-color .15s ease;
+}
+
+
+.add-memory-btn:active {
+
+  transform:
+    scale(.985);
+
+}
+
+
+.add-memory-plus {
+
+  color: var(--gold);
+
+  font-size: 22px;
+
+  line-height: 1;
+
+}
+
+
+.add-memory-text {
+
+  color: var(--gold-soft);
+
+}
+
 
     /* =========================
        TIMELINE
@@ -765,6 +835,18 @@
 
     </section>
 
+    <button
+  class="add-memory-btn"
+  onclick="openCreateMemory()"
+>
+  <span class="add-memory-plus">
+    ＋
+  </span>
+
+  <span class="add-memory-text">
+    新增回憶
+  </span>
+</button>
 
 
     <div class="section-head">
@@ -1201,7 +1283,17 @@
         .join('');
 
   }
+  /* =========================================
+   新增回憶
+   ========================================= */
 
+function openCreateMemory() {
+
+  showToast(
+    '新增回憶功能準備中 ♡'
+  );
+
+}
 
 
   /* =========================================
