@@ -296,6 +296,46 @@
       white-space: nowrap;
     }
 
+    /* DELETE */
+
+.entry-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.delete-button {
+  border: 1px solid rgba(231,163,163,.28);
+
+  background:
+    rgba(231,163,163,.045);
+
+  color: #b98989;
+
+  border-radius: 10px;
+
+  padding: 7px 11px;
+
+  font-size: 11px;
+
+  letter-spacing: .5px;
+
+  cursor: pointer;
+
+  transition: .18s;
+}
+
+.delete-button:active {
+  transform: scale(.96);
+}
+
+.delete-button:disabled {
+  opacity: .4;
+  cursor: default;
+}
+
     .entry-note {
       margin-top: 8px;
       font-size: 12px;
