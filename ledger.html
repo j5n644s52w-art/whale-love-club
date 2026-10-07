@@ -1378,6 +1378,143 @@
 
 }
 
+/* ==============================
+   刪除紀錄
+   ============================== */
+
+async function deleteEntry(
+  entryId,
+  button
+) {
+
+  const entryElement =
+    button.closest(
+      '.entry'
+    );
+
+
+  const title =
+    entryElement
+      ?.querySelector(
+        '.entry-title'
+      )
+      ?.textContent
+      ?.trim() ||
+    '這筆紀錄';
+
+
+  const confirmed =
+    window.confirm(
+      `確定要刪除「${title}」嗎？\n\n刪除後無法復原。`
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  button.disabled =
+    true;
+
+
+  button.textContent =
+    '刪除中...';
+
+
+  try {
+
+    const response =
+      await fetch(
+        '/api/ledger',
+        {
+
+          method:
+            'POST',
+
+          headers: {
+
+            'Content-Type':
+              'application/json'
+
+          },
+
+          body:
+            JSON.stringify({
+
+              idToken:
+                idToken,
+
+              action:
+                'delete',
+
+              entryId:
+                entryId
+
+            })
+
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+      if (
+        String(
+          data.message || ''
+        )
+          .toLowerCase()
+          .includes('expired')
+      ) {
+
+        return refreshLogin();
+
+      }
+
+
+      throw new Error(
+        data.message ||
+        '刪除失敗'
+      );
+
+    }
+
+
+    showToast(
+      '已刪除這筆紀錄'
+    );
+
+
+    await loadLedger();
+
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    showToast(
+      error.message ||
+      '刪除失敗'
+    );
+
+
+    button.disabled =
+      false;
+
+
+    button.textContent =
+      '刪除';
+
+  }
+
+}
 
   /* ==============================
      月份切換
