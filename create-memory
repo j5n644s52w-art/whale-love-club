@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <title>新增回憶 | Whale Love Club</title>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+
+    :root {
+
+      --bg: #070707;
+
+      --card: #111111;
+
+      --line:
+        rgba(255,255,255,.08);
+
+      --text:
+        #f7f3ee;
+
+      --muted:
+        #96918b;
+
+      --gold:
+        #d8b184;
+
+      --gold-soft:
+        #f0d5b2;
+
+    }
+
+
+    body {
+
+      margin: 0;
+
+      min-height: 100vh;
+
+      background:
+
+        radial-gradient(
+          circle at 50% -5%,
+          rgba(216,177,132,.17),
+          transparent 30%
+        ),
+
+        #070707;
+
+      color:
+        var(--text);
+
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "PingFang TC",
+        "Noto Sans TC",
+        sans-serif;
+
+      padding-bottom:
+        calc(
+          40px +
+          env(safe-area-inset-bottom)
+        );
+
+    }
+
+
+    button,
+    input,
+    textarea {
+
+      font: inherit;
+
+    }
+
+
+    .page {
+
+      width:
+        min(100%, 760px);
+
+      margin:
+        0 auto;
+
+      padding:
+
+        calc(
+          20px +
+          env(safe-area-inset-top)
+        )
+
+        18px
+        40px;
+
+    }
+
+
+    /* =========================
+       TOP
+       ========================= */
+
+    .topbar {
+
+      display: flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
+
+      margin-bottom:
+        28px;
+
+    }
+
+
+    .back {
+
+      border: 0;
+
+      background:
+        transparent;
+
+      color:
+        var(--muted);
+
+      padding:
+        8px 0;
+
+      font-size:
+        14px;
+
+      cursor:
+        pointer;
+
+    }
+
+
+    .brand {
+
+      text-align:
+        right;
+
+    }
+
+
+    .brand-small {
+
+      color:
+        var(--gold);
+
+      font-size:
+        10px;
+
+      letter-spacing:
+        3px;
+
+    }
+
+
+    .brand-name {
+
+      font-family:
+        Georgia,
+        serif;
+
+      margin-top:
+        4px;
+
+      font-size:
+        15px;
+
+    }
+
+
+    /* =========================
+       TITLE
+       ========================= */
+
+    .eyebrow {
+
+      color:
+        var(--gold);
+
+      font-size:
+        10px;
+
+      letter-spacing:
+        4px;
+
+      margin-bottom:
+        10px;
+
+    }
+
+
+    h1 {
+
+      margin:
+        0;
+
+      font-family:
+        Georgia,
+        "Noto Serif TC",
+        serif;
+
+      font-weight:
+        400;
+
+      font-size:
+        31px;
+
+      letter-spacing:
+        2px;
+
+    }
+
+
+    .subtitle {
+
+      margin-top:
+        8px;
+
+      color:
+        var(--muted);
+
+      font-size:
+        13px;
+
+      line-height:
+        1.8;
+
+    }
+
+
+    /* =========================
+       FORM
+       ========================= */
+
+    .form-card {
+
+      margin-top:
+        28px;
+
+      padding:
+        20px;
+
+      border-radius:
+        22px;
+
+      border:
+        1px solid
+        rgba(216,177,132,.18);
+
+      background:
+
+        linear-gradient(
+          145deg,
+          rgba(216,177,132,.07),
+          rgba(255,255,255,.015)
+        );
+
+    }
+
+
+    .field {
+
+      margin-bottom:
+        22px;
+
+    }
+
+
+    .label {
+
+      margin-bottom:
+        9px;
+
+      color:
+        var(--gold-soft);
+
+      font-size:
+        12px;
+
+      letter-spacing:
+        1px;
+
+    }
+
+
+    .required {
+
+      color:
+        var(--gold);
+
+    }
+
+
+    .input,
+    .textarea {
+
+      width:
+        100%;
+
+      border:
+        1px solid
+        var(--line);
+
+      border-radius:
+        14px;
+
+      padding:
+        14px;
+
+      background:
+        rgba(255,255,255,.035);
+
+      color:
+        var(--text);
+
+      outline:
+        none;
+
+    }
+
+
+    .textarea {
+
+      resize:
+        vertical;
+
+      min-height:
+        120px;
+
+      line-height:
+        1.7;
+
+    }
+
+
+    .input:focus,
+    .textarea:focus {
+
+      border-color:
+        rgba(216,177,132,.5);
+
+    }
+
+
+    /* =========================
+       PHOTO SELECT
+       ========================= */
+
+    .photo-box {
+
+      border:
+        1px dashed
+        rgba(216,177,132,.3);
+
+      border-radius:
+        16px;
+
+      padding:
+        18px;
+
+      text-align:
+        center;
+
+      cursor:
+        pointer;
+
+      background:
+        rgba(216,177,132,.035);
+
+    }
+
+
+    .photo-plus {
+
+      font-size:
+        25px;
+
+      color:
+        var(--gold);
+
+    }
+
+
+    .photo-title {
+
+      margin-top:
+        6px;
+
+      color:
+        var(--gold-soft);
+
+      font-size:
+        13px;
+
+    }
+
+
+    .photo-note {
+
+      margin-top:
+        5px;
+
+      color:
+        var(--muted);
+
+      font-size:
+        11px;
+
+    }
+
+
+    .hidden-input {
+
+      display:
+        none;
+
+    }
+
+
+    /* =========================
+       PREVIEW
+       ========================= */
+
+    .cover-preview {
+
+      margin-top:
+        14px;
+
+      display:
+        none;
+
+      overflow:
+        hidden;
+
+      border-radius:
+        16px;
+
+    }
+
+
+    .cover-preview img {
+
+      width:
+        100%;
+
+      max-height:
+        320px;
+
+      display:
+        block;
+
+      object-fit:
+        cover;
+
+    }
+
+
+    .photo-grid {
+
+      margin-top:
+        14px;
+
+      display:
+        grid;
+
+      grid-template-columns:
+        repeat(3, 1fr);
+
+      gap:
+        8px;
+
+    }
+
+
+    .photo-grid img {
+
+      width:
+        100%;
+
+      aspect-ratio:
+        1 / 1;
+
+      object-fit:
+        cover;
+
+      border-radius:
+        12px;
+
+      border:
+        1px solid
+        var(--line);
+
+    }
+
+
+    /* =========================
+       SAVE
+       ========================= */
+
+    .save-btn {
+
+      width:
+        100%;
+
+      margin-top:
+        24px;
+
+      padding:
+        16px;
+
+      border:
+        1px solid
+        rgba(216,177,132,.35);
+
+      border-radius:
+        16px;
+
+      background:
+
+        linear-gradient(
+          145deg,
+          rgba(216,177,132,.20),
+          rgba(216,177,132,.08)
+        );
+
+      color:
+        var(--gold-soft);
+
+      cursor:
+        pointer;
+
+      font-size:
+        14px;
+
+      letter-spacing:
+        1px;
+
+    }
+
+
+    .save-btn:disabled {
+
+      opacity:
+        .5;
+
+      cursor:
+        default;
+
+    }
+
+
+    /* =========================
+       TOAST
+       ========================= */
+
+    .toast {
+
+      position:
+        fixed;
+
+      left:
+        50%;
+
+      bottom:
+        calc(
+          25px +
+          env(safe-area-inset-bottom)
+        );
+
+      transform:
+        translate(-50%, 30px);
+
+      opacity:
+        0;
+
+      background:
+        #f2dfc6;
+
+      color:
+        #111;
+
+      padding:
+        12px 18px;
+
+      border-radius:
+        999px;
+
+      z-index:
+        999;
+
+      font-size:
+        12px;
+
+      transition:
+        .25s;
+
+      pointer-events:
+        none;
+
+      max-width:
+        calc(100% - 40px);
+
+      text-align:
+        center;
+
+    }
+
+
+    .toast.show {
+
+      opacity:
+        1;
+
+      transform:
+        translate(-50%, 0);
+
+    }
+
+  </style>
+
+
+  <link
+    rel="stylesheet"
+    href="/cute-theme.css?v=3"
+  >
+
+</head>
+
+
+<body class="cute-memory">
+
+  <main class="page">
+
+
+    <div class="topbar">
+
+      <button
+        class="back"
+        onclick="goBack()"
+      >
+        ← 回憶相簿
+      </button>
+
+
+      <div class="brand">
+
+        <div class="brand-small">
+          ♡ PRIVATE MEMBERS
+        </div>
+
+        <div class="brand-name">
+          Whale Love Club
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="eyebrow">
+      NEW MEMORY
+    </div>
+
+
+    <h1>
+      新增回憶
+    </h1>
+
+
+    <div class="subtitle">
+      把今天值得留下的事情，收藏進我們的故事裡。
+    </div>
+
+
+    <section class="form-card">
+
+
+      <div class="field">
+
+        <div class="label">
+          回憶標題
+          <span class="required">*</span>
+        </div>
+
+        <input
+          class="input"
+          id="title"
+          type="text"
+          placeholder="例如：第一次一起去看海"
+          maxlength="60"
+        >
+
+      </div>
+
+
+      <div class="field">
+
+        <div class="label">
+          日期
+        </div>
+
+        <input
+          class="input"
+          id="eventDate"
+          type="date"
+        >
+
+      </div>
+
+
+      <div class="field">
+
+        <div class="label">
+          地點
+        </div>
+
+        <input
+          class="input"
+          id="location"
+          type="text"
+          placeholder="例如：高美濕地"
+          maxlength="80"
+        >
+
+      </div>
+
+
+      <div class="field">
+
+        <div class="label">
+          回憶內容
+        </div>
+
+        <textarea
+          class="textarea"
+          id="description"
+          placeholder="寫下想記住的事情..."
+          maxlength="1000"
+        ></textarea>
+
+      </div>
+
+
+      <div class="field">
+
+        <div class="label">
+          封面照片
+        </div>
+
+        <label class="photo-box">
+
+          <div class="photo-plus">
+            ＋
+          </div>
+
+          <div class="photo-title">
+            選擇封面照片
+          </div>
+
+          <div class="photo-note">
+            JPG / PNG / WebP
+          </div>
+
+          <input
+            class="hidden-input"
+            id="coverInput"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+          >
+
+        </label>
+
+
+        <div
+          class="cover-preview"
+          id="coverPreview"
+        ></div>
+
+      </div>
+
+
+      <div class="field">
+
+        <div class="label">
+          相簿照片
+        </div>
+
+        <label class="photo-box">
+
+          <div class="photo-plus">
+            ＋
+          </div>
+
+          <div class="photo-title">
+            新增照片
+          </div>
+
+          <div class="photo-note">
+            可以一次選擇多張照片
+          </div>
+
+          <input
+            class="hidden-input"
+            id="photosInput"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+          >
+
+        </label>
+
+
+        <div
+          class="photo-grid"
+          id="photoGrid"
+        ></div>
+
+      </div>
+
+
+      <button
+        class="save-btn"
+        id="saveBtn"
+        onclick="saveMemory()"
+      >
+        儲存回憶
+      </button>
+
+
+    </section>
+
+
+  </main>
+
+
+  <div
+    class="toast"
+    id="toast"
+  ></div>
+
+
+<script>
+
+  const LIFF_ID =
+    '2011857712-lXq9lJFT';
+
+
+  let idToken = '';
+
+  let coverFile = null;
+
+  let photoFiles = [];
+
+
+  /* =========================================
+     初始化
+     ========================================= */
+
+  async function init() {
+
+    try {
+
+      await liff.init({
+        liffId:
+          LIFF_ID
+      });
+
+
+      if (!liff.isLoggedIn()) {
+
+        liff.login({
+          redirectUri:
+            window.location.href
+        });
+
+        return;
+
+      }
+
+
+      idToken =
+        liff.getIDToken();
+
+
+      if (!idToken) {
+
+        throw new Error(
+          '無法取得 LINE 登入資訊'
+        );
+
+      }
+
+
+      setDefaultDate();
+
+
+    } catch (error) {
+
+      console.error(
+        error
+      );
+
+
+      showToast(
+        error.message ||
+        '初始化失敗'
+      );
+
+    }
+
+  }
+
+
+  /* =========================================
+     預設日期
+     ========================================= */
+
+  function setDefaultDate() {
+
+    const today =
+      new Date();
+
+
+    const year =
+      today.getFullYear();
+
+
+    const month =
+      String(
+        today.getMonth() + 1
+      ).padStart(
+        2,
+        '0'
+      );
+
+
+    const day =
+      String(
+        today.getDate()
+      ).padStart(
+        2,
+        '0'
+      );
+
+
+    document
+      .getElementById(
+        'eventDate'
+      )
+      .value =
+      `${year}-${month}-${day}`;
+
+  }
+
+
+  /* =========================================
+     封面預覽
+     ========================================= */
+
+  document
+    .getElementById(
+      'coverInput'
+    )
+    .addEventListener(
+      'change',
+      function(event) {
+
+        const file =
+          event.target.files[0];
+
+
+        if (!file) {
+          return;
+        }
+
+
+        coverFile =
+          file;
+
+
+        const preview =
+          document.getElementById(
+            'coverPreview'
+          );
+
+
+        preview.style.display =
+          'block';
+
+
+        preview.innerHTML = `
+          <img
+            src="${URL.createObjectURL(file)}"
+            alt="cover"
+          >
+        `;
+
+      }
+    );
+
+
+  /* =========================================
+     多張照片預覽
+     ========================================= */
+
+  document
+    .getElementById(
+      'photosInput'
+    )
+    .addEventListener(
+      'change',
+      function(event) {
+
+        photoFiles =
+          Array.from(
+            event.target.files
+          );
+
+
+        const grid =
+          document.getElementById(
+            'photoGrid'
+          );
+
+
+        grid.innerHTML =
+          photoFiles
+            .map(
+              file => `
+                <img
+                  src="${URL.createObjectURL(file)}"
+                  alt="memory photo"
+                >
+              `
+            )
+            .join('');
+
+      }
+    );
+
+
+  /* =========================================
+     儲存
+     ========================================= */
+
+  async function saveMemory() {
+
+    const title =
+      document
+        .getElementById(
+          'title'
+        )
+        .value
+        .trim();
+
+
+    if (!title) {
+
+      showToast(
+        '請輸入回憶標題'
+      );
+
+      return;
+
+    }
+
+
+    /*
+     * 下一步會在這裡接：
+     *
+     * 1. 建立 Memory_ID
+     * 2. 上傳封面
+     * 3. 上傳相簿照片
+     * 4. 寫入 Memories
+     * 5. 寫入 MemoryPhotos
+     */
+
+
+    showToast(
+      '表單完成，下一步接儲存功能 ♡'
+    );
+
+  }
+
+
+  /* =========================================
+     返回
+     ========================================= */
+
+  function goBack() {
+
+    window.location.href =
+      '/memories.html';
+
+  }
+
+
+  /* =========================================
+     Toast
+     ========================================= */
+
+  function showToast(message) {
+
+    const toast =
+      document.getElementById(
+        'toast'
+      );
+
+
+    toast.textContent =
+      message;
+
+
+    toast.classList.add(
+      'show'
+    );
+
+
+    setTimeout(
+      () => {
+
+        toast
+          .classList
+          .remove(
+            'show'
+          );
+
+      },
+      2400
+    );
+
+  }
+
+
+  init();
+
+</script>
+
+
+</body>
+</html>
