@@ -1157,3 +1157,244 @@ button.primary,
   }
 
 }
+
+/* ==================================================
+   LUXURY INLINE LOADING
+   記帳本 / 收藏 / 相簿等頁面共用
+   ================================================== */
+
+.loading {
+
+  position:
+    relative;
+
+  min-height:
+    190px;
+
+  padding:
+    34px 20px !important;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    22px;
+
+  overflow:
+    hidden;
+
+  color:
+    #a99d8b !important;
+
+  font-family:
+    Georgia,
+    "Noto Serif TC",
+    serif;
+
+  font-size:
+    12px !important;
+
+  font-weight:
+    400 !important;
+
+  letter-spacing:
+    1.5px;
+
+  text-align:
+    center;
+
+  border:
+    1px solid
+    rgba(215,180,106,.13) !important;
+
+  border-radius:
+    22px !important;
+
+  background:
+
+    radial-gradient(
+      circle at 50% 40%,
+      rgba(215,180,106,.08),
+      transparent 32%
+    ),
+
+    linear-gradient(
+      145deg,
+      rgba(22,19,14,.95),
+      rgba(9,8,7,.98)
+    ) !important;
+
+  box-shadow:
+
+    inset 0 1px 0
+    rgba(255,255,255,.025),
+
+    0 18px 45px
+    rgba(0,0,0,.28) !important;
+
+}
+
+
+/* 中央愛心 */
+
+.loading::before {
+
+  content:
+    "♡";
+
+  width:
+    62px;
+
+  height:
+    62px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  border-radius:
+    50%;
+
+  color:
+    #f1d9a2;
+
+  font-family:
+    Georgia,
+    serif;
+
+  font-size:
+    27px;
+
+  border:
+    1px solid
+    rgba(215,180,106,.40);
+
+  background:
+
+    radial-gradient(
+      circle at 35% 25%,
+      rgba(255,240,200,.10),
+      transparent 35%
+    ),
+
+    linear-gradient(
+      145deg,
+      #1c1811,
+      #0a0907
+    );
+
+  box-shadow:
+
+    inset 0 0 22px
+    rgba(215,180,106,.04),
+
+    0 0 30px
+    rgba(215,180,106,.07),
+
+    0 12px 28px
+    rgba(0,0,0,.38);
+
+  animation:
+    wlcLoadingFloat
+    2.1s
+    ease-in-out
+    infinite;
+
+}
+
+
+/* 旋轉金環 */
+
+.loading::after {
+
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    calc(50% - 52px);
+
+  left:
+    calc(50% - 39px);
+
+  width:
+    76px;
+
+  height:
+    76px;
+
+  border-radius:
+    50%;
+
+  border:
+    1px solid
+    rgba(215,180,106,.09);
+
+  border-top-color:
+    rgba(240,216,160,.72);
+
+  pointer-events:
+    none;
+
+  animation:
+    wlcLoadingRing
+    4.5s
+    linear
+    infinite;
+
+}
+
+
+@keyframes wlcLoadingFloat {
+
+  0%,
+  100% {
+
+    transform:
+      translateY(0);
+
+  }
+
+  50% {
+
+    transform:
+      translateY(-6px);
+
+  }
+
+}
+
+
+@keyframes wlcLoadingRing {
+
+  from {
+
+    transform:
+      rotate(0deg);
+
+  }
+
+  to {
+
+    transform:
+      rotate(360deg);
+
+  }
+
+}
