@@ -1220,122 +1220,125 @@
 
   function renderEntries(entries) {
 
-    const container =
-      document.getElementById(
-        'entries'
-      );
+  const container =
+    document.getElementById(
+      'entries'
+    );
 
 
-    document
-      .getElementById(
-        'recordCount'
-      )
-      .textContent =
-      `${entries.length} 筆`;
+  document
+    .getElementById(
+      'recordCount'
+    )
+    .textContent =
+    `${entries.length} 筆`;
 
 
-    if (!entries.length) {
+  if (!entries.length) {
 
-      container.innerHTML = `
+    container.innerHTML = `
 
-        <div class="empty">
+      <div class="empty">
 
-          這個月還沒有任何紀錄 ♡<br>
+        這個月還沒有任何紀錄 ♡<br>
 
-          點上方「新增一筆紀錄」開始記帳
+        點上方「新增一筆紀錄」開始記帳
 
-        </div>
+      </div>
 
-      `;
+    `;
 
-      return;
-    }
+    return;
 
-
-    container.innerHTML =
-      entries
-        .map(entry => {
-
-          const isIncome =
-            entry.type === 'INCOME';
+  }
 
 
-          const sign =
-            isIncome
-              ? '+'
-              : '-';
+  container.innerHTML =
+    entries
+      .map(entry => {
+
+        const isIncome =
+          entry.type === 'INCOME';
 
 
-          const amountClass =
-            isIncome
-              ? 'income'
-              : 'expense';
+        const sign =
+          isIncome
+            ? '+'
+            : '-';
 
 
-          return `
-
-            <article class="entry">
-
-              <div>
-
-                <div class="entry-title">
-
-                  ${escapeHtml(
-                    entry.title
-                  )}
-
-                </div>
+        const amountClass =
+          isIncome
+            ? 'income'
+            : 'expense';
 
 
-                <div class="entry-meta">
+        return `
 
-                  ${escapeHtml(
-                    entry.date
-                  )}
+          <article class="entry">
 
-                  ・
+            <div>
 
-                  ${escapeHtml(
-                    entry.category
-                  )}
+              <div class="entry-title">
 
-                  <br>
-
-                  付款：
-                  ${personName(
-                    entry.paidBy
-                  )}
-
-                  ・
-
-                  對象：
-                  ${forWhomName(
-                    entry.forWhom
-                  )}
-
-                </div>
-
-
-                ${
-                  entry.note
-
-                  ? `
-
-                    <div class="entry-note">
-
-                      ${escapeHtml(
-                        entry.note
-                      )}
-
-                    </div>
-
-                  `
-
-                  : ''
-                }
+                ${escapeHtml(
+                  entry.title
+                )}
 
               </div>
 
+
+              <div class="entry-meta">
+
+                ${escapeHtml(
+                  entry.date
+                )}
+
+                ・
+
+                ${escapeHtml(
+                  entry.category
+                )}
+
+                <br>
+
+                付款：
+                ${personName(
+                  entry.paidBy
+                )}
+
+                ・
+
+                對象：
+                ${forWhomName(
+                  entry.forWhom
+                )}
+
+              </div>
+
+
+              ${
+                entry.note
+
+                ? `
+
+                  <div class="entry-note">
+
+                    ${escapeHtml(
+                      entry.note
+                    )}
+
+                  </div>
+
+                `
+
+                : ''
+              }
+
+            </div>
+
+
+            <div class="entry-side">
 
               <div
                 class="
@@ -1350,15 +1353,30 @@
 
               </div>
 
-            </article>
 
-          `;
+              <button
+                class="delete-button"
+                type="button"
+                onclick="
+                  deleteEntry(
+                    '${entry.entryId}',
+                    this
+                  )
+                "
+              >
+                刪除
+              </button>
 
-        })
-        .join('');
+            </div>
 
-  }
+          </article>
 
+        `;
+
+      })
+      .join('');
+
+}
 
 
   /* ==============================
