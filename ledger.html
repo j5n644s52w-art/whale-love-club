@@ -1903,3 +1903,131 @@
 
 </body>
 </html>
+
+/* =========================================
+   記帳本：刪除紀錄
+   ========================================= */
+
+function deleteLedgerEntry(
+  lineUserId,
+  entryId
+) {
+
+  const member =
+    requireMember(
+      lineUserId
+    );
+
+
+  entryId =
+    String(
+      entryId || ''
+    ).trim();
+
+
+  if (!entryId) {
+
+    return jsonResponse({
+      success: false,
+      message:
+        'Entry ID is required'
+    });
+
+  }
+
+
+  const lock =
+    LockService.getScriptLock();
+
+
+  lock.waitLock(10000);
+
+
+  try {
+
+    const sheet =
+      getSheet(
+        SHEETS.LEDGER
+      );
+
+
+    const data =
+      sheet
+        .getDataRange()
+        .getValues();
+
+
+    let targetRow = null;
+
+
+    for (
+      let i = 1;
+      i < data.length;
+      i++
+    ) {
+
+      const rowEntryId =
+        String(
+          data[i][0] || ''
+        ).trim();
+
+
+      if (
+        rowEntryId ===
+        entryId
+      ) {
+
+        targetRow =
+          i + 1;
+
+        break;
+
+      }
+
+    }
+
+
+    if (!targetRow) {
+
+      return jsonResponse({
+        success: false,
+        status:
+          'ENTRY_NOT_FOUND',
+        message:
+          'Ledger entry not found'
+      });
+
+    }
+
+
+    sheet.deleteRow(
+      targetRow
+    );
+
+
+    SpreadsheetApp.flush();
+
+
+    return jsonResponse({
+
+      success: true,
+
+      entryId:
+        entryId,
+
+      deletedBy:
+        member.memberNo,
+
+      message:
+        'Ledger entry deleted'
+
+    });
+
+
+  } finally {
+
+    lock.releaseLock();
+
+  }
+
+}
