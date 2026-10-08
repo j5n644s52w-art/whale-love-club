@@ -969,13 +969,21 @@
     /*
      * Cover
      */
-    const cover =
-      document.getElementById(
-        'cover'
-      );
+    /*
+ * Cover
+ */
+const cover =
+  document.getElementById(
+    'cover'
+  );
 
 
-    if (memory.coverImageUrl) {
+if (memory.coverImageUrl) {
+
+  loadPrivatePhoto(
+    memory.coverImageUrl
+  )
+    .then(function(imageSrc) {
 
       const img =
         document.createElement(
@@ -984,7 +992,7 @@
 
 
       img.src =
-        memory.coverImageUrl;
+        imageSrc;
 
 
       img.alt =
@@ -1004,7 +1012,17 @@
         cover.firstChild
       );
 
-    }
+    })
+    .catch(function(error) {
+
+      console.error(
+        '封面載入失敗',
+        error
+      );
+
+    });
+
+}
 
 
     /*
