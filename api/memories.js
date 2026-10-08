@@ -46,67 +46,128 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
 
       const {
-        idToken,
-        memoryId
-      } = req.query;
+  idToken,
+  action,
+  memory,
+  memoryId,
+  fileId
+} = req.body || {};
 
 
-      if (!idToken) {
+if (!idToken) {
 
-        return res.status(400).json({
-          success: false,
-          message: 'Missing idToken'
-        });
+  return res.status(400).json({
+    success: false,
+    message: 'Missing idToken'
+  });
+
+}
+
+
+const lineData =
+  await verifyLineToken(
+    idToken,
+    channelId
+  );
+
+
+/* =========================================
+   設定回憶封面
+   ========================================= */
+
+if (
+  action === 'setMemoryCover'
+) {
+
+  if (!memoryId) {
+
+    return res.status(400).json({
+      success: false,
+      message: 'Missing memoryId'
+    });
+
+  }
+
+
+  if (!fileId) {
+
+    return res.status(400).json({
+      success: false,
+      message: 'Missing fileId'
+    });
+
+  }
+
+
+  const result =
+    await callAppsScript(
+      appsScriptUrl,
+      {
+
+        action:
+          'setMemoryCover',
+
+        secret:
+          appsScriptSecret,
+
+        lineUserId:
+          lineData.sub,
+
+        memoryId:
+          memoryId,
+
+        fileId:
+          fileId
 
       }
+    );
 
 
-      const lineData =
-        await verifyLineToken(
-          idToken,
-          channelId
-        );
+  return res
+    .status(200)
+    .json(result);
+
+}
 
 
-      const payload =
-        memoryId
+/* =========================================
+   建立新回憶
+   ========================================= */
 
-          ? {
-              action:
-                'getMemoryDetail',
+if (!memory) {
 
-              secret:
-                appsScriptSecret,
+  return res.status(400).json({
+    success: false,
+    message: 'Missing memory'
+  });
 
-              lineUserId:
-                lineData.sub,
-
-              memoryId:
-                memoryId
-            }
-
-          : {
-              action:
-                'getMemories',
-
-              secret:
-                appsScriptSecret,
-
-              lineUserId:
-                lineData.sub
-            };
+}
 
 
-      const result =
-        await callAppsScript(
-          appsScriptUrl,
-          payload
-        );
+const result =
+  await callAppsScript(
+    appsScriptUrl,
+    {
+
+      action:
+        'createMemory',
+
+      secret:
+        appsScriptSecret,
+
+      lineUserId:
+        lineData.sub,
+
+      memory:
+        memory
+
+    }
+  );
 
 
-      return res
-        .status(200)
-        .json(result);
+return res
+  .status(200)
+  .json(result);
 
     }
 
