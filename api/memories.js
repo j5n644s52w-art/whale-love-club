@@ -1,6 +1,9 @@
 export default async function handler(req, res) {
 
-  if (req.method !== 'GET') {
+  if (
+    req.method !== 'GET' &&
+    req.method !== 'POST'
+  ) {
 
     return res.status(405).json({
       success: false,
@@ -36,10 +39,87 @@ export default async function handler(req, res) {
 
   try {
 
+    /* =========================================
+       GET：讀取回憶
+       ========================================= */
+
+    if (req.method === 'GET') {
+
+      const {
+        idToken,
+        memoryId
+      } = req.query;
+
+
+      if (!idToken) {
+
+        return res.status(400).json({
+          success: false,
+          message: 'Missing idToken'
+        });
+
+      }
+
+
+      const lineData =
+        await verifyLineToken(
+          idToken,
+          channelId
+        );
+
+
+      const payload =
+        memoryId
+
+          ? {
+              action:
+                'getMemoryDetail',
+
+              secret:
+                appsScriptSecret,
+
+              lineUserId:
+                lineData.sub,
+
+              memoryId:
+                memoryId
+            }
+
+          : {
+              action:
+                'getMemories',
+
+              secret:
+                appsScriptSecret,
+
+              lineUserId:
+                lineData.sub
+            };
+
+
+      const result =
+        await callAppsScript(
+          appsScriptUrl,
+          payload
+        );
+
+
+      return res
+        .status(200)
+        .json(result);
+
+    }
+
+
+
+    /* =========================================
+       POST：建立新回憶
+       ========================================= */
+
     const {
       idToken,
-      memoryId
-    } = req.query;
+      memory
+    } = req.body || {};
 
 
     if (!idToken) {
@@ -52,9 +132,15 @@ export default async function handler(req, res) {
     }
 
 
-    /* ==========================
-       驗證 LINE 身分
-       ========================== */
+    if (!memory) {
+
+      return res.status(400).json({
+        success: false,
+        message: 'Missing memory'
+      });
+
+    }
+
 
     const lineData =
       await verifyLineToken(
@@ -63,47 +149,24 @@ export default async function handler(req, res) {
       );
 
 
-    /*
-     * 有 memoryId
-     * → 讀取單一回憶
-     *
-     * 沒有 memoryId
-     * → 讀取所有已解鎖回憶
-     */
-
-    const payload =
-      memoryId
-
-        ? {
-            action:
-              'getMemoryDetail',
-
-            secret:
-              appsScriptSecret,
-
-            lineUserId:
-              lineData.sub,
-
-            memoryId:
-              memoryId
-          }
-
-        : {
-            action:
-              'getMemories',
-
-            secret:
-              appsScriptSecret,
-
-            lineUserId:
-              lineData.sub
-          };
-
-
     const result =
       await callAppsScript(
         appsScriptUrl,
-        payload
+        {
+
+          action:
+            'createMemory',
+
+          secret:
+            appsScriptSecret,
+
+          lineUserId:
+            lineData.sub,
+
+          memory:
+            memory
+
+        }
       );
 
 
