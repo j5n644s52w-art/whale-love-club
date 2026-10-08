@@ -1,5 +1,9 @@
 export default async function handler(req, res) {
 
+  /* =========================================
+     只接受 GET / POST
+     ========================================= */
+
   if (
     req.method !== 'GET' &&
     req.method !== 'POST'
@@ -12,6 +16,10 @@ export default async function handler(req, res) {
 
   }
 
+
+  /* =========================================
+     Server Environment
+     ========================================= */
 
   const channelId =
     process.env.LINE_CHANNEL_ID;
@@ -46,140 +54,96 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
 
       const {
-  idToken,
-  action,
-  memory,
-  memoryId,
-  fileId
-} = req.body || {};
+        idToken,
+        memoryId
+      } = req.query || {};
 
 
-if (!idToken) {
+      if (!idToken) {
 
-  return res.status(400).json({
-    success: false,
-    message: 'Missing idToken'
-  });
-
-}
-
-
-const lineData =
-  await verifyLineToken(
-    idToken,
-    channelId
-  );
-
-
-/* =========================================
-   設定回憶封面
-   ========================================= */
-
-if (
-  action === 'setMemoryCover'
-) {
-
-  if (!memoryId) {
-
-    return res.status(400).json({
-      success: false,
-      message: 'Missing memoryId'
-    });
-
-  }
-
-
-  if (!fileId) {
-
-    return res.status(400).json({
-      success: false,
-      message: 'Missing fileId'
-    });
-
-  }
-
-
-  const result =
-    await callAppsScript(
-      appsScriptUrl,
-      {
-
-        action:
-          'setMemoryCover',
-
-        secret:
-          appsScriptSecret,
-
-        lineUserId:
-          lineData.sub,
-
-        memoryId:
-          memoryId,
-
-        fileId:
-          fileId
+        return res.status(400).json({
+          success: false,
+          message: 'Missing idToken'
+        });
 
       }
-    );
 
 
-  return res
-    .status(200)
-    .json(result);
-
-}
-
-
-/* =========================================
-   建立新回憶
-   ========================================= */
-
-if (!memory) {
-
-  return res.status(400).json({
-    success: false,
-    message: 'Missing memory'
-  });
-
-}
+      const lineData =
+        await verifyLineToken(
+          idToken,
+          channelId
+        );
 
 
-const result =
-  await callAppsScript(
-    appsScriptUrl,
-    {
-
-      action:
-        'createMemory',
-
-      secret:
-        appsScriptSecret,
-
-      lineUserId:
-        lineData.sub,
-
-      memory:
-        memory
-
-    }
-  );
+      let payload;
 
 
-return res
-  .status(200)
-  .json(result);
+      /* 讀取單一回憶 */
+      if (memoryId) {
+
+        payload = {
+
+          action:
+            'getMemoryDetail',
+
+          secret:
+            appsScriptSecret,
+
+          lineUserId:
+            lineData.sub,
+
+          memoryId:
+            memoryId
+
+        };
+
+      }
+
+      /* 讀取回憶列表 */
+      else {
+
+        payload = {
+
+          action:
+            'getMemories',
+
+          secret:
+            appsScriptSecret,
+
+          lineUserId:
+            lineData.sub
+
+        };
+
+      }
+
+
+      const result =
+        await callAppsScript(
+          appsScriptUrl,
+          payload
+        );
+
+
+      return res
+        .status(200)
+        .json(result);
 
     }
 
 
 
     /* =========================================
-       POST：建立新回憶
+       POST
        ========================================= */
 
     const {
       idToken,
-      memory
+      action,
+      memory,
+      memoryId,
+      fileId
     } = req.body || {};
 
 
@@ -193,16 +157,6 @@ return res
     }
 
 
-    if (!memory) {
-
-      return res.status(400).json({
-        success: false,
-        message: 'Missing memory'
-      });
-
-    }
-
-
     const lineData =
       await verifyLineToken(
         idToken,
@@ -210,30 +164,123 @@ return res
       );
 
 
-    const result =
-      await callAppsScript(
-        appsScriptUrl,
-        {
 
-          action:
-            'createMemory',
+    /* =========================================
+       POST：設定回憶封面
+       ========================================= */
 
-          secret:
-            appsScriptSecret,
+    if (
+      action === 'setMemoryCover'
+    ) {
 
-          lineUserId:
-            lineData.sub,
+      if (!memoryId) {
 
-          memory:
-            memory
+        return res.status(400).json({
+          success: false,
+          message: 'Missing memoryId'
+        });
 
-        }
-      );
+      }
 
 
-    return res
-      .status(200)
-      .json(result);
+      if (!fileId) {
+
+        return res.status(400).json({
+          success: false,
+          message: 'Missing fileId'
+        });
+
+      }
+
+
+      const result =
+        await callAppsScript(
+          appsScriptUrl,
+          {
+
+            action:
+              'setMemoryCover',
+
+            secret:
+              appsScriptSecret,
+
+            lineUserId:
+              lineData.sub,
+
+            memoryId:
+              memoryId,
+
+            fileId:
+              fileId
+
+          }
+        );
+
+
+      return res
+        .status(200)
+        .json(result);
+
+    }
+
+
+
+    /* =========================================
+       POST：建立新回憶
+       ========================================= */
+
+    if (
+      !action ||
+      action === 'createMemory'
+    ) {
+
+      if (!memory) {
+
+        return res.status(400).json({
+          success: false,
+          message: 'Missing memory'
+        });
+
+      }
+
+
+      const result =
+        await callAppsScript(
+          appsScriptUrl,
+          {
+
+            action:
+              'createMemory',
+
+            secret:
+              appsScriptSecret,
+
+            lineUserId:
+              lineData.sub,
+
+            memory:
+              memory
+
+          }
+        );
+
+
+      return res
+        .status(200)
+        .json(result);
+
+    }
+
+
+
+    /* =========================================
+       不認識的 POST Action
+       ========================================= */
+
+    return res.status(400).json({
+      success: false,
+      message: 'Unknown memory action'
+    });
 
 
   } catch (error) {
@@ -312,8 +359,10 @@ async function verifyLineToken(
   if (!response.ok) {
 
     throw new Error(
+
       data.error_description ||
       'LINE verification failed'
+
     );
 
   }
