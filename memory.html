@@ -889,6 +889,81 @@
       .classList
       .remove('hidden');
 
+    /* =========================================
+   讀取私人照片
+   ========================================= */
+
+async function loadPrivatePhoto(
+  fileId
+) {
+
+  const response =
+    await fetch(
+      '/api/photo',
+      {
+
+        method:
+          'POST',
+
+        headers: {
+
+          'Content-Type':
+            'application/json'
+
+        },
+
+        body:
+          JSON.stringify({
+
+            idToken:
+              idToken,
+
+            fileId:
+              fileId
+
+          })
+
+      }
+    );
+
+
+  const data =
+    await response.json();
+
+
+  if (!data.success) {
+
+    throw new Error(
+
+      data.message ||
+      '照片讀取失敗'
+
+    );
+
+  }
+
+
+  if (
+    !data.mimeType ||
+    !data.base64Data
+  ) {
+
+    throw new Error(
+      '照片資料不完整'
+    );
+
+  }
+
+
+  return (
+    'data:' +
+    data.mimeType +
+    ';base64,' +
+    data.base64Data
+  );
+
+}
+
 
     /*
      * 標題
