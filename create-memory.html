@@ -1270,44 +1270,176 @@
      儲存
      ========================================= */
 
-  async function saveMemory() {
+ async function saveMemory() {
 
-    const title =
-      document
-        .getElementById(
-          'title'
-        )
-        .value
-        .trim();
+  const title =
+    document
+      .getElementById(
+        'title'
+      )
+      .value
+      .trim();
 
 
-    if (!title) {
+  const eventDate =
+    document
+      .getElementById(
+        'eventDate'
+      )
+      .value;
 
-      showToast(
-        '請輸入回憶標題'
+
+  const location =
+    document
+      .getElementById(
+        'location'
+      )
+      .value
+      .trim();
+
+
+  const description =
+    document
+      .getElementById(
+        'description'
+      )
+      .value
+      .trim();
+
+
+  if (!title) {
+
+    showToast(
+      '請輸入回憶標題'
+    );
+
+    return;
+
+  }
+
+
+  const button =
+    document.getElementById(
+      'saveBtn'
+    );
+
+
+  button.disabled =
+    true;
+
+
+  button.textContent =
+    '儲存中...';
+
+
+  try {
+
+    const response =
+      await fetch(
+        '/api/memories',
+        {
+
+          method:
+            'POST',
+
+          headers: {
+
+            'Content-Type':
+              'application/json'
+
+          },
+
+          body:
+            JSON.stringify({
+
+              idToken:
+                idToken,
+
+              memory: {
+
+                title:
+                  title,
+
+                eventDate:
+                  eventDate,
+
+                location:
+                  location,
+
+                description:
+                  description,
+
+                coverImageUrl:
+                  '',
+
+                relatedCardId:
+                  ''
+
+              }
+
+            })
+
+        }
       );
 
-      return;
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+      throw new Error(
+
+        data.message ||
+        '建立回憶失敗'
+
+      );
 
     }
 
 
-    /*
-     * 下一步會在這裡接：
-     *
-     * 1. 建立 Memory_ID
-     * 2. 上傳封面
-     * 3. 上傳相簿照片
-     * 4. 寫入 Memories
-     * 5. 寫入 MemoryPhotos
-     */
+    showToast(
+      '回憶已建立 ♡'
+    );
+
+
+    setTimeout(
+      () => {
+
+        window.location.href =
+          '/memories.html';
+
+      },
+      900
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
 
 
     showToast(
-      '表單完成，下一步接儲存功能 ♡'
+
+      error.message ||
+      '建立回憶失敗'
+
     );
 
+
+    button.disabled =
+      false;
+
+
+    button.textContent =
+      '儲存回憶';
+
   }
+
+}
 
 
   /* =========================================
