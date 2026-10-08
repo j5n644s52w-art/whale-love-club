@@ -1078,6 +1078,8 @@
 
   let photoFiles = [];
 
+  let createdMemoryId = '';
+
 
   /* =========================================
      初始化
@@ -1270,39 +1272,31 @@
      儲存
      ========================================= */
 
- async function saveMemory() {
+async function saveMemory() {
 
   const title =
     document
-      .getElementById(
-        'title'
-      )
+      .getElementById('title')
       .value
       .trim();
 
 
   const eventDate =
     document
-      .getElementById(
-        'eventDate'
-      )
+      .getElementById('eventDate')
       .value;
 
 
   const location =
     document
-      .getElementById(
-        'location'
-      )
+      .getElementById('location')
       .value
       .trim();
 
 
   const description =
     document
-      .getElementById(
-        'description'
-      )
+      .getElementById('description')
       .value
       .trim();
 
@@ -1324,83 +1318,231 @@
     );
 
 
-  button.disabled =
-    true;
-
+  button.disabled = true;
 
   button.textContent =
-    '儲存中...';
+    '正在儲存...';
 
 
   try {
 
-    const response =
-      await fetch(
-        '/api/memories',
-        {
+    /* =====================================
+       1. 先建立 Memory
+       ===================================== */
 
-          method:
-            'POST',
+    if (!createdMemoryId) {
 
-          headers: {
+      const response =
+        await fetch(
+          '/api/memories',
+          {
 
-            'Content-Type':
-              'application/json'
+            method: 'POST',
 
-          },
+            headers: {
 
-          body:
-            JSON.stringify({
+              'Content-Type':
+                'application/json'
 
-              idToken:
-                idToken,
+            },
 
-              memory: {
+            body:
+              JSON.stringify({
 
-                title:
-                  title,
+                idToken:
+                  idToken,
 
-                eventDate:
-                  eventDate,
+                memory: {
 
-                location:
-                  location,
+                  title:
+                    title,
 
-                description:
-                  description,
+                  eventDate:
+                    eventDate,
 
-                coverImageUrl:
-                  '',
+                  location:
+                    location,
 
-                relatedCardId:
-                  ''
+                  description:
+                    description,
 
-              }
+                  coverImageUrl:
+                    '',
 
-            })
+                  relatedCardId:
+                    ''
 
-        }
-      );
+                }
+
+              })
+
+          }
+        );
 
 
-    const data =
-      await response.json();
+      const data =
+        await response.json();
 
 
-    if (!data.success) {
+      if (!data.success) {
 
-      throw new Error(
+        throw new Error(
 
-        data.message ||
-        '建立回憶失敗'
+          data.message ||
+          '建立回憶失敗'
 
-      );
+        );
+
+      }
+
+
+      createdMemoryId =
+        data.memoryId;
 
     }
 
 
+
+    /* =====================================
+       2. 上傳封面
+       ===================================== */
+
+    if (coverFile) {
+
+      button.textContent =
+        '正在上傳封面...';
+
+
+      const base64Data =
+        await fileToBase64(
+          coverFile
+        );
+
+
+      const uploadResponse =
+        await fetch(
+          '/api/upload-photo',
+          {
+
+            method:
+              'POST',
+
+            headers: {
+
+              'Content-Type':
+                'application/json'
+
+            },
+
+            body:
+              JSON.stringify({
+
+                idToken:
+                  idToken,
+
+                fileName:
+                  coverFile.name,
+
+                mimeType:
+                  coverFile.type,
+
+                base64Data:
+                  base64Data,
+
+                folderType:
+                  'Memories',
+
+                subfolderName:
+                  createdMemoryId
+
+              })
+
+          }
+        );
+
+
+      const uploadData =
+        await uploadResponse.json();
+
+
+      if (!uploadData.success) {
+
+        throw new Error(
+
+          uploadData.message ||
+          '封面上傳失敗'
+
+        );
+
+      }
+
+
+
+      /* =====================================
+         3. 把 File ID 寫回 Memory
+         ===================================== */
+
+      const coverResponse =
+        await fetch(
+          '/api/memories',
+          {
+
+            method:
+              'POST',
+
+            headers: {
+
+              'Content-Type':
+                'application/json'
+
+            },
+
+            body:
+              JSON.stringify({
+
+                idToken:
+                  idToken,
+
+                action:
+                  'setMemoryCover',
+
+                memoryId:
+                  createdMemoryId,
+
+                fileId:
+                  uploadData.fileId
+
+              })
+
+          }
+        );
+
+
+      const coverData =
+        await coverResponse.json();
+
+
+      if (!coverData.success) {
+
+        throw new Error(
+
+          coverData.message ||
+          '封面綁定失敗'
+
+        );
+
+      }
+
+    }
+
+
+
+    /* =====================================
+       完成
+       ===================================== */
+
     showToast(
-      '回憶已建立 ♡'
+      '回憶已儲存 ♡'
     );
 
 
@@ -1425,7 +1567,7 @@
     showToast(
 
       error.message ||
-      '建立回憶失敗'
+      '儲存失敗'
 
     );
 
@@ -1440,7 +1582,48 @@
   }
 
 }
+function fileToBase64(file) {
 
+  return new Promise(
+    (
+      resolve,
+      reject
+    ) => {
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        function() {
+
+          resolve(
+            reader.result
+          );
+
+        };
+
+
+      reader.onerror =
+        function() {
+
+          reject(
+            new Error(
+              '讀取圖片失敗'
+            )
+          );
+
+        };
+
+
+      reader.readAsDataURL(
+        file
+      );
+
+    }
+  );
+
+}
 
   /* =========================================
      返回
