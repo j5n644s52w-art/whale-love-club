@@ -1083,15 +1083,23 @@
 
     <div class="form-actions">
 
-      <button
-        class="cancel"
-        type="button"
-        onclick="closeDetailModal()"
-      >
-        關閉
-      </button>
+  <button
+    class="cancel"
+    type="button"
+    onclick="closeDetailModal()"
+  >
+    關閉
+  </button>
 
-    </div>
+  <button
+    class="save"
+    type="button"
+    onclick="editDetail()"
+  >
+    編輯
+  </button>
+
+</div>
 
   </div>
 </div>
@@ -1623,6 +1631,15 @@ function closeDetailModal() {
     )
     .classList
     .remove('show');
+
+}
+
+
+function editDetail() {
+
+  showToast(
+    '下一步進入編輯模式'
+  );
 
 }
 /* ==============================
