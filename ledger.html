@@ -741,7 +741,10 @@
 
       <div class="modal-handle"></div>
 
-      <div class="modal-title">
+      <div 
+        class="modal-title"
+        id="formModalTitle"
+        >
         新增紀錄 ♡
       </div>
 
@@ -1121,9 +1124,15 @@
 
 
   let idToken = '';
-  let ledgerEntries = [];
-  let selectedType =
-    'EXPENSE';
+
+let ledgerEntries = [];
+
+let currentDetailEntryId = '';
+
+let editingEntryId = '';
+
+let selectedType =
+  'EXPENSE';
 
 
   const now =
@@ -1521,6 +1530,8 @@ renderEntries(
    ============================== */
 
 function openDetailModal(entryId) {
+  currentDetailEntryId =
+  entryId;
 
   const entry =
     ledgerEntries.find(
@@ -1637,9 +1648,114 @@ function closeDetailModal() {
 
 function editDetail() {
 
-  showToast(
-    '下一步進入編輯模式'
+  const entry =
+    ledgerEntries.find(
+      item =>
+        String(item.entryId) ===
+        String(currentDetailEntryId)
+    );
+
+
+  if (!entry) {
+
+    showToast(
+      '找不到這筆紀錄'
+    );
+
+    return;
+  }
+
+
+  editingEntryId =
+    entry.entryId;
+
+
+  document
+    .getElementById(
+      'amount'
+    )
+    .value =
+    entry.amount || '';
+
+
+  document
+    .getElementById(
+      'category'
+    )
+    .value =
+    entry.category || '其他';
+
+
+  document
+    .getElementById(
+      'title'
+    )
+    .value =
+    entry.title || '';
+
+
+  document
+    .getElementById(
+      'paidBy'
+    )
+    .value =
+    entry.paidBy || 'ADMIN001';
+
+
+  document
+    .getElementById(
+      'forWhom'
+    )
+    .value =
+    entry.forWhom || 'BOTH';
+
+
+  document
+    .getElementById(
+      'entryDate'
+    )
+    .value =
+    entry.date || '';
+
+
+  document
+    .getElementById(
+      'note'
+    )
+    .value =
+    entry.note || '';
+
+
+  setType(
+    entry.type || 'EXPENSE'
   );
+
+
+  document
+    .getElementById(
+      'formModalTitle'
+    )
+    .textContent =
+    '編輯紀錄 ♡';
+
+
+  document
+    .getElementById(
+      'saveButton'
+    )
+    .textContent =
+    '儲存修改 ♡';
+
+
+  closeDetailModal();
+
+
+  document
+    .getElementById(
+      'modalMask'
+    )
+    .classList
+    .add('show');
 
 }
 /* ==============================
