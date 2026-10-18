@@ -1488,10 +1488,10 @@
                 class="delete-button"
                 type="button"
                 onclick="
-                  deleteEntry(
-                    '${entry.entryId}',
-                    this
-                  )
+                event.stopPropagation();
+                deleteEntry(
+                '${entry.entryId}', this
+                )
                 "
               >
                 刪除
@@ -1507,7 +1507,123 @@
       .join('');
 
 }
+/* ==============================
+   記帳明細
+   ============================== */
 
+function openDetailModal(entryId) {
+
+  const entry =
+    ledgerEntries.find(
+      item =>
+        String(item.entryId) ===
+        String(entryId)
+    );
+
+
+  if (!entry) {
+
+    showToast(
+      '找不到這筆紀錄'
+    );
+
+    return;
+  }
+
+
+  document
+    .getElementById(
+      'detailType'
+    )
+    .textContent =
+    entry.type === 'INCOME'
+      ? '收入'
+      : '支出';
+
+
+  document
+    .getElementById(
+      'detailDate'
+    )
+    .textContent =
+    entry.date || '-';
+
+
+  document
+    .getElementById(
+      'detailCategory'
+    )
+    .textContent =
+    entry.category || '-';
+
+
+  document
+    .getElementById(
+      'detailTitle'
+    )
+    .textContent =
+    entry.title || '-';
+
+
+  document
+    .getElementById(
+      'detailAmount'
+    )
+    .textContent =
+    money(
+      entry.amount || 0
+    );
+
+
+  document
+    .getElementById(
+      'detailPaidBy'
+    )
+    .textContent =
+    personName(
+      entry.paidBy
+    );
+
+
+  document
+    .getElementById(
+      'detailForWhom'
+    )
+    .textContent =
+    forWhomName(
+      entry.forWhom
+    );
+
+
+  document
+    .getElementById(
+      'detailNote'
+    )
+    .textContent =
+    entry.note ||
+    '無備註';
+
+
+  document
+    .getElementById(
+      'detailMask'
+    )
+    .classList
+    .add('show');
+
+}
+
+
+function closeDetailModal() {
+
+  document
+    .getElementById(
+      'detailMask'
+    )
+    .classList
+    .remove('show');
+
+}
 /* ==============================
    刪除紀錄
    ============================== */
