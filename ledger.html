@@ -1648,116 +1648,65 @@ function closeDetailModal() {
 
 function editDetail() {
 
-  const entry =
-    ledgerEntries.find(
-      item =>
-        String(item.entryId) ===
-        String(currentDetailEntryId)
-    );
-
+  const entry = ledgerEntries.find(
+    item =>
+      String(item.entryId) ===
+      String(currentDetailEntryId)
+  );
 
   if (!entry) {
-
-    showToast(
-      '找不到這筆紀錄'
-    );
-
+    showToast('找不到這筆紀錄');
     return;
   }
 
+  editingEntryId = entry.entryId;
 
-  editingEntryId =
-    entry.entryId;
-
-
-  document
-    .getElementById(
-      'amount'
-    )
-    .value =
+  document.getElementById('amount').value =
     entry.amount || '';
 
-
-  document
-    .getElementById(
-      'category'
-    )
-    .value =
+  document.getElementById('category').value =
     entry.category || '其他';
 
-
-  document
-    .getElementById(
-      'title'
-    )
-    .value =
+  document.getElementById('title').value =
     entry.title || '';
 
-
-  document
-    .getElementById(
-      'paidBy'
-    )
-    .value =
+  document.getElementById('paidBy').value =
     entry.paidBy || 'ADMIN001';
 
-
-  document
-    .getElementById(
-      'forWhom'
-    )
-    .value =
+  document.getElementById('forWhom').value =
     entry.forWhom || 'BOTH';
 
+  document.getElementById('entryDate').value =
+    String(entry.date || '')
+      .replaceAll('/', '-');
 
-  document
-    .getElementById(
-      'entryDate'
-    )
-    .value =
-    entry.date || '';
-
-
-  document
-    .getElementById(
-      'note'
-    )
-    .value =
+  document.getElementById('note').value =
     entry.note || '';
-
 
   setType(
     entry.type || 'EXPENSE'
   );
 
-
   document
-    .getElementById(
-      'formModalTitle'
-    )
+    .getElementById('formModalTitle')
     .textContent =
     '編輯紀錄 ♡';
 
-
   document
-    .getElementById(
-      'saveButton'
-    )
+    .getElementById('saveButton')
     .textContent =
     '儲存修改 ♡';
 
-
   closeDetailModal();
 
-
   document
-    .getElementById(
-      'modalMask'
-    )
+    .getElementById('modalMask')
     .classList
     .add('show');
 
 }
+
+
 /* ==============================
    刪除紀錄
    ============================== */
@@ -1768,39 +1717,26 @@ async function deleteEntry(
 ) {
 
   const entryElement =
-    button.closest(
-      '.entry'
-    );
-
+    button.closest('.entry');
 
   const title =
     entryElement
-      ?.querySelector(
-        '.entry-title'
-      )
+      ?.querySelector('.entry-title')
       ?.textContent
       ?.trim() ||
     '這筆紀錄';
-
 
   const confirmed =
     window.confirm(
       `確定要刪除「${title}」嗎？\n\n刪除後無法復原。`
     );
 
-
   if (!confirmed) {
     return;
   }
 
-
-  button.disabled =
-    true;
-
-
-  button.textContent =
-    '刪除中...';
-
+  button.disabled = true;
+  button.textContent = '刪除中...';
 
   try {
 
@@ -1808,15 +1744,309 @@ async function deleteEntry(
       await fetch(
         '/api/ledger',
         {
+          method: 'POST',
 
+          headers: {
+            'Content-Type':
+              'application/json'
+          },
+
+          body:
+            JSON.stringify({
+              idToken: idToken,
+              action: 'delete',
+              entryId: entryId
+            })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (!data.success) {
+
+      if (
+        String(data.message || '')
+          .toLowerCase()
+          .includes('expired')
+      ) {
+        return refreshLogin();
+      }
+
+      throw new Error(
+        data.message ||
+        '刪除失敗'
+      );
+    }
+
+    showToast(
+      '已刪除這筆紀錄'
+    );
+
+    await loadLedger();
+
+  } catch (error) {
+
+    console.error(error);
+
+    showToast(
+      error.message ||
+      '刪除失敗'
+    );
+
+    button.disabled = false;
+    button.textContent = '刪除';
+
+  }
+
+}
+
+
+/* ==============================
+   月份切換
+   ============================== */
+
+async function changeMonth(step) {
+
+  selectedMonth += step;
+
+  if (selectedMonth === 13) {
+    selectedMonth = 1;
+    selectedYear++;
+  }
+
+  if (selectedMonth === 0) {
+    selectedMonth = 12;
+    selectedYear--;
+  }
+
+  updateMonthTitle();
+
+  try {
+
+    await loadLedger();
+
+  } catch (error) {
+
+    showToast(
+      error.message ||
+      '月份載入失敗'
+    );
+
+  }
+
+}
+
+
+function updateMonthTitle() {
+
+  document
+    .getElementById('monthTitle')
+    .textContent =
+    monthNames[
+      selectedMonth - 1
+    ];
+
+  document
+    .getElementById('yearTitle')
+    .textContent =
+    selectedYear;
+
+}
+
+
+/* ==============================
+   開啟新增紀錄
+   ============================== */
+
+function openModal() {
+
+  editingEntryId = '';
+
+  resetForm();
+
+  document
+    .getElementById('formModalTitle')
+    .textContent =
+    '新增紀錄 ♡';
+
+  document
+    .getElementById('saveButton')
+    .textContent =
+    '儲存 ♡';
+
+  document
+    .getElementById('modalMask')
+    .classList
+    .add('show');
+
+}
+
+
+/* ==============================
+   關閉新增 / 編輯視窗
+   ============================== */
+
+function closeModal() {
+
+  document
+    .getElementById('modalMask')
+    .classList
+    .remove('show');
+
+  editingEntryId = '';
+
+  document
+    .getElementById('formModalTitle')
+    .textContent =
+    '新增紀錄 ♡';
+
+  document
+    .getElementById('saveButton')
+    .textContent =
+    '儲存 ♡';
+
+}
+
+
+/* ==============================
+   收入 / 支出切換
+   ============================== */
+
+function setType(type) {
+
+  selectedType = type;
+
+  document
+    .getElementById('expenseTab')
+    .classList
+    .toggle(
+      'active',
+      type === 'EXPENSE'
+    );
+
+  document
+    .getElementById('incomeTab')
+    .classList
+    .toggle(
+      'active',
+      type === 'INCOME'
+    );
+
+}
+
+
+/* ==============================
+   儲存新增 / 修改紀錄
+   ============================== */
+
+async function saveEntry() {
+
+  const amount =
+    Number(
+      document
+        .getElementById('amount')
+        .value
+    );
+
+  const title =
+    document
+      .getElementById('title')
+      .value
+      .trim();
+
+  if (
+    !amount ||
+    amount <= 0
+  ) {
+
+    showToast(
+      '請輸入正確金額'
+    );
+
+    return;
+  }
+
+  if (!title) {
+
+    showToast(
+      '請輸入項目名稱'
+    );
+
+    return;
+  }
+
+  const entry = {
+
+    type:
+      selectedType,
+
+    amount:
+      amount,
+
+    category:
+      document
+        .getElementById('category')
+        .value,
+
+    title:
+      title,
+
+    paidBy:
+      document
+        .getElementById('paidBy')
+        .value,
+
+    forWhom:
+      document
+        .getElementById('forWhom')
+        .value,
+
+    date:
+      document
+        .getElementById('entryDate')
+        .value,
+
+    note:
+      document
+        .getElementById('note')
+        .value
+        .trim()
+
+  };
+
+  const isEditing =
+    Boolean(
+      editingEntryId
+    );
+
+  const targetEntryId =
+    editingEntryId;
+
+  const button =
+    document.getElementById(
+      'saveButton'
+    );
+
+  button.disabled = true;
+
+  button.textContent =
+    isEditing
+      ? '修改中...'
+      : '儲存中...';
+
+  try {
+
+    const response =
+      await fetch(
+        '/api/ledger',
+        {
           method:
             'POST',
 
           headers: {
-
             'Content-Type':
               'application/json'
-
           },
 
           body:
@@ -1826,20 +2056,24 @@ async function deleteEntry(
                 idToken,
 
               action:
-                'delete',
+                isEditing
+                  ? 'update'
+                  : 'add',
 
               entryId:
-                entryId
+                isEditing
+                  ? targetEntryId
+                  : undefined,
+
+              entry:
+                entry
 
             })
-
         }
       );
 
-
     const data =
       await response.json();
-
 
     if (!data.success) {
 
@@ -1855,393 +2089,87 @@ async function deleteEntry(
 
       }
 
-
       throw new Error(
         data.message ||
-        '刪除失敗'
+        (
+          isEditing
+            ? '修改失敗'
+            : '新增失敗'
+        )
       );
 
     }
 
+    /*
+     * 先保留這次操作是不是修改
+     * 因為 closeModal() 會清空 editingEntryId
+     */
+
+    const wasEditing =
+      isEditing;
+
+    closeModal();
+
+    resetForm();
 
     showToast(
-      '已刪除這筆紀錄'
+      wasEditing
+        ? '紀錄修改完成 ♡'
+        : '已加入我們的帳本 ♡'
     );
 
+    /*
+     * 如果日期有修改，
+     * 儲存後自動切到那個月份
+     */
+
+    const dateParts =
+      String(entry.date)
+        .split('-');
+
+    if (
+      dateParts.length === 3
+    ) {
+
+      selectedYear =
+        Number(
+          dateParts[0]
+        );
+
+      selectedMonth =
+        Number(
+          dateParts[1]
+        );
+
+    }
+
+    updateMonthTitle();
 
     await loadLedger();
 
-
   } catch (error) {
 
-    console.error(
-      error
-    );
-
+    console.error(error);
 
     showToast(
       error.message ||
-      '刪除失敗'
+      (
+        isEditing
+          ? '修改失敗'
+          : '新增失敗'
+      )
     );
 
+  } finally {
 
-    button.disabled =
-      false;
-
+    button.disabled = false;
 
     button.textContent =
-      '刪除';
+      '儲存 ♡';
 
   }
 
 }
-
-  /* ==============================
-     月份切換
-     ============================== */
-
-  async function changeMonth(step) {
-
-    selectedMonth += step;
-
-
-    if (selectedMonth === 13) {
-
-      selectedMonth = 1;
-
-      selectedYear++;
-
-    }
-
-
-    if (selectedMonth === 0) {
-
-      selectedMonth = 12;
-
-      selectedYear--;
-
-    }
-
-
-    updateMonthTitle();
-
-
-    try {
-
-      await loadLedger();
-
-    } catch (error) {
-
-      showToast(
-        error.message ||
-        '月份載入失敗'
-      );
-
-    }
-
-  }
-
-
-
-  function updateMonthTitle() {
-
-    document
-      .getElementById(
-        'monthTitle'
-      )
-      .textContent =
-      monthNames[
-        selectedMonth - 1
-      ];
-
-
-    document
-      .getElementById(
-        'yearTitle'
-      )
-      .textContent =
-      selectedYear;
-
-  }
-
-
-
-  /* ==============================
-     新增紀錄
-     ============================== */
-
-  function openModal() {
-
-    setToday();
-
-    document
-      .getElementById(
-        'modalMask'
-      )
-      .classList
-      .add('show');
-
-  }
-
-
-
-  function closeModal() {
-
-    document
-      .getElementById(
-        'modalMask'
-      )
-      .classList
-      .remove('show');
-
-  }
-
-
-
-  function setType(type) {
-
-    selectedType =
-      type;
-
-
-    document
-      .getElementById(
-        'expenseTab'
-      )
-      .classList
-      .toggle(
-        'active',
-        type === 'EXPENSE'
-      );
-
-
-    document
-      .getElementById(
-        'incomeTab'
-      )
-      .classList
-      .toggle(
-        'active',
-        type === 'INCOME'
-      );
-
-  }
-
-
-
-  async function saveEntry() {
-
-    const amount =
-      Number(
-        document
-          .getElementById(
-            'amount'
-          )
-          .value
-      );
-
-
-    const title =
-      document
-        .getElementById(
-          'title'
-        )
-        .value
-        .trim();
-
-
-    if (
-      !amount ||
-      amount <= 0
-    ) {
-
-      showToast(
-        '請輸入正確金額'
-      );
-
-      return;
-    }
-
-
-    if (!title) {
-
-      showToast(
-        '請輸入項目名稱'
-      );
-
-      return;
-    }
-
-
-    const entry = {
-
-      type:
-        selectedType,
-
-      amount:
-        amount,
-
-      category:
-        document
-          .getElementById(
-            'category'
-          )
-          .value,
-
-      title:
-        title,
-
-      paidBy:
-        document
-          .getElementById(
-            'paidBy'
-          )
-          .value,
-
-      forWhom:
-        document
-          .getElementById(
-            'forWhom'
-          )
-          .value,
-
-      date:
-        document
-          .getElementById(
-            'entryDate'
-          )
-          .value,
-
-      note:
-        document
-          .getElementById(
-            'note'
-          )
-          .value
-          .trim()
-
-    };
-
-
-    const button =
-      document.getElementById(
-        'saveButton'
-      );
-
-
-    button.disabled = true;
-
-    button.textContent =
-      '儲存中...';
-
-
-    try {
-
-      const response =
-        await fetch(
-          '/api/ledger',
-          {
-
-            method:
-              'POST',
-
-            headers: {
-
-              'Content-Type':
-                'application/json'
-
-            },
-
-            body:
-              JSON.stringify({
-
-                idToken:
-                  idToken,
-
-                entry:
-                  entry
-
-              })
-
-          }
-        );
-
-
-      const data =
-        await response.json();
-
-
-      if (!data.success) {
-
-        if (
-          String(
-            data.message || ''
-          )
-            .toLowerCase()
-            .includes('expired')
-        ) {
-
-          return refreshLogin();
-
-        }
-
-
-        throw new Error(
-          data.message ||
-          '新增失敗'
-        );
-
-      }
-
-
-      closeModal();
-
-      resetForm();
-
-
-      showToast(
-        '已加入我們的帳本 ♡'
-      );
-
-
-      const date =
-        new Date(entry.date);
-
-
-      selectedYear =
-        date.getFullYear();
-
-
-      selectedMonth =
-        date.getMonth() + 1;
-
-
-      updateMonthTitle();
-
-
-      await loadLedger();
-
-
-    } catch (error) {
-
-      console.error(error);
-
-      showToast(
-        error.message ||
-        '新增失敗'
-      );
-
-    } finally {
-
-      button.disabled = false;
-
-      button.textContent =
-        '儲存 ♡';
-
-    }
-
-  }
-
 
 
   /* ==============================
