@@ -207,6 +207,76 @@ export default async function handler(req, res) {
 
     }
 
+    /* ==========================
+   UPDATE：修改紀錄
+   ========================== */
+
+if (
+  action === 'update'
+) {
+
+  if (!entryId) {
+
+    return res
+      .status(400)
+      .json({
+
+        success: false,
+
+        message:
+          'Missing entryId'
+
+      });
+
+  }
+
+
+  if (!entry) {
+
+    return res
+      .status(400)
+      .json({
+
+        success: false,
+
+        message:
+          'Missing entry'
+
+      });
+
+  }
+
+
+  const result =
+    await callAppsScript(
+      appsScriptUrl,
+      {
+
+        action:
+          'updateLedger',
+
+        secret:
+          appsScriptSecret,
+
+        lineUserId:
+          lineData.sub,
+
+        entryId:
+          entryId,
+
+        entry:
+          entry
+
+      }
+    );
+
+
+  return res
+    .status(200)
+    .json(result);
+
+}
+
 
 
     /* ==========================
