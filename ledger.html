@@ -1113,7 +1113,7 @@
 
 
   let idToken = '';
-
+  let ledgerEntries = [];
   let selectedType =
     'EXPENSE';
 
@@ -1292,6 +1292,9 @@
 
     renderEntries(
       data.entries || []
+
+    renderEntries(
+  ledgerEntries
     );
 
   }
@@ -1398,7 +1401,11 @@
 
         return `
 
-          <article class="entry">
+          <article
+          class="entry"
+          onclick="openDetailModal('${entry.entryId}')"
+          style="cursor:pointer;"
+          >
 
             <div>
 
