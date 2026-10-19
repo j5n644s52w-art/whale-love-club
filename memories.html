@@ -1228,130 +1228,283 @@
     memories
   ) {
 
-    const fileIds =
+    const jobs =
       memories
         .map(
-          function(memory) {
-            return String(
-              memory.coverImageUrl || ''
-            ).trim();
+          function(memory, index) {
+
+            const fileId =
+              String(
+                memory.coverImageUrl || ''
+              ).trim();
+
+
+            if (!fileId) {
+              return null;
+            }
+
+
+            return {
+              index:
+                index,
+              fileId:
+                fileId
+            };
+
           }
         )
         .filter(Boolean);
 
 
-    if (!fileIds.length) {
+    if (!jobs.length) {
       return;
     }
 
 
-    const photoMap =
-      await loadPrivatePhotoMap(
-        fileIds
+    /*
+     * 列表頁不要等「全部封面」讀完才一起顯示。
+     * 改成小批次、漸進式載入：
+     *
+     * - 每批最多 2 張
+     * - 同時最多跑 2 批
+     * - 某一批失敗，不影響其他封面
+     *
+     * 這樣即使相簿很多，也會先看到前面的封面，
+     * 不會整頁一直只有愛心 placeholder。
+     */
+
+    const chunks = [];
+
+
+    for (
+      let i = 0;
+      i < jobs.length;
+      i += 2
+    ) {
+
+      chunks.push(
+        jobs.slice(
+          i,
+          i + 2
+        )
       );
 
-
-    const coverElements =
-      document.querySelectorAll(
-        '[data-cover-index]'
-      );
+    }
 
 
-    coverElements.forEach(
-      function(cover) {
-
-        const index =
-          Number(
-            cover.dataset.coverIndex
-          );
+    let cursor = 0;
 
 
-        const memory =
-          memories[index];
+    async function worker() {
+
+      while (
+        cursor < chunks.length
+      ) {
+
+        const currentIndex =
+          cursor++;
 
 
-        if (
-          !memory ||
-          !memory.coverImageUrl
-        ) {
-          return;
-        }
-
-
-        const src =
-          photoMap[
-            memory.coverImageUrl
+        const chunk =
+          chunks[
+            currentIndex
           ];
 
 
-        if (!src) {
-          return;
-        }
+        try {
+
+          const photoMap =
+            await loadPrivatePhotoMap(
+              chunk.map(
+                function(job) {
+                  return job.fileId;
+                }
+              )
+            );
 
 
-        const placeholder =
-          cover.querySelector(
-            '.cover-placeholder'
-          );
+          for (
+            let j = 0;
+            j < chunk.length;
+            j++
+          ) {
+
+            const job =
+              chunk[j];
 
 
-        if (placeholder) {
-          placeholder.style.display =
-            'none';
-        }
+            const src =
+              photoMap[
+                job.fileId
+              ];
 
 
-        const img =
-          document.createElement(
-            'img'
-          );
-
-
-        img.src =
-          src;
-
-        img.alt =
-          'memory';
-
-        img.loading =
-          'lazy';
-
-
-        img.style.position =
-          'absolute';
-
-        img.style.inset =
-          '0';
-
-        img.style.width =
-          '100%';
-
-        img.style.height =
-          '100%';
-
-        img.style.objectFit =
-          'cover';
-
-
-        img.onerror =
-          function() {
-
-            img.remove();
-
-            if (placeholder) {
-              placeholder.style.display =
-                '';
+            if (!src) {
+              continue;
             }
 
-          };
 
+            applyMemoryCover(
+              job.index,
+              src
+            );
 
-        cover.insertBefore(
-          img,
-          cover.firstChild
-        );
+          }
+
+        } catch (error) {
+
+          console.error(
+            '部分封面載入失敗',
+            error
+          );
+
+          /*
+           * 不 throw。
+           * 讓後面的相簿封面繼續載入。
+           */
+
+        }
 
       }
+
+    }
+
+
+    const workerCount =
+      Math.min(
+        2,
+        chunks.length
+      );
+
+
+    const workers = [];
+
+
+    for (
+      let i = 0;
+      i < workerCount;
+      i++
+    ) {
+
+      workers.push(
+        worker()
+      );
+
+    }
+
+
+    await Promise.all(
+      workers
+    );
+
+  }
+
+
+  function applyMemoryCover(
+    index,
+    src
+  ) {
+
+    const cover =
+      document.querySelector(
+        `[data-cover-index="${index}"]`
+      );
+
+
+    if (
+      !cover ||
+      !src
+    ) {
+      return;
+    }
+
+
+    const placeholder =
+      cover.querySelector(
+        '.cover-placeholder'
+      );
+
+
+    const oldImage =
+      cover.querySelector(
+        'img[data-list-cover="1"]'
+      );
+
+
+    if (oldImage) {
+      oldImage.remove();
+    }
+
+
+    const img =
+      document.createElement(
+        'img'
+      );
+
+
+    img.dataset.listCover =
+      '1';
+
+    img.src =
+      src;
+
+    img.alt =
+      'memory';
+
+    img.loading =
+      'lazy';
+
+    img.decoding =
+      'async';
+
+
+    img.style.position =
+      'absolute';
+
+    img.style.inset =
+      '0';
+
+    img.style.width =
+      '100%';
+
+    img.style.height =
+      '100%';
+
+    img.style.objectFit =
+      'cover';
+
+
+    img.onload =
+      function() {
+
+        if (placeholder) {
+
+          placeholder.style.display =
+            'none';
+
+        }
+
+      };
+
+
+    img.onerror =
+      function() {
+
+        img.remove();
+
+        if (placeholder) {
+
+          placeholder.style.display =
+            '';
+
+        }
+
+      };
+
+
+    cover.insertBefore(
+      img,
+      cover.firstChild
     );
 
   }
