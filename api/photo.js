@@ -38,7 +38,8 @@ export default async function handler(req, res) {
 
     const {
       idToken,
-      fileId
+      fileId,
+      fileIds
     } = req.body || {};
 
 
@@ -52,19 +53,36 @@ export default async function handler(req, res) {
     }
 
 
-    if (!fileId) {
+    const hasBatch =
+      Array.isArray(fileIds) &&
+      fileIds.length > 0;
+
+
+    if (
+      !fileId &&
+      !hasBatch
+    ) {
 
       return res.status(400).json({
         success: false,
-        message: 'Missing fileId'
+        message: 'Missing fileId / fileIds'
       });
 
     }
 
 
-    /* =========================================
-       驗證 LINE
-       ========================================= */
+    if (
+      hasBatch &&
+      fileIds.length > 6
+    ) {
+
+      return res.status(400).json({
+        success: false,
+        message: '最多一次讀取 6 張照片'
+      });
+
+    }
+
 
     const lineData =
       await verifyLineToken(
@@ -73,28 +91,28 @@ export default async function handler(req, res) {
       );
 
 
-    /* =========================================
-       讀取私人照片
-       ========================================= */
+    const payload =
+      hasBatch
+
+        ? {
+            action: 'getPrivatePhotos',
+            secret: appsScriptSecret,
+            lineUserId: lineData.sub,
+            fileIds: fileIds
+          }
+
+        : {
+            action: 'getPrivatePhoto',
+            secret: appsScriptSecret,
+            lineUserId: lineData.sub,
+            fileId: fileId
+          };
+
 
     const result =
       await callAppsScript(
         appsScriptUrl,
-        {
-
-          action:
-            'getPrivatePhoto',
-
-          secret:
-            appsScriptSecret,
-
-          lineUserId:
-            lineData.sub,
-
-          fileId:
-            fileId
-
-        }
+        payload
       );
 
 
@@ -108,20 +126,18 @@ export default async function handler(req, res) {
     console.error(error);
 
 
-    return res.status(500).json({
-
-      success: false,
-
-      message:
-        error.message ||
-        'Photo load failed'
-
-    });
+    return res
+      .status(500)
+      .json({
+        success: false,
+        message:
+          error.message ||
+          'Photo load failed'
+      });
 
   }
 
 }
-
 
 
 /* =========================================
@@ -153,19 +169,13 @@ async function verifyLineToken(
     await fetch(
       'https://api.line.me/oauth2/v2.1/verify',
       {
-
         method: 'POST',
-
         headers: {
-
           'Content-Type':
             'application/x-www-form-urlencoded'
-
         },
-
         body:
           params.toString()
-
       }
     );
 
@@ -177,10 +187,8 @@ async function verifyLineToken(
   if (!response.ok) {
 
     throw new Error(
-
       data.error_description ||
       'LINE verification failed'
-
     );
 
   }
@@ -203,7 +211,6 @@ async function verifyLineToken(
 }
 
 
-
 /* =========================================
    呼叫 Apps Script
    ========================================= */
@@ -217,19 +224,13 @@ async function callAppsScript(
     await fetch(
       url,
       {
-
         method: 'POST',
-
         headers: {
-
           'Content-Type':
             'application/json'
-
         },
-
         body:
           JSON.stringify(payload)
-
       }
     );
 
