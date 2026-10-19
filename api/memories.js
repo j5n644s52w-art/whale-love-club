@@ -1,9 +1,5 @@
 export default async function handler(req, res) {
 
-  /* =========================================
-     只接受 GET / POST
-     ========================================= */
-
   if (
     req.method !== 'GET' &&
     req.method !== 'POST'
@@ -16,10 +12,6 @@ export default async function handler(req, res) {
 
   }
 
-
-  /* =========================================
-     Server Environment
-     ========================================= */
 
   const channelId =
     process.env.LINE_CHANNEL_ID;
@@ -76,47 +68,21 @@ export default async function handler(req, res) {
         );
 
 
-      let payload;
+      const payload =
+        memoryId
 
+          ? {
+              action: 'getMemoryDetail',
+              secret: appsScriptSecret,
+              lineUserId: lineData.sub,
+              memoryId: memoryId
+            }
 
-      /* 讀取單一回憶 */
-      if (memoryId) {
-
-        payload = {
-
-          action:
-            'getMemoryDetail',
-
-          secret:
-            appsScriptSecret,
-
-          lineUserId:
-            lineData.sub,
-
-          memoryId:
-            memoryId
-
-        };
-
-      }
-
-      /* 讀取回憶列表 */
-      else {
-
-        payload = {
-
-          action:
-            'getMemories',
-
-          secret:
-            appsScriptSecret,
-
-          lineUserId:
-            lineData.sub
-
-        };
-
-      }
+          : {
+              action: 'getMemories',
+              secret: appsScriptSecret,
+              lineUserId: lineData.sub
+            };
 
 
       const result =
@@ -133,7 +99,6 @@ export default async function handler(req, res) {
     }
 
 
-
     /* =========================================
        POST
        ========================================= */
@@ -143,7 +108,8 @@ export default async function handler(req, res) {
       action,
       memory,
       memoryId,
-      fileId
+      fileId,
+      photos
     } = req.body || {};
 
 
@@ -164,9 +130,8 @@ export default async function handler(req, res) {
       );
 
 
-
     /* =========================================
-       POST：設定回憶封面
+       設定封面
        ========================================= */
 
     if (
@@ -197,22 +162,11 @@ export default async function handler(req, res) {
         await callAppsScript(
           appsScriptUrl,
           {
-
-            action:
-              'setMemoryCover',
-
-            secret:
-              appsScriptSecret,
-
-            lineUserId:
-              lineData.sub,
-
-            memoryId:
-              memoryId,
-
-            fileId:
-              fileId
-
+            action: 'setMemoryCover',
+            secret: appsScriptSecret,
+            lineUserId: lineData.sub,
+            memoryId: memoryId,
+            fileId: fileId
           }
         );
 
@@ -224,9 +178,59 @@ export default async function handler(req, res) {
     }
 
 
+    /* =========================================
+       寫入多張相簿照片
+       ========================================= */
+
+    if (
+      action === 'addMemoryPhotos'
+    ) {
+
+      if (!memoryId) {
+
+        return res.status(400).json({
+          success: false,
+          message: 'Missing memoryId'
+        });
+
+      }
+
+
+      if (
+        !Array.isArray(photos) ||
+        photos.length === 0
+      ) {
+
+        return res.status(400).json({
+          success: false,
+          message: 'Missing photos'
+        });
+
+      }
+
+
+      const result =
+        await callAppsScript(
+          appsScriptUrl,
+          {
+            action: 'addMemoryPhotos',
+            secret: appsScriptSecret,
+            lineUserId: lineData.sub,
+            memoryId: memoryId,
+            photos: photos
+          }
+        );
+
+
+      return res
+        .status(200)
+        .json(result);
+
+    }
+
 
     /* =========================================
-       POST：建立新回憶
+       建立新回憶
        ========================================= */
 
     if (
@@ -248,19 +252,10 @@ export default async function handler(req, res) {
         await callAppsScript(
           appsScriptUrl,
           {
-
-            action:
-              'createMemory',
-
-            secret:
-              appsScriptSecret,
-
-            lineUserId:
-              lineData.sub,
-
-            memory:
-              memory
-
+            action: 'createMemory',
+            secret: appsScriptSecret,
+            lineUserId: lineData.sub,
+            memory: memory
           }
         );
 
@@ -271,11 +266,6 @@ export default async function handler(req, res) {
 
     }
 
-
-
-    /* =========================================
-       不認識的 POST Action
-       ========================================= */
 
     return res.status(400).json({
       success: false,
@@ -291,19 +281,15 @@ export default async function handler(req, res) {
     return res
       .status(500)
       .json({
-
         success: false,
-
         message:
           error.message ||
           'Internal server error'
-
       });
 
   }
 
 }
-
 
 
 /* =========================================
@@ -335,19 +321,13 @@ async function verifyLineToken(
     await fetch(
       'https://api.line.me/oauth2/v2.1/verify',
       {
-
         method: 'POST',
-
         headers: {
-
           'Content-Type':
             'application/x-www-form-urlencoded'
-
         },
-
         body:
           params.toString()
-
       }
     );
 
@@ -359,10 +339,8 @@ async function verifyLineToken(
   if (!response.ok) {
 
     throw new Error(
-
       data.error_description ||
       'LINE verification failed'
-
     );
 
   }
@@ -385,7 +363,6 @@ async function verifyLineToken(
 }
 
 
-
 /* =========================================
    呼叫 Apps Script
    ========================================= */
@@ -399,19 +376,13 @@ async function callAppsScript(
     await fetch(
       url,
       {
-
         method: 'POST',
-
         headers: {
-
           'Content-Type':
             'application/json'
-
         },
-
         body:
           JSON.stringify(payload)
-
       }
     );
 
