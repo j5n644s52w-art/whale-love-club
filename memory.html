@@ -673,17 +673,11 @@
 
 
 <script>
-
-  /*
-   * 請換成目前使用中的
-   * Developing LIFF ID
-   */
   const LIFF_ID =
     '2011857714-fZwEK6lN';
 
 
   let idToken = '';
-
 
 
   /* =========================================
@@ -694,9 +688,6 @@
 
     try {
 
-      /*
-       * 取得網址中的 Memory ID
-       */
       const params =
         new URLSearchParams(
           window.location.search
@@ -716,9 +707,6 @@
       }
 
 
-      /*
-       * 初始化 LINE
-       */
       await liff.init({
         liffId: LIFF_ID
       });
@@ -749,9 +737,6 @@
       }
 
 
-      /*
-       * 讀取回憶
-       */
       await loadMemory(
         memoryId
       );
@@ -771,7 +756,6 @@
   }
 
 
-
   /* =========================================
      LOAD MEMORY
      ========================================= */
@@ -782,22 +766,17 @@
 
     const query =
       new URLSearchParams({
-
         idToken:
           idToken,
-
         memoryId:
           memoryId
-
       });
 
 
     const response =
       await fetch(
-
         '/api/memories?' +
         query.toString()
-
       );
 
 
@@ -806,7 +785,6 @@
 
 
     if (!data.success) {
-
 
       const message =
         String(
@@ -821,7 +799,6 @@
       ) {
 
         refreshLogin();
-
         return;
 
       }
@@ -847,19 +824,23 @@
     }
 
 
-    renderMemory(
+    renderMemoryShell(
+      data.memory
+    );
+
+
+    await hydrateMemoryImages(
       data.memory
     );
 
   }
 
 
-
   /* =========================================
-     RENDER
+     先顯示文字內容
      ========================================= */
 
-  function renderMemory(
+  function renderMemoryShell(
     memory
   ) {
 
@@ -875,126 +856,32 @@
 
 
     document
-      .getElementById(
-        'loading'
-      )
+      .getElementById('loading')
       .classList
       .add('hidden');
 
 
     document
-      .getElementById(
-        'content'
-      )
+      .getElementById('content')
       .classList
       .remove('hidden');
 
-    /* =========================================
-   讀取私人照片
-   ========================================= */
 
-async function loadPrivatePhoto(
-  fileId
-) {
-
-  const response =
-    await fetch(
-      '/api/photo',
-      {
-
-        method:
-          'POST',
-
-        headers: {
-
-          'Content-Type':
-            'application/json'
-
-        },
-
-        body:
-          JSON.stringify({
-
-            idToken:
-              idToken,
-
-            fileId:
-              fileId
-
-          })
-
-      }
-    );
-
-
-  const data =
-    await response.json();
-
-
-  if (!data.success) {
-
-    throw new Error(
-
-      data.message ||
-      '照片讀取失敗'
-
-    );
-
-  }
-
-
-  if (
-    !data.mimeType ||
-    !data.base64Data
-  ) {
-
-    throw new Error(
-      '照片資料不完整'
-    );
-
-  }
-
-
-  return (
-    'data:' +
-    data.mimeType +
-    ';base64,' +
-    data.base64Data
-  );
-
-}
-
-
-    /*
-     * 標題
-     */
     document
-      .getElementById(
-        'coverTitle'
-      )
+      .getElementById('coverTitle')
       .textContent =
-
       memory.title ||
       'Our Memory';
 
 
-    /*
-     * 日期
-     */
     document
-      .getElementById(
-        'coverDate'
-      )
+      .getElementById('coverDate')
       .textContent =
-
       prettyDate(
         memory.eventDate
       );
 
 
-    /*
-     * 地點
-     */
     const location =
       document.getElementById(
         'location'
@@ -1004,7 +891,6 @@ async function loadPrivatePhoto(
     if (memory.location) {
 
       location.innerHTML =
-
         `<span>♡</span> ${
           escapeHtml(
             memory.location
@@ -1019,103 +905,29 @@ async function loadPrivatePhoto(
     }
 
 
-    /*
-     * 故事
-     */
     const story =
       document.getElementById(
         'story'
       );
 
 
-    if (memory.description) {
-
-      story.textContent =
-        memory.description;
-
-    } else {
-
-      story.textContent =
-        '這一天，也成為了我們故事的一部分。';
-
-    }
+    story.textContent =
+      memory.description ||
+      '這一天，也成為了我們故事的一部分。';
 
 
-    /*
-     * Cover
-     */
-    /*
- * Cover
- */
-const cover =
-  document.getElementById(
-    'cover'
-  );
-
-
-if (memory.coverImageUrl) {
-
-  loadPrivatePhoto(
-    memory.coverImageUrl
-  )
-    .then(function(imageSrc) {
-
-      const img =
-        document.createElement(
-          'img'
-        );
-
-
-      img.src =
-        imageSrc;
-
-
-      img.alt =
-        'memory cover';
-
-
-      img.onerror =
-        function() {
-
-          img.remove();
-
-        };
-
-
-      cover.insertBefore(
-        img,
-        cover.firstChild
-      );
-
-    })
-    .catch(function(error) {
-
-      console.error(
-        '封面載入失敗',
-        error
-      );
-
-    });
-
-}
-
-
-    /*
-     * Photos
-     */
-    renderPhotos(
+    renderPhotosShell(
       memory.photos || []
     );
 
   }
 
 
-
   /* =========================================
-     PHOTOS
+     建立照片格骨架
      ========================================= */
 
-  function renderPhotos(
+  function renderPhotosShell(
     photos
   ) {
 
@@ -1126,11 +938,8 @@ if (memory.coverImageUrl) {
 
 
     document
-      .getElementById(
-        'photoCount'
-      )
+      .getElementById('photoCount')
       .textContent =
-
       `${photos.length} ${
         photos.length === 1
           ? 'PHOTO'
@@ -1141,7 +950,6 @@ if (memory.coverImageUrl) {
     if (!photos.length) {
 
       container.innerHTML = `
-
         <div
           class="empty"
           style="
@@ -1149,11 +957,8 @@ if (memory.coverImageUrl) {
             margin-top: 0;
           "
         >
-
           這段回憶目前還沒有照片 ♡
-
         </div>
-
       `;
 
       return;
@@ -1163,52 +968,507 @@ if (memory.coverImageUrl) {
 
     container.innerHTML =
       photos
-        .map(photo => {
+        .map(
+          function(photo, index) {
 
-          return `
+            return `
+              <div class="photo">
 
-            <div class="photo">
+                <img
+                  data-photo-index="${index}"
+                  alt="memory photo"
+                  loading="lazy"
+                >
 
-              <img
+                ${
+                  photo.caption
 
-                src="${escapeAttribute(
-                  photo.imageUrl
-                )}"
+                    ? `
+                        <div class="photo-caption">
+                          ${escapeHtml(
+                            photo.caption
+                          )}
+                        </div>
+                      `
 
-                alt="memory photo"
+                    : ''
+                }
 
-                loading="lazy"
+              </div>
+            `;
 
-              >
-
-
-              ${
-                photo.caption
-
-                  ? `
-
-                    <div class="photo-caption">
-
-                      ${escapeHtml(
-                        photo.caption
-                      )}
-
-                    </div>
-
-                  `
-
-                  : ''
-              }
-
-            </div>
-
-          `;
-
-        })
+          }
+        )
         .join('');
 
   }
 
+
+  /* =========================================
+     一次載入封面 + 相簿照片
+     每批最多 6 張
+     ========================================= */
+
+  async function hydrateMemoryImages(
+    memory
+  ) {
+
+    const photos =
+      memory.photos || [];
+
+
+    const fileIds = [];
+
+
+    if (memory.coverImageUrl) {
+      fileIds.push(
+        memory.coverImageUrl
+      );
+    }
+
+
+    for (
+      let i = 0;
+      i < photos.length;
+      i++
+    ) {
+
+      if (photos[i].imageUrl) {
+        fileIds.push(
+          photos[i].imageUrl
+        );
+      }
+
+    }
+
+
+    if (!fileIds.length) {
+      return;
+    }
+
+
+    let photoMap = {};
+
+
+    try {
+
+      photoMap =
+        await loadPrivatePhotoMap(
+          fileIds
+        );
+
+    } catch (error) {
+
+      console.error(
+        '照片載入失敗',
+        error
+      );
+
+      return;
+
+    }
+
+
+    if (
+      memory.coverImageUrl &&
+      photoMap[
+        memory.coverImageUrl
+      ]
+    ) {
+
+      setCoverImage(
+        photoMap[
+          memory.coverImageUrl
+        ]
+      );
+
+    }
+
+
+    const imageElements =
+      document
+        .querySelectorAll(
+          '[data-photo-index]'
+        );
+
+
+    imageElements.forEach(
+      function(img) {
+
+        const index =
+          Number(
+            img.dataset.photoIndex
+          );
+
+
+        const photo =
+          photos[index];
+
+
+        if (!photo) {
+          return;
+        }
+
+
+        const src =
+          photoMap[
+            photo.imageUrl
+          ];
+
+
+        if (src) {
+
+          img.src =
+            src;
+
+        } else {
+
+          const wrapper =
+            img.closest(
+              '.photo'
+            );
+
+
+          if (wrapper) {
+
+            wrapper.innerHTML = `
+              <div
+                style="
+                  min-height: inherit;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: var(--muted);
+                  font-size: 12px;
+                  text-align: center;
+                  padding: 20px;
+                "
+              >
+                照片暫時無法載入
+              </div>
+            `;
+
+          }
+
+        }
+
+      }
+    );
+
+  }
+
+
+  function setCoverImage(
+    imageSrc
+  ) {
+
+    const cover =
+      document.getElementById(
+        'cover'
+      );
+
+
+    const placeholder =
+      cover.querySelector(
+        '.cover-placeholder'
+      );
+
+
+    if (placeholder) {
+      placeholder.style.display =
+        'none';
+    }
+
+
+    const oldImage =
+      cover.querySelector(
+        'img[data-memory-cover="1"]'
+      );
+
+
+    if (oldImage) {
+      oldImage.remove();
+    }
+
+
+    const img =
+      document.createElement(
+        'img'
+      );
+
+
+    img.dataset.memoryCover =
+      '1';
+
+    img.src =
+      imageSrc;
+
+    img.alt =
+      'memory cover';
+
+    img.style.position =
+      'absolute';
+
+    img.style.inset =
+      '0';
+
+    img.style.width =
+      '100%';
+
+    img.style.height =
+      '100%';
+
+    img.style.objectFit =
+      'cover';
+
+
+    img.onerror =
+      function() {
+
+        img.remove();
+
+        if (placeholder) {
+          placeholder.style.display =
+            '';
+        }
+
+      };
+
+
+    cover.insertBefore(
+      img,
+      cover.firstChild
+    );
+
+  }
+
+
+  /* =========================================
+     私人照片讀取 + Session Cache
+     ========================================= */
+
+  async function loadPrivatePhotoMap(
+    fileIds
+  ) {
+
+    const uniqueIds =
+      Array.from(
+        new Set(
+          fileIds
+            .map(
+              function(value) {
+                return String(
+                  value || ''
+                ).trim();
+              }
+            )
+            .filter(Boolean)
+        )
+      );
+
+
+    const result = {};
+
+    const missing = [];
+
+
+    for (
+      let i = 0;
+      i < uniqueIds.length;
+      i++
+    ) {
+
+      const fileId =
+        uniqueIds[i];
+
+
+      const cached =
+        readPhotoCache(
+          fileId
+        );
+
+
+      if (cached) {
+
+        result[fileId] =
+          cached;
+
+      } else {
+
+        missing.push(
+          fileId
+        );
+
+      }
+
+    }
+
+
+    for (
+      let start = 0;
+      start < missing.length;
+      start += 6
+    ) {
+
+      const chunk =
+        missing.slice(
+          start,
+          start + 6
+        );
+
+
+      const response =
+        await fetch(
+          '/api/photo',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+            body:
+              JSON.stringify({
+                idToken:
+                  idToken,
+                fileIds:
+                  chunk
+              })
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!data.success) {
+
+        const message =
+          String(
+            data.message || ''
+          );
+
+
+        if (
+          message
+            .toLowerCase()
+            .includes('expired')
+        ) {
+
+          refreshLogin();
+
+          throw new Error(
+            'LINE 登入已過期'
+          );
+
+        }
+
+
+        throw new Error(
+          message ||
+          '照片讀取失敗'
+        );
+
+      }
+
+
+      const loadedPhotos =
+        Array.isArray(data.photos)
+          ? data.photos
+          : [];
+
+
+      for (
+        let i = 0;
+        i < loadedPhotos.length;
+        i++
+      ) {
+
+        const photo =
+          loadedPhotos[i];
+
+
+        if (
+          !photo ||
+          !photo.success ||
+          !photo.fileId ||
+          !photo.mimeType ||
+          !photo.base64Data
+        ) {
+          continue;
+        }
+
+
+        const src =
+          'data:' +
+          photo.mimeType +
+          ';base64,' +
+          photo.base64Data;
+
+
+        result[
+          photo.fileId
+        ] = src;
+
+
+        writePhotoCache(
+          photo.fileId,
+          src
+        );
+
+      }
+
+    }
+
+
+    return result;
+
+  }
+
+
+  function readPhotoCache(
+    fileId
+  ) {
+
+    try {
+
+      return sessionStorage.getItem(
+        'wlc-photo-v2:' +
+        fileId
+      ) || '';
+
+    } catch (error) {
+
+      return '';
+
+    }
+
+  }
+
+
+  function writePhotoCache(
+    fileId,
+    src
+  ) {
+
+    try {
+
+      sessionStorage.setItem(
+        'wlc-photo-v2:' +
+        fileId,
+        src
+      );
+
+    } catch (error) {
+
+      /*
+       * WebView 儲存空間不足時，
+       * 不影響照片當次顯示。
+       */
+
+    }
+
+  }
 
 
   /* =========================================
@@ -1231,14 +1491,11 @@ if (memory.coverImageUrl) {
     if (
       parts.length < 3
     ) {
-
       return value;
-
     }
 
 
     return (
-
       parts[0] +
       ' · ' +
       String(parts[1])
@@ -1246,11 +1503,9 @@ if (memory.coverImageUrl) {
       ' · ' +
       String(parts[2])
         .padStart(2, '0')
-
     );
 
   }
-
 
 
   /* =========================================
@@ -1260,9 +1515,7 @@ if (memory.coverImageUrl) {
   function showError(message) {
 
     document
-      .getElementById(
-        'loading'
-      )
+      .getElementById('loading')
       .classList
       .add('hidden');
 
@@ -1279,17 +1532,13 @@ if (memory.coverImageUrl) {
 
 
     box.innerHTML = `
-
       ♡<br><br>
-
       ${escapeHtml(
         message
       )}
-
     `;
 
   }
-
 
 
   /* =========================================
@@ -1304,7 +1553,6 @@ if (memory.coverImageUrl) {
   }
 
 
-
   /* =========================================
      LOGIN
      ========================================= */
@@ -1312,21 +1560,16 @@ if (memory.coverImageUrl) {
   function refreshLogin() {
 
     try {
-
       liff.logout();
-
     } catch (error) {}
 
 
     liff.login({
-
       redirectUri:
         window.location.href
-
     });
 
   }
-
 
 
   /* =========================================
@@ -1338,43 +1581,13 @@ if (memory.coverImageUrl) {
     return String(
       value ?? ''
     )
-
-      .replaceAll(
-        '&',
-        '&amp;'
-      )
-
-      .replaceAll(
-        '<',
-        '&lt;'
-      )
-
-      .replaceAll(
-        '>',
-        '&gt;'
-      )
-
-      .replaceAll(
-        '"',
-        '&quot;'
-      )
-
-      .replaceAll(
-        "'",
-        '&#039;'
-      );
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
 
   }
-
-
-  function escapeAttribute(value) {
-
-    return escapeHtml(
-      value
-    );
-
-  }
-
 
 
   init();
