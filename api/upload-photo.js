@@ -76,10 +76,6 @@ export default async function handler(req, res) {
     }
 
 
-    /* =========================================
-       驗證 LINE 身分
-       ========================================= */
-
     const lineData =
       await verifyLineToken(
         idToken,
@@ -87,39 +83,21 @@ export default async function handler(req, res) {
       );
 
 
-    /* =========================================
-       傳送到 Apps Script
-       ========================================= */
-
     const result =
       await callAppsScript(
         appsScriptUrl,
         {
-
-          action:
-            'uploadPhoto',
-
-          secret:
-            appsScriptSecret,
-
-          lineUserId:
-            lineData.sub,
-
-          fileName:
-            fileName || '',
-
-          mimeType:
-            mimeType,
-
-          base64Data:
-            base64Data,
-
+          action: 'uploadPhoto',
+          secret: appsScriptSecret,
+          lineUserId: lineData.sub,
+          fileName: fileName || '',
+          mimeType: mimeType,
+          base64Data: base64Data,
           folderType:
-            folderType || 'Memories',
-
+            folderType ||
+            'Memories',
           subfolderName:
             subfolderName || ''
-
         }
       );
 
@@ -137,24 +115,16 @@ export default async function handler(req, res) {
     return res
       .status(500)
       .json({
-
         success: false,
-
         message:
           error.message ||
           'Photo upload failed'
-
       });
 
   }
 
 }
 
-
-
-/* =========================================
-   LINE ID Token 驗證
-   ========================================= */
 
 async function verifyLineToken(
   idToken,
@@ -181,19 +151,13 @@ async function verifyLineToken(
     await fetch(
       'https://api.line.me/oauth2/v2.1/verify',
       {
-
         method: 'POST',
-
         headers: {
-
           'Content-Type':
             'application/x-www-form-urlencoded'
-
         },
-
         body:
           params.toString()
-
       }
     );
 
@@ -229,11 +193,6 @@ async function verifyLineToken(
 }
 
 
-
-/* =========================================
-   呼叫 Apps Script
-   ========================================= */
-
 async function callAppsScript(
   url,
   payload
@@ -243,19 +202,13 @@ async function callAppsScript(
     await fetch(
       url,
       {
-
         method: 'POST',
-
         headers: {
-
           'Content-Type':
             'application/json'
-
         },
-
         body:
           JSON.stringify(payload)
-
       }
     );
 
