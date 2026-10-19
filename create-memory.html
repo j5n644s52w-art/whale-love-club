@@ -985,14 +985,14 @@
           </div>
 
           <div class="photo-note">
-            JPG / PNG / WebP
+            手機照片 / JPG / PNG / WebP
           </div>
 
           <input
             class="hidden-input"
             id="coverInput"
             type="file"
-            accept="image/jpeg,image/png,image/webp"
+            accept="image/*"
           >
 
         </label>
@@ -1030,7 +1030,7 @@
             class="hidden-input"
             id="photosInput"
             type="file"
-            accept="image/jpeg,image/png,image/webp"
+            accept="image/*"
             multiple
           >
 
@@ -1067,7 +1067,6 @@
 
 
 <script>
-
   const LIFF_ID =
     '2011857714-fZwEK6lN';
 
@@ -1125,10 +1124,7 @@
 
     } catch (error) {
 
-      console.error(
-        error
-      );
-
+      console.error(error);
 
       showToast(
         error.message ||
@@ -1242,8 +1238,26 @@
 
         photoFiles =
           Array.from(
-            event.target.files
+            event.target.files || []
           );
+
+
+        if (
+          photoFiles.length > 30
+        ) {
+
+          photoFiles =
+            photoFiles.slice(
+              0,
+              30
+            );
+
+
+          showToast(
+            '一次最多加入 30 張照片'
+          );
+
+        }
 
 
         const grid =
@@ -1269,361 +1283,727 @@
 
 
   /* =========================================
-     儲存
+     儲存回憶
      ========================================= */
 
-async function saveMemory() {
+  async function saveMemory() {
 
-  const title =
-    document
-      .getElementById('title')
-      .value
-      .trim();
-
-
-  const eventDate =
-    document
-      .getElementById('eventDate')
-      .value;
+    const title =
+      document
+        .getElementById('title')
+        .value
+        .trim();
 
 
-  const location =
-    document
-      .getElementById('location')
-      .value
-      .trim();
+    const eventDate =
+      document
+        .getElementById('eventDate')
+        .value;
 
 
-  const description =
-    document
-      .getElementById('description')
-      .value
-      .trim();
+    const location =
+      document
+        .getElementById('location')
+        .value
+        .trim();
 
 
-  if (!title) {
-
-    showToast(
-      '請輸入回憶標題'
-    );
-
-    return;
-
-  }
+    const description =
+      document
+        .getElementById('description')
+        .value
+        .trim();
 
 
-  const button =
-    document.getElementById(
-      'saveBtn'
-    );
+    if (!title) {
 
+      showToast(
+        '請輸入回憶標題'
+      );
 
-  button.disabled = true;
-
-  button.textContent =
-    '正在儲存...';
-
-
-  try {
-
-    /* =====================================
-       1. 先建立 Memory
-       ===================================== */
-
-    if (!createdMemoryId) {
-
-      const response =
-        await fetch(
-          '/api/memories',
-          {
-
-            method: 'POST',
-
-            headers: {
-
-              'Content-Type':
-                'application/json'
-
-            },
-
-            body:
-              JSON.stringify({
-
-                idToken:
-                  idToken,
-
-                memory: {
-
-                  title:
-                    title,
-
-                  eventDate:
-                    eventDate,
-
-                  location:
-                    location,
-
-                  description:
-                    description,
-
-                  coverImageUrl:
-                    '',
-
-                  relatedCardId:
-                    ''
-
-                }
-
-              })
-
-          }
-        );
-
-
-      const data =
-        await response.json();
-
-
-      if (!data.success) {
-
-        throw new Error(
-
-          data.message ||
-          '建立回憶失敗'
-
-        );
-
-      }
-
-
-      createdMemoryId =
-        data.memoryId;
+      return;
 
     }
 
 
-
-    /* =====================================
-       2. 上傳封面
-       ===================================== */
-
-    if (coverFile) {
-
-      button.textContent =
-        '正在上傳封面...';
+    const button =
+      document.getElementById(
+        'saveBtn'
+      );
 
 
-      const base64Data =
-        await fileToBase64(
-          coverFile
-        );
+    button.disabled = true;
+
+    button.textContent =
+      '正在建立回憶...';
 
 
-      const uploadResponse =
-        await fetch(
-          '/api/upload-photo',
-          {
+    try {
 
-            method:
-              'POST',
+      /* =====================================
+         1. 建立 Memory
+         ===================================== */
 
-            headers: {
+      if (!createdMemoryId) {
 
-              'Content-Type':
-                'application/json'
-
-            },
-
-            body:
-              JSON.stringify({
-
-                idToken:
-                  idToken,
-
-                fileName:
-                  coverFile.name,
-
-                mimeType:
-                  coverFile.type,
-
-                base64Data:
-                  base64Data,
-
-                folderType:
-                  'Memories',
-
-                subfolderName:
-                  createdMemoryId
-
-              })
-
-          }
-        );
+        const response =
+          await fetch(
+            '/api/memories',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type':
+                  'application/json'
+              },
+              body:
+                JSON.stringify({
+                  idToken:
+                    idToken,
+                  action:
+                    'createMemory',
+                  memory: {
+                    title:
+                      title,
+                    eventDate:
+                      eventDate,
+                    location:
+                      location,
+                    description:
+                      description,
+                    relatedCardId:
+                      ''
+                  }
+                })
+            }
+          );
 
 
-      const uploadData =
-        await uploadResponse.json();
+        const data =
+          await response.json();
 
 
-      if (!uploadData.success) {
+        if (!data.success) {
 
-        throw new Error(
+          throw new Error(
+            data.message ||
+            '建立回憶失敗'
+          );
 
-          uploadData.message ||
-          '封面上傳失敗'
+        }
 
-        );
+
+        createdMemoryId =
+          data.memoryId;
 
       }
-
 
 
       /* =====================================
-         3. 把 File ID 寫回 Memory
+         2. 封面：先縮圖再上傳
          ===================================== */
 
-      const coverResponse =
-        await fetch(
-          '/api/memories',
-          {
+      if (coverFile) {
 
-            method:
-              'POST',
+        button.textContent =
+          '正在處理封面...';
 
-            headers: {
 
-              'Content-Type':
-                'application/json'
+        const preparedCover =
+          await prepareImageForUpload(
+            coverFile,
+            1440,
+            0.78
+          );
 
-            },
 
-            body:
-              JSON.stringify({
+        button.textContent =
+          '正在上傳封面...';
 
-                idToken:
-                  idToken,
 
-                action:
-                  'setMemoryCover',
+        const uploadData =
+          await uploadPreparedImage(
+            preparedCover,
+            createdMemoryId
+          );
 
-                memoryId:
-                  createdMemoryId,
 
+        const coverResponse =
+          await fetch(
+            '/api/memories',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type':
+                  'application/json'
+              },
+              body:
+                JSON.stringify({
+                  idToken:
+                    idToken,
+                  action:
+                    'setMemoryCover',
+                  memoryId:
+                    createdMemoryId,
+                  fileId:
+                    uploadData.fileId
+                })
+            }
+          );
+
+
+        const coverData =
+          await coverResponse.json();
+
+
+        if (!coverData.success) {
+
+          throw new Error(
+            coverData.message ||
+            '封面綁定失敗'
+          );
+
+        }
+
+      }
+
+
+      /* =====================================
+         3. 相簿照片：最多同時上傳 2 張
+         ===================================== */
+
+      if (photoFiles.length > 0) {
+
+        let completed = 0;
+
+
+        const uploadedPhotos =
+          await mapWithConcurrency(
+            photoFiles,
+            2,
+            async function(file, index) {
+
+              const prepared =
+                await prepareImageForUpload(
+                  file,
+                  1440,
+                  0.76
+                );
+
+
+              const uploadData =
+                await uploadPreparedImage(
+                  prepared,
+                  createdMemoryId
+                );
+
+
+              completed++;
+
+
+              button.textContent =
+                `正在上傳照片 ${completed}/${photoFiles.length}...`;
+
+
+              return {
                 fileId:
-                  uploadData.fileId
+                  uploadData.fileId,
+                caption:
+                  '',
+                sortOrder:
+                  index + 1,
+                takenAt:
+                  eventDate
+              };
 
-              })
+            }
+          );
 
-          }
+
+        button.textContent =
+          '正在整理相簿...';
+
+
+        const savePhotosResponse =
+          await fetch(
+            '/api/memories',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type':
+                  'application/json'
+              },
+              body:
+                JSON.stringify({
+                  idToken:
+                    idToken,
+                  action:
+                    'addMemoryPhotos',
+                  memoryId:
+                    createdMemoryId,
+                  photos:
+                    uploadedPhotos
+                })
+            }
+          );
+
+
+        const savePhotosData =
+          await savePhotosResponse.json();
+
+
+        if (!savePhotosData.success) {
+
+          throw new Error(
+            savePhotosData.message ||
+            '相簿照片儲存失敗'
+          );
+
+        }
+
+      }
+
+
+      button.textContent =
+        '完成 ♡';
+
+
+      showToast(
+        '回憶已儲存 ♡'
+      );
+
+
+      setTimeout(
+        function() {
+
+          window.location.href =
+            '/memories.html';
+
+        },
+        650
+      );
+
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      showToast(
+        error.message ||
+        '儲存失敗'
+      );
+
+
+      button.disabled =
+        false;
+
+
+      button.textContent =
+        '儲存回憶';
+
+    }
+
+  }
+
+
+  /* =========================================
+     圖片壓縮
+     - 統一輸出 JPEG
+     - 長邊最大 1440px
+     - 大幅降低 Base64 傳輸量
+     ========================================= */
+
+  async function prepareImageForUpload(
+    file,
+    maxDimension,
+    quality
+  ) {
+
+    if (!file) {
+
+      throw new Error(
+        '沒有選擇圖片'
+      );
+
+    }
+
+
+    if (
+      !String(file.type || '')
+        .startsWith('image/')
+    ) {
+
+      throw new Error(
+        '請選擇圖片檔案'
+      );
+
+    }
+
+
+    const image =
+      await loadImageFile(
+        file
+      );
+
+
+    const sourceWidth =
+      image.naturalWidth ||
+      image.width;
+
+    const sourceHeight =
+      image.naturalHeight ||
+      image.height;
+
+
+    if (
+      !sourceWidth ||
+      !sourceHeight
+    ) {
+
+      throw new Error(
+        '無法讀取圖片尺寸'
+      );
+
+    }
+
+
+    const scale =
+      Math.min(
+        1,
+        maxDimension /
+          Math.max(
+            sourceWidth,
+            sourceHeight
+          )
+      );
+
+
+    const width =
+      Math.max(
+        1,
+        Math.round(
+          sourceWidth * scale
+        )
+      );
+
+    const height =
+      Math.max(
+        1,
+        Math.round(
+          sourceHeight * scale
+        )
+      );
+
+
+    const canvas =
+      document.createElement(
+        'canvas'
+      );
+
+
+    canvas.width =
+      width;
+
+    canvas.height =
+      height;
+
+
+    const context =
+      canvas.getContext(
+        '2d',
+        {
+          alpha: false
+        }
+      );
+
+
+    if (!context) {
+
+      throw new Error(
+        '圖片處理失敗'
+      );
+
+    }
+
+
+    context.fillStyle =
+      '#ffffff';
+
+    context.fillRect(
+      0,
+      0,
+      width,
+      height
+    );
+
+
+    context.drawImage(
+      image,
+      0,
+      0,
+      width,
+      height
+    );
+
+
+    const base64Data =
+      canvas.toDataURL(
+        'image/jpeg',
+        quality
+      );
+
+
+    if (
+      !base64Data ||
+      base64Data === 'data:,'
+    ) {
+
+      throw new Error(
+        '圖片壓縮失敗'
+      );
+
+    }
+
+
+    const originalName =
+      String(
+        file.name ||
+        'memory-photo'
+      );
+
+
+    const baseName =
+      originalName
+        .replace(
+          /\.[^.]+$/,
+          ''
+        )
+        .slice(
+          0,
+          70
         );
 
 
-      const coverData =
-        await coverResponse.json();
+    return {
+      fileName:
+        (baseName || 'memory-photo') +
+        '.jpg',
+      mimeType:
+        'image/jpeg',
+      base64Data:
+        base64Data
+    };
+
+  }
 
 
-      if (!coverData.success) {
+  function loadImageFile(file) {
+
+    return new Promise(
+      function(resolve, reject) {
+
+        const url =
+          URL.createObjectURL(
+            file
+          );
+
+
+        const image =
+          new Image();
+
+
+        image.onload =
+          function() {
+
+            URL.revokeObjectURL(
+              url
+            );
+
+            resolve(
+              image
+            );
+
+          };
+
+
+        image.onerror =
+          function() {
+
+            URL.revokeObjectURL(
+              url
+            );
+
+            reject(
+              new Error(
+                '這張圖片無法讀取，請改用 手機照片 / JPG / PNG / WebP'
+              )
+            );
+
+          };
+
+
+        image.src =
+          url;
+
+      }
+    );
+
+  }
+
+
+  /* =========================================
+     上傳已壓縮圖片
+     ========================================= */
+
+  async function uploadPreparedImage(
+    prepared,
+    memoryId
+  ) {
+
+    const response =
+      await fetch(
+        '/api/upload-photo',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type':
+              'application/json'
+          },
+          body:
+            JSON.stringify({
+              idToken:
+                idToken,
+              fileName:
+                prepared.fileName,
+              mimeType:
+                prepared.mimeType,
+              base64Data:
+                prepared.base64Data,
+              folderType:
+                'Memories',
+              subfolderName:
+                memoryId
+            })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+      if (
+        String(data.message || '')
+          .toLowerCase()
+          .includes('expired')
+      ) {
+
+        refreshLogin();
 
         throw new Error(
-
-          coverData.message ||
-          '封面綁定失敗'
-
+          'LINE 登入已過期，請重新開啟頁面'
         );
+
+      }
+
+
+      throw new Error(
+        data.message ||
+        '照片上傳失敗'
+      );
+
+    }
+
+
+    return data;
+
+  }
+
+
+  /* =========================================
+     限制同時執行數量
+     ========================================= */
+
+  async function mapWithConcurrency(
+    items,
+    limit,
+    worker
+  ) {
+
+    const results =
+      new Array(
+        items.length
+      );
+
+
+    let nextIndex =
+      0;
+
+
+    async function runWorker() {
+
+      while (true) {
+
+        const index =
+          nextIndex;
+
+
+        nextIndex++;
+
+
+        if (
+          index >=
+          items.length
+        ) {
+          return;
+        }
+
+
+        results[index] =
+          await worker(
+            items[index],
+            index
+          );
 
       }
 
     }
 
 
-
-    /* =====================================
-       完成
-       ===================================== */
-
-    showToast(
-      '回憶已儲存 ♡'
-    );
+    const workerCount =
+      Math.min(
+        limit,
+        items.length
+      );
 
 
-    setTimeout(
-      () => {
-
-        window.location.href =
-          '/memories.html';
-
-      },
-      900
-    );
+    const workers = [];
 
 
-  } catch (error) {
+    for (
+      let i = 0;
+      i < workerCount;
+      i++
+    ) {
 
-    console.error(
-      error
-    );
-
-
-    showToast(
-
-      error.message ||
-      '儲存失敗'
-
-    );
-
-
-    button.disabled =
-      false;
-
-
-    button.textContent =
-      '儲存回憶';
-
-  }
-
-}
-function fileToBase64(file) {
-
-  return new Promise(
-    (
-      resolve,
-      reject
-    ) => {
-
-      const reader =
-        new FileReader();
-
-
-      reader.onload =
-        function() {
-
-          resolve(
-            reader.result
-          );
-
-        };
-
-
-      reader.onerror =
-        function() {
-
-          reject(
-            new Error(
-              '讀取圖片失敗'
-            )
-          );
-
-        };
-
-
-      reader.readAsDataURL(
-        file
+      workers.push(
+        runWorker()
       );
 
     }
-  );
 
-}
+
+    await Promise.all(
+      workers
+    );
+
+
+    return results;
+
+  }
+
 
   /* =========================================
      返回
@@ -1633,6 +2013,25 @@ function fileToBase64(file) {
 
     window.location.href =
       '/memories.html';
+
+  }
+
+
+  /* =========================================
+     LINE Token 過期
+     ========================================= */
+
+  function refreshLogin() {
+
+    try {
+      liff.logout();
+    } catch (error) {}
+
+
+    liff.login({
+      redirectUri:
+        window.location.href
+    });
 
   }
 
@@ -1659,7 +2058,7 @@ function fileToBase64(file) {
 
 
     setTimeout(
-      () => {
+      function() {
 
         toast
           .classList
