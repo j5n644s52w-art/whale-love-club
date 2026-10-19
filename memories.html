@@ -1221,7 +1221,7 @@
 
 
   /* =========================================
-     批次載入列表封面
+     列表封面：可視區載入 + 永久圖片快取
      ========================================= */
 
   async function hydrateMemoryCovers(
@@ -1244,11 +1244,24 @@
             }
 
 
+            const element =
+              document.querySelector(
+                `[data-cover-index="${index}"]`
+              );
+
+
+            if (!element) {
+              return null;
+            }
+
+
             return {
               index:
                 index,
               fileId:
-                fileId
+                fileId,
+              element:
+                element
             };
 
           }
@@ -1262,140 +1275,246 @@
 
 
     /*
-     * 列表頁不要等「全部封面」讀完才一起顯示。
-     * 改成小批次、漸進式載入：
-     *
-     * - 每批最多 2 張
-     * - 同時最多跑 2 批
-     * - 某一批失敗，不影響其他封面
-     *
-     * 這樣即使相簿很多，也會先看到前面的封面，
-     * 不會整頁一直只有愛心 placeholder。
+     * 只載入目前畫面附近的封面。
+     * rootMargin 600px 代表使用者快滑到之前就先抓，
+     * 不會一次把整頁所有封面都下載。
      */
 
-    const chunks = [];
+    const pending = [];
+
+    const queuedIds =
+      new Set();
+
+    let activeBatches = 0;
+
+    let flushTimer = null;
 
 
-    for (
-      let i = 0;
-      i < jobs.length;
-      i += 2
-    ) {
+    function enqueue(job) {
 
-      chunks.push(
-        jobs.slice(
-          i,
-          i + 2
+      if (
+        !job ||
+        queuedIds.has(
+          job.fileId
         )
+      ) {
+        return;
+      }
+
+
+      queuedIds.add(
+        job.fileId
       );
+
+
+      pending.push(
+        job
+      );
+
+
+      if (flushTimer) {
+        clearTimeout(
+          flushTimer
+        );
+      }
+
+
+      flushTimer =
+        setTimeout(
+          flushQueue,
+          50
+        );
 
     }
 
 
-    let cursor = 0;
+    function flushQueue() {
 
+      flushTimer = null;
 
-    async function worker() {
 
       while (
-        cursor < chunks.length
+        activeBatches < 2 &&
+        pending.length > 0
       ) {
 
-        const currentIndex =
-          cursor++;
-
-
-        const chunk =
-          chunks[
-            currentIndex
-          ];
-
-
-        try {
-
-          const photoMap =
-            await loadPrivatePhotoMap(
-              chunk.map(
-                function(job) {
-                  return job.fileId;
-                }
-              )
-            );
-
-
-          for (
-            let j = 0;
-            j < chunk.length;
-            j++
-          ) {
-
-            const job =
-              chunk[j];
-
-
-            const src =
-              photoMap[
-                job.fileId
-              ];
-
-
-            if (!src) {
-              continue;
-            }
-
-
-            applyMemoryCover(
-              job.index,
-              src
-            );
-
-          }
-
-        } catch (error) {
-
-          console.error(
-            '部分封面載入失敗',
-            error
+        const batch =
+          pending.splice(
+            0,
+            4
           );
 
-          /*
-           * 不 throw。
-           * 讓後面的相簿封面繼續載入。
-           */
 
-        }
+        activeBatches++;
+
+
+        loadPrivatePhotoMap(
+          batch.map(
+            function(job) {
+              return job.fileId;
+            }
+          )
+        )
+          .then(
+            function(photoMap) {
+
+              for (
+                let i = 0;
+                i < batch.length;
+                i++
+              ) {
+
+                const job =
+                  batch[i];
+
+
+                const src =
+                  photoMap[
+                    job.fileId
+                  ];
+
+
+                if (src) {
+
+                  applyMemoryCover(
+                    job.index,
+                    src
+                  );
+
+                }
+
+              }
+
+            }
+          )
+          .catch(
+            function(error) {
+
+              console.error(
+                '部分封面載入失敗',
+                error
+              );
+
+            }
+          )
+          .finally(
+            function() {
+
+              activeBatches--;
+
+
+              if (
+                pending.length > 0
+              ) {
+
+                flushQueue();
+
+              }
+
+            }
+          );
 
       }
 
     }
 
 
-    const workerCount =
-      Math.min(
-        2,
-        chunks.length
-      );
-
-
-    const workers = [];
-
-
-    for (
-      let i = 0;
-      i < workerCount;
-      i++
+    if (
+      'IntersectionObserver' in window
     ) {
 
-      workers.push(
-        worker()
-      );
+      const observer =
+        new IntersectionObserver(
+          function(entries) {
+
+            for (
+              let i = 0;
+              i < entries.length;
+              i++
+            ) {
+
+              const entry =
+                entries[i];
+
+
+              if (!entry.isIntersecting) {
+                continue;
+              }
+
+
+              const index =
+                Number(
+                  entry.target.dataset.coverIndex
+                );
+
+
+              const job =
+                jobs.find(
+                  function(item) {
+                    return item.index === index;
+                  }
+                );
+
+
+              if (job) {
+
+                observer.unobserve(
+                  entry.target
+                );
+
+
+                enqueue(
+                  job
+                );
+
+              }
+
+            }
+
+          },
+          {
+            root:
+              null,
+            rootMargin:
+              '600px 0px',
+            threshold:
+              0.01
+          }
+        );
+
+
+      for (
+        let i = 0;
+        i < jobs.length;
+        i++
+      ) {
+
+        observer.observe(
+          jobs[i].element
+        );
+
+      }
+
+    } else {
+
+      /*
+       * 舊瀏覽器 fallback：
+       * 沒有 IntersectionObserver 時仍然分批載入。
+       */
+
+      for (
+        let i = 0;
+        i < jobs.length;
+        i++
+      ) {
+
+        enqueue(
+          jobs[i]
+        );
+
+      }
 
     }
-
-
-    await Promise.all(
-      workers
-    );
 
   }
 
@@ -1511,8 +1630,33 @@
 
 
   /* =========================================
-     私人照片批次讀取 + Session Cache
+     私人照片批次讀取 + IndexedDB 永久快取
      ========================================= */
+
+  const PHOTO_CACHE_DB_NAME =
+    'wlc-private-photo-cache';
+
+  const PHOTO_CACHE_DB_VERSION =
+    1;
+
+  const PHOTO_CACHE_STORE =
+    'photos';
+
+  const PHOTO_CACHE_MAX_BYTES =
+    80 * 1024 * 1024;
+
+  const PHOTO_CACHE_MAX_ITEMS =
+    120;
+
+  let photoCacheDbPromise =
+    null;
+
+  let cacheCleanupScheduled =
+    false;
+
+  const activeObjectUrls =
+    new Set();
+
 
   async function loadPrivatePhotoMap(
     fileIds
@@ -1539,31 +1683,49 @@
     const missing = [];
 
 
+    const cachedEntries =
+      await Promise.all(
+        uniqueIds.map(
+          async function(fileId) {
+
+            const cached =
+              await readPhotoCache(
+                fileId
+              );
+
+
+            return {
+              fileId:
+                fileId,
+              src:
+                cached
+            };
+
+          }
+        )
+      );
+
+
     for (
       let i = 0;
-      i < uniqueIds.length;
+      i < cachedEntries.length;
       i++
     ) {
 
-      const fileId =
-        uniqueIds[i];
+      const item =
+        cachedEntries[i];
 
 
-      const cached =
-        readPhotoCache(
-          fileId
-        );
+      if (item.src) {
 
-
-      if (cached) {
-
-        result[fileId] =
-          cached;
+        result[
+          item.fileId
+        ] = item.src;
 
       } else {
 
         missing.push(
-          fileId
+          item.fileId
         );
 
       }
@@ -1666,11 +1828,17 @@
         }
 
 
+        const blob =
+          base64ToBlob(
+            photo.base64Data,
+            photo.mimeType
+          );
+
+
         const src =
-          'data:' +
-          photo.mimeType +
-          ';base64,' +
-          photo.base64Data;
+          createTrackedObjectUrl(
+            blob
+          );
 
 
         result[
@@ -1680,7 +1848,15 @@
 
         writePhotoCache(
           photo.fileId,
-          src
+          blob,
+          photo.mimeType
+        ).catch(
+          function(error) {
+            console.warn(
+              '照片快取寫入失敗',
+              error
+            );
+          }
         );
 
       }
@@ -1693,42 +1869,601 @@
   }
 
 
-  function readPhotoCache(
+  function openPhotoCacheDb() {
+
+    if (photoCacheDbPromise) {
+      return photoCacheDbPromise;
+    }
+
+
+    photoCacheDbPromise =
+      new Promise(
+        function(resolve, reject) {
+
+          if (!('indexedDB' in window)) {
+
+            reject(
+              new Error(
+                'IndexedDB unavailable'
+              )
+            );
+
+            return;
+
+          }
+
+
+          const request =
+            indexedDB.open(
+              PHOTO_CACHE_DB_NAME,
+              PHOTO_CACHE_DB_VERSION
+            );
+
+
+          request.onupgradeneeded =
+            function(event) {
+
+              const db =
+                event.target.result;
+
+
+              if (
+                !db.objectStoreNames.contains(
+                  PHOTO_CACHE_STORE
+                )
+              ) {
+
+                const store =
+                  db.createObjectStore(
+                    PHOTO_CACHE_STORE,
+                    {
+                      keyPath:
+                        'fileId'
+                    }
+                  );
+
+
+                store.createIndex(
+                  'lastAccess',
+                  'lastAccess',
+                  {
+                    unique:
+                      false
+                  }
+                );
+
+              }
+
+            };
+
+
+          request.onsuccess =
+            function() {
+              resolve(
+                request.result
+              );
+            };
+
+
+          request.onerror =
+            function() {
+              reject(
+                request.error ||
+                new Error(
+                  'IndexedDB open failed'
+                )
+              );
+            };
+
+        }
+      );
+
+
+    return photoCacheDbPromise;
+
+  }
+
+
+  async function readPhotoCache(
     fileId
   ) {
 
     try {
 
-      return sessionStorage.getItem(
-        'wlc-photo-v2:' +
+      const db =
+        await openPhotoCacheDb();
+
+
+      const record =
+        await new Promise(
+          function(resolve, reject) {
+
+            const transaction =
+              db.transaction(
+                PHOTO_CACHE_STORE,
+                'readonly'
+              );
+
+
+            const store =
+              transaction.objectStore(
+                PHOTO_CACHE_STORE
+              );
+
+
+            const request =
+              store.get(
+                fileId
+              );
+
+
+            request.onsuccess =
+              function() {
+                resolve(
+                  request.result || null
+                );
+              };
+
+
+            request.onerror =
+              function() {
+                reject(
+                  request.error
+                );
+              };
+
+          }
+        );
+
+
+      if (
+        !record ||
+        !record.blob
+      ) {
+        return '';
+      }
+
+
+      touchPhotoCache(
         fileId
-      ) || '';
+      );
+
+
+      return createTrackedObjectUrl(
+        record.blob
+      );
+
 
     } catch (error) {
 
-      return '';
+      /*
+       * 如果裝置不支援 IndexedDB，
+       * 退回原本 Session Cache。
+       */
+
+      try {
+
+        return sessionStorage.getItem(
+          'wlc-photo-v2:' +
+          fileId
+        ) || '';
+
+      } catch (fallbackError) {
+
+        return '';
+
+      }
 
     }
 
   }
 
 
-  function writePhotoCache(
+  async function writePhotoCache(
     fileId,
-    src
+    blob,
+    mimeType
   ) {
 
     try {
 
-      sessionStorage.setItem(
-        'wlc-photo-v2:' +
-        fileId,
-        src
+      const db =
+        await openPhotoCacheDb();
+
+
+      await new Promise(
+        function(resolve, reject) {
+
+          const transaction =
+            db.transaction(
+              PHOTO_CACHE_STORE,
+              'readwrite'
+            );
+
+
+          const store =
+            transaction.objectStore(
+              PHOTO_CACHE_STORE
+            );
+
+
+          store.put({
+            fileId:
+              fileId,
+            blob:
+              blob,
+            mimeType:
+              mimeType || blob.type || '',
+            size:
+              Number(blob.size || 0),
+            lastAccess:
+              Date.now()
+          });
+
+
+          transaction.oncomplete =
+            function() {
+              resolve();
+            };
+
+
+          transaction.onerror =
+            function() {
+              reject(
+                transaction.error
+              );
+            };
+
+        }
       );
 
-    } catch (error) {}
+
+      schedulePhotoCacheCleanup();
+
+
+    } catch (error) {
+
+      /*
+       * IndexedDB 寫入失敗時不影響圖片顯示。
+       * 不再把大張 Base64 強塞 localStorage。
+       */
+
+    }
 
   }
+
+
+  function touchPhotoCache(
+    fileId
+  ) {
+
+    openPhotoCacheDb()
+      .then(
+        function(db) {
+
+          const transaction =
+            db.transaction(
+              PHOTO_CACHE_STORE,
+              'readwrite'
+            );
+
+
+          const store =
+            transaction.objectStore(
+              PHOTO_CACHE_STORE
+            );
+
+
+          const request =
+            store.get(
+              fileId
+            );
+
+
+          request.onsuccess =
+            function() {
+
+              const record =
+                request.result;
+
+
+              if (!record) {
+                return;
+              }
+
+
+              record.lastAccess =
+                Date.now();
+
+
+              store.put(
+                record
+              );
+
+            };
+
+        }
+      )
+      .catch(
+        function() {}
+      );
+
+  }
+
+
+  function schedulePhotoCacheCleanup() {
+
+    if (cacheCleanupScheduled) {
+      return;
+    }
+
+
+    cacheCleanupScheduled =
+      true;
+
+
+    setTimeout(
+      function() {
+
+        cacheCleanupScheduled =
+          false;
+
+
+        cleanupPhotoCache()
+          .catch(
+            function() {}
+          );
+
+      },
+      1500
+    );
+
+  }
+
+
+  async function cleanupPhotoCache() {
+
+    const db =
+      await openPhotoCacheDb();
+
+
+    const records =
+      await new Promise(
+        function(resolve, reject) {
+
+          const transaction =
+            db.transaction(
+              PHOTO_CACHE_STORE,
+              'readonly'
+            );
+
+
+          const store =
+            transaction.objectStore(
+              PHOTO_CACHE_STORE
+            );
+
+
+          const request =
+            store.getAll();
+
+
+          request.onsuccess =
+            function() {
+              resolve(
+                request.result || []
+              );
+            };
+
+
+          request.onerror =
+            function() {
+              reject(
+                request.error
+              );
+            };
+
+        }
+      );
+
+
+    records.sort(
+      function(a, b) {
+        return Number(
+          a.lastAccess || 0
+        ) - Number(
+          b.lastAccess || 0
+        );
+      }
+    );
+
+
+    let totalBytes =
+      records.reduce(
+        function(sum, item) {
+          return sum +
+            Number(
+              item.size || 0
+            );
+        },
+        0
+      );
+
+
+    let totalItems =
+      records.length;
+
+
+    const idsToDelete = [];
+
+
+    for (
+      let i = 0;
+      i < records.length;
+      i++
+    ) {
+
+      if (
+        totalBytes <= PHOTO_CACHE_MAX_BYTES &&
+        totalItems <= PHOTO_CACHE_MAX_ITEMS
+      ) {
+        break;
+      }
+
+
+      idsToDelete.push(
+        records[i].fileId
+      );
+
+
+      totalBytes -=
+        Number(
+          records[i].size || 0
+        );
+
+
+      totalItems--;
+
+    }
+
+
+    if (!idsToDelete.length) {
+      return;
+    }
+
+
+    await new Promise(
+      function(resolve, reject) {
+
+        const transaction =
+          db.transaction(
+            PHOTO_CACHE_STORE,
+            'readwrite'
+          );
+
+
+        const store =
+          transaction.objectStore(
+            PHOTO_CACHE_STORE
+          );
+
+
+        for (
+          let i = 0;
+          i < idsToDelete.length;
+          i++
+        ) {
+
+          store.delete(
+            idsToDelete[i]
+          );
+
+        }
+
+
+        transaction.oncomplete =
+          function() {
+            resolve();
+          };
+
+
+        transaction.onerror =
+          function() {
+            reject(
+              transaction.error
+            );
+          };
+
+      }
+    );
+
+  }
+
+
+  function base64ToBlob(
+    base64Data,
+    mimeType
+  ) {
+
+    const binary =
+      atob(
+        base64Data
+      );
+
+
+    const bytes =
+      new Uint8Array(
+        binary.length
+      );
+
+
+    for (
+      let i = 0;
+      i < binary.length;
+      i++
+    ) {
+
+      bytes[i] =
+        binary.charCodeAt(
+          i
+        );
+
+    }
+
+
+    return new Blob(
+      [bytes],
+      {
+        type:
+          mimeType ||
+          'application/octet-stream'
+      }
+    );
+
+  }
+
+
+  function createTrackedObjectUrl(
+    blob
+  ) {
+
+    const url =
+      URL.createObjectURL(
+        blob
+      );
+
+
+    activeObjectUrls.add(
+      url
+    );
+
+
+    return url;
+
+  }
+
+
+  window.addEventListener(
+    'beforeunload',
+    function() {
+
+      activeObjectUrls.forEach(
+        function(url) {
+
+          try {
+            URL.revokeObjectURL(
+              url
+            );
+          } catch (error) {}
+
+        }
+      );
+
+
+      activeObjectUrls.clear();
+
+    }
+  );
 
 
   /* =========================================
