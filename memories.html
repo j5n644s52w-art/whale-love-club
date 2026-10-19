@@ -893,17 +893,11 @@
 
 
 <script>
-
-  /*
-   * 換成你 index.html
-   * 使用中的同一組 LIFF ID
-   */
   const LIFF_ID =
     '2011857714-fZwEK6lN';
 
 
   let idToken = '';
-
 
 
   /* =========================================
@@ -953,28 +947,20 @@
 
 
       document
-        .getElementById(
-          'timeline'
-        )
+        .getElementById('timeline')
         .innerHTML = `
-
           <div class="empty">
-
             無法載入回憶相簿<br>
-
             ${escapeHtml(
               error.message ||
               '請稍後再試'
             )}
-
           </div>
-
         `;
 
     }
 
   }
-
 
 
   /* =========================================
@@ -985,19 +971,15 @@
 
     const params =
       new URLSearchParams({
-
         idToken:
           idToken
-
       });
 
 
     const response =
       await fetch(
-
         '/api/memories?' +
         params.toString()
-
       );
 
 
@@ -1006,7 +988,6 @@
 
 
     if (!data.success) {
-
 
       if (
         String(
@@ -1017,7 +998,6 @@
       ) {
 
         refreshLogin();
-
         return;
 
       }
@@ -1031,17 +1011,35 @@
     }
 
 
+    const memories =
+      data.memories || [];
+
+
     renderSummary(
       data.total || 0
     );
 
 
     renderMemories(
-      data.memories || []
+      memories
+    );
+
+
+    /*
+     * 文字先出現，封面再批次載入。
+     */
+    hydrateMemoryCovers(
+      memories
+    ).catch(
+      function(error) {
+        console.error(
+          '封面載入失敗',
+          error
+        );
+      }
     );
 
   }
-
 
 
   /* =========================================
@@ -1055,17 +1053,13 @@
 
 
     document
-      .getElementById(
-        'memoryCount'
-      )
+      .getElementById('memoryCount')
       .textContent =
       total;
 
 
     document
-      .getElementById(
-        'memoryLabel'
-      )
+      .getElementById('memoryLabel')
       .textContent =
       `${total} ${
         total === 1
@@ -1074,7 +1068,6 @@
       }`;
 
   }
-
 
 
   /* =========================================
@@ -1092,21 +1085,15 @@
     if (!memories.length) {
 
       timeline.innerHTML = `
-
         <div class="empty">
-
           <div class="empty-heart">
             ♡
           </div>
 
           目前還沒有解鎖的回憶。<br>
-
           等第一張限定 NFC 卡被解鎖後，<br>
-
           屬於你們的故事就會從這裡開始。
-
         </div>
-
       `;
 
       return;
@@ -1116,186 +1103,491 @@
 
     timeline.innerHTML =
       memories
-        .map(memory => {
+        .map(
+          function(memory, index) {
 
-          const date =
-            parseDate(
-              memory.eventDate
-            );
+            const date =
+              parseDate(
+                memory.eventDate
+              );
 
 
-          const cover =
-            memory.coverImageUrl
+            return `
+              <article
+                class="memory"
+                onclick="openMemory('${escapeJs(
+                  memory.memoryId
+                )}')"
+              >
 
-              ? `
-
-                <img
-                  src="${escapeAttribute(
-                    memory.coverImageUrl
-                  )}"
-                  alt="memory"
-                  loading="lazy"
-                  onerror="
-                    this.parentElement.innerHTML =
-                    '<div class=&quot;cover-placeholder&quot;>♡</div>'
-                  "
+                <div
+                  class="memory-cover"
+                  data-cover-index="${index}"
                 >
 
-              `
+                  <div class="cover-placeholder">
+                    ♡
+                  </div>
 
-              : `
+                  ${
+                    date
 
-                <div class="cover-placeholder">
-                  ♡
-                </div>
+                      ? `
+                          <div class="date-badge">
+                            <div class="date-month">
+                              ${date.month}
+                            </div>
+                            <div class="date-day">
+                              ${date.day}
+                            </div>
+                            <div class="date-year">
+                              ${date.year}
+                            </div>
+                          </div>
+                        `
 
-              `;
-
-
-          return `
-
-            <article
-
-              class="memory"
-
-              onclick="
-                openMemory(
-                  '${escapeJs(
-                    memory.memoryId
-                  )}'
-                )
-              "
-
-            >
-
-
-              <div class="memory-cover">
-
-                ${cover}
-
-
-                ${
-                  date
-
-                  ? `
-
-                    <div class="date-badge">
-
-                      <div class="date-month">
-                        ${date.month}
-                      </div>
-
-                      <div class="date-day">
-                        ${date.day}
-                      </div>
-
-                      <div class="date-year">
-                        ${date.year}
-                      </div>
-
-                    </div>
-
-                  `
-
-                  : ''
-                }
-
-
-              </div>
-
-
-              <div class="memory-body">
-
-
-                ${
-                  memory.location
-
-                  ? `
-
-                    <div class="memory-location">
-                      ♡ ${escapeHtml(
-                        memory.location
-                      )}
-                    </div>
-
-                  `
-
-                  : ''
-                }
-
-
-                <div class="memory-title">
-
-                  ${escapeHtml(
-                    memory.title ||
-                    'Our Memory'
-                  )}
+                      : ''
+                  }
 
                 </div>
 
 
-                ${
-                  memory.description
+                <div class="memory-body">
 
-                  ? `
+                  ${
+                    memory.location
 
-                    <div class="memory-description">
+                      ? `
+                          <div class="memory-location">
+                            ♡ ${escapeHtml(
+                              memory.location
+                            )}
+                          </div>
+                        `
 
-                      ${escapeHtml(
-                        memory.description
-                      )}
-
-                    </div>
-
-                  `
-
-                  : ''
-                }
+                      : ''
+                  }
 
 
-                <div class="memory-footer">
-
-                  <div class="unlocked">
-
-                    ${
-                      memory.relatedCardId
-
-                        ? 'UNLOCKED BY NFC CARD'
-
-                        : 'PRIVATE MEMORY'
-                    }
-
+                  <div class="memory-title">
+                    ${escapeHtml(
+                      memory.title ||
+                      'Our Memory'
+                    )}
                   </div>
 
 
-                  <div class="view">
-                    查看回憶 →
+                  ${
+                    memory.description
+
+                      ? `
+                          <div class="memory-description">
+                            ${escapeHtml(
+                              memory.description
+                            )}
+                          </div>
+                        `
+
+                      : ''
+                  }
+
+
+                  <div class="memory-footer">
+
+                    <div class="unlocked">
+                      ${
+                        memory.relatedCardId
+                          ? 'UNLOCKED BY NFC CARD'
+                          : 'PRIVATE MEMORY'
+                      }
+                    </div>
+
+                    <div class="view">
+                      查看回憶 →
+                    </div>
+
                   </div>
 
                 </div>
 
+              </article>
+            `;
 
-              </div>
-
-
-            </article>
-
-          `;
-
-        })
+          }
+        )
         .join('');
 
   }
+
+
   /* =========================================
-   新增回憶
-   ========================================= */
+     批次載入列表封面
+     ========================================= */
 
-function openCreateMemory() {
+  async function hydrateMemoryCovers(
+    memories
+  ) {
 
-  window.location.href =
-    '/create-memory.html';
+    const fileIds =
+      memories
+        .map(
+          function(memory) {
+            return String(
+              memory.coverImageUrl || ''
+            ).trim();
+          }
+        )
+        .filter(Boolean);
 
-}
+
+    if (!fileIds.length) {
+      return;
+    }
+
+
+    const photoMap =
+      await loadPrivatePhotoMap(
+        fileIds
+      );
+
+
+    const coverElements =
+      document.querySelectorAll(
+        '[data-cover-index]'
+      );
+
+
+    coverElements.forEach(
+      function(cover) {
+
+        const index =
+          Number(
+            cover.dataset.coverIndex
+          );
+
+
+        const memory =
+          memories[index];
+
+
+        if (
+          !memory ||
+          !memory.coverImageUrl
+        ) {
+          return;
+        }
+
+
+        const src =
+          photoMap[
+            memory.coverImageUrl
+          ];
+
+
+        if (!src) {
+          return;
+        }
+
+
+        const placeholder =
+          cover.querySelector(
+            '.cover-placeholder'
+          );
+
+
+        if (placeholder) {
+          placeholder.style.display =
+            'none';
+        }
+
+
+        const img =
+          document.createElement(
+            'img'
+          );
+
+
+        img.src =
+          src;
+
+        img.alt =
+          'memory';
+
+        img.loading =
+          'lazy';
+
+
+        img.style.position =
+          'absolute';
+
+        img.style.inset =
+          '0';
+
+        img.style.width =
+          '100%';
+
+        img.style.height =
+          '100%';
+
+        img.style.objectFit =
+          'cover';
+
+
+        img.onerror =
+          function() {
+
+            img.remove();
+
+            if (placeholder) {
+              placeholder.style.display =
+                '';
+            }
+
+          };
+
+
+        cover.insertBefore(
+          img,
+          cover.firstChild
+        );
+
+      }
+    );
+
+  }
+
+
+  /* =========================================
+     私人照片批次讀取 + Session Cache
+     ========================================= */
+
+  async function loadPrivatePhotoMap(
+    fileIds
+  ) {
+
+    const uniqueIds =
+      Array.from(
+        new Set(
+          fileIds
+            .map(
+              function(value) {
+                return String(
+                  value || ''
+                ).trim();
+              }
+            )
+            .filter(Boolean)
+        )
+      );
+
+
+    const result = {};
+
+    const missing = [];
+
+
+    for (
+      let i = 0;
+      i < uniqueIds.length;
+      i++
+    ) {
+
+      const fileId =
+        uniqueIds[i];
+
+
+      const cached =
+        readPhotoCache(
+          fileId
+        );
+
+
+      if (cached) {
+
+        result[fileId] =
+          cached;
+
+      } else {
+
+        missing.push(
+          fileId
+        );
+
+      }
+
+    }
+
+
+    for (
+      let start = 0;
+      start < missing.length;
+      start += 6
+    ) {
+
+      const chunk =
+        missing.slice(
+          start,
+          start + 6
+        );
+
+
+      const response =
+        await fetch(
+          '/api/photo',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+            body:
+              JSON.stringify({
+                idToken:
+                  idToken,
+                fileIds:
+                  chunk
+              })
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!data.success) {
+
+        const message =
+          String(
+            data.message || ''
+          );
+
+
+        if (
+          message
+            .toLowerCase()
+            .includes('expired')
+        ) {
+
+          refreshLogin();
+
+          throw new Error(
+            'LINE 登入已過期'
+          );
+
+        }
+
+
+        throw new Error(
+          message ||
+          '照片讀取失敗'
+        );
+
+      }
+
+
+      const loadedPhotos =
+        Array.isArray(data.photos)
+          ? data.photos
+          : [];
+
+
+      for (
+        let i = 0;
+        i < loadedPhotos.length;
+        i++
+      ) {
+
+        const photo =
+          loadedPhotos[i];
+
+
+        if (
+          !photo ||
+          !photo.success ||
+          !photo.fileId ||
+          !photo.mimeType ||
+          !photo.base64Data
+        ) {
+          continue;
+        }
+
+
+        const src =
+          'data:' +
+          photo.mimeType +
+          ';base64,' +
+          photo.base64Data;
+
+
+        result[
+          photo.fileId
+        ] = src;
+
+
+        writePhotoCache(
+          photo.fileId,
+          src
+        );
+
+      }
+
+    }
+
+
+    return result;
+
+  }
+
+
+  function readPhotoCache(
+    fileId
+  ) {
+
+    try {
+
+      return sessionStorage.getItem(
+        'wlc-photo-v2:' +
+        fileId
+      ) || '';
+
+    } catch (error) {
+
+      return '';
+
+    }
+
+  }
+
+
+  function writePhotoCache(
+    fileId,
+    src
+  ) {
+
+    try {
+
+      sessionStorage.setItem(
+        'wlc-photo-v2:' +
+        fileId,
+        src
+      );
+
+    } catch (error) {}
+
+  }
+
+
+  /* =========================================
+     新增回憶
+     ========================================= */
+
+  function openCreateMemory() {
+
+    window.location.href =
+      '/create-memory.html';
+
+  }
 
 
   /* =========================================
@@ -1304,20 +1596,13 @@ function openCreateMemory() {
 
   function openMemory(memoryId) {
 
-    /*
-     * 下一步會建立 memory.html
-     */
-
     window.location.href =
-
       '/memory.html?id=' +
-
       encodeURIComponent(
         memoryId
       );
 
   }
-
 
 
   /* =========================================
@@ -1353,13 +1638,8 @@ function openCreateMemory() {
 
 
     const day =
-      String(
-        parts[2]
-      )
-      .padStart(
-        2,
-        '0'
-      );
+      String(parts[2])
+        .padStart(2, '0');
 
 
     const months = [
@@ -1387,22 +1667,17 @@ function openCreateMemory() {
 
 
     return {
-
       year:
         year,
-
       month:
         months[
           monthNumber - 1
         ],
-
       day:
         day
-
     };
 
   }
-
 
 
   /* =========================================
@@ -1417,7 +1692,6 @@ function openCreateMemory() {
   }
 
 
-
   /* =========================================
      LINE Token 過期
      ========================================= */
@@ -1425,21 +1699,16 @@ function openCreateMemory() {
   function refreshLogin() {
 
     try {
-
       liff.logout();
-
     } catch (error) {}
 
 
     liff.login({
-
       redirectUri:
         window.location.href
-
     });
 
   }
-
 
 
   /* =========================================
@@ -1464,20 +1733,17 @@ function openCreateMemory() {
 
 
     setTimeout(
-      () => {
+      function() {
 
         toast
           .classList
-          .remove(
-            'show'
-          );
+          .remove('show');
 
       },
       2400
     );
 
   }
-
 
 
   /* =========================================
@@ -1489,44 +1755,13 @@ function openCreateMemory() {
     return String(
       value ?? ''
     )
-
-      .replaceAll(
-        '&',
-        '&amp;'
-      )
-
-      .replaceAll(
-        '<',
-        '&lt;'
-      )
-
-      .replaceAll(
-        '>',
-        '&gt;'
-      )
-
-      .replaceAll(
-        '"',
-        '&quot;'
-      )
-
-      .replaceAll(
-        "'",
-        '&#039;'
-      );
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
 
   }
-
-
-
-  function escapeAttribute(value) {
-
-    return escapeHtml(
-      value
-    );
-
-  }
-
 
 
   function escapeJs(value) {
@@ -1534,25 +1769,12 @@ function openCreateMemory() {
     return String(
       value ?? ''
     )
-      .replaceAll(
-        '\\',
-        '\\\\'
-      )
-      .replaceAll(
-        "'",
-        "\\'"
-      )
-      .replaceAll(
-        '\n',
-        ''
-      )
-      .replaceAll(
-        '\r',
-        ''
-      );
+      .replaceAll('\\', '\\\\')
+      .replaceAll("'", "\\'")
+      .replaceAll('\n', '')
+      .replaceAll('\r', '');
 
   }
-
 
 
   init();
