@@ -1461,27 +1461,32 @@
 
 <script>
 
-
-  /*
-   * 請換成 index.html
-   * 使用中的同一個 LIFF ID
-   */
-
   const LIFF_ID =
     '2011857714-fZwEK6lN';
 
+  let idToken = '';
+  let currentMemoryId = '';
+  let cardData = [];
 
-  let idToken =
-    '';
+  // 已成功解析的卡面，避免詳情視窗再次讀取
+  const cardImageSources =
+    new Map();
 
+  // 私人圖片快取
+  const IMAGE_DB_NAME =
+    'wlc-private-image-cache';
 
-  let currentMemoryId =
-    '';
+  const IMAGE_STORE_NAME =
+    'images';
 
+  const IMAGE_DB_VERSION =
+    1;
 
-  let cardData =
-    [];
+  const IMAGE_CACHE_MAX_ITEMS =
+    120;
 
+  const IMAGE_CACHE_MAX_BYTES =
+    80 * 1024 * 1024;
 
 
   /* =========================
@@ -1492,22 +1497,17 @@
 
     try {
 
-
       await liff.init({
-
         liffId:
           LIFF_ID
-
       });
 
 
       if (!liff.isLoggedIn()) {
 
         liff.login({
-
           redirectUri:
             window.location.href
-
         });
 
         return;
@@ -1533,9 +1533,7 @@
 
     } catch (error) {
 
-
       console.error(error);
-
 
       document
         .getElementById(
@@ -1561,29 +1559,23 @@
   }
 
 
-
   /* =========================
-     LOAD
+     LOAD COLLECTION
      ========================= */
 
   async function loadCollection() {
 
-
     const params =
       new URLSearchParams({
-
         idToken:
           idToken
-
       });
 
 
     const response =
       await fetch(
-
         '/api/collection?' +
         params.toString()
-
       );
 
 
@@ -1593,29 +1585,23 @@
 
     if (!data.success) {
 
-
       if (
-
         String(
           data.message || ''
         )
           .toLowerCase()
           .includes('expired')
-
       ) {
 
         refreshLogin();
-
         return;
 
       }
 
 
       throw new Error(
-
         data.message ||
         '讀取收藏失敗'
-
       );
 
     }
@@ -1632,29 +1618,24 @@
   }
 
 
-
   /* =========================
      SUMMARY
      ========================= */
 
   function renderSummary(data) {
 
-
     const total =
       Number(data.total || 0);
-
 
     const collected =
       Number(
         data.collected || 0
       );
 
-
     const locked =
       Number(
         data.locked || 0
       );
-
 
     const percent =
       total > 0
@@ -1701,13 +1682,11 @@
   }
 
 
-
   /* =========================
-     CARDS
+     CARD GRID
      ========================= */
 
   function renderCards(cards) {
-
 
     const grid =
       document.getElementById(
@@ -1716,7 +1695,6 @@
 
 
     if (!cards.length) {
-
 
       grid.innerHTML = `
 
@@ -1731,7 +1709,6 @@
 
       `;
 
-
       return;
 
     }
@@ -1742,11 +1719,11 @@
         .map(
           (card, index) => {
 
-
+            // 未解鎖卡片：
+            // 不顯示名稱、圖片、福利或回憶
             if (
               !card.collected
             ) {
-
 
               return `
 
@@ -1771,33 +1748,6 @@
             }
 
 
-            const image =
-              card.cardImageUrl
-
-                ? `
-
-                  <img
-                    src="${escapeAttribute(
-                      card.cardImageUrl
-                    )}"
-                    alt="card"
-                    onerror="
-                      this.parentElement.innerHTML =
-                      '<div class=&quot;card-placeholder&quot;>♠</div>'
-                    "
-                  >
-
-                `
-
-                : `
-
-                  <div class="card-placeholder">
-                    ♠
-                  </div>
-
-                `;
-
-
             return `
 
               <div
@@ -1805,9 +1755,15 @@
                 onclick="openDetail(${index})"
               >
 
-                <div class="card-image">
+                <div
+                  class="card-image private-card-image"
+                  id="cardImage-${index}"
+                  data-card-index="${index}"
+                >
 
-                  ${image}
+                  <div class="card-placeholder">
+                    ♠
+                  </div>
 
                 </div>
 
@@ -1840,13 +1796,13 @@
                     ${
                       card.collectedAt
 
-                      ? `Collected · ${
-                          escapeHtml(
-                            card.collectedAt
-                          )
-                        }`
+                        ? `Collected · ${
+                            escapeHtml(
+                              card.collectedAt
+                            )
+                          }`
 
-                      : 'Collected'
+                        : 'Collected'
                     }
 
                   </div>
@@ -1862,16 +1818,884 @@
         )
         .join('');
 
+
+    observeCardImages();
+
   }
 
+
+  /* =========================
+     LAZY LOAD CARD IMAGES
+     ========================= */
+
+  function observeCardImages() {
+
+    const elements =
+      Array.from(
+        document.querySelectorAll(
+          '.private-card-image'
+        )
+      );
+
+
+    if (!elements.length) {
+      return;
+    }
+
+
+    if (
+      !('IntersectionObserver' in window)
+    ) {
+
+      elements.forEach(
+        element => {
+          loadCardImageElement(
+            element
+          );
+        }
+      );
+
+      return;
+
+    }
+
+
+    const observer =
+      new IntersectionObserver(
+        entries => {
+
+          entries.forEach(
+            entry => {
+
+              if (
+                !entry.isIntersecting
+              ) {
+                return;
+              }
+
+
+              observer.unobserve(
+                entry.target
+              );
+
+
+              loadCardImageElement(
+                entry.target
+              );
+
+            }
+          );
+
+        },
+        {
+          rootMargin:
+            '320px 0px'
+        }
+      );
+
+
+    elements.forEach(
+      element => {
+        observer.observe(
+          element
+        );
+      }
+    );
+
+  }
+
+
+  async function loadCardImageElement(
+    element
+  ) {
+
+    if (
+      !element ||
+      element.dataset.loaded === '1'
+    ) {
+      return;
+    }
+
+
+    element.dataset.loaded =
+      '1';
+
+
+    const index =
+      Number(
+        element.dataset.cardIndex
+      );
+
+
+    const card =
+      cardData[index];
+
+
+    if (
+      !card ||
+      !card.collected
+    ) {
+      return;
+    }
+
+
+    const imageRef =
+      String(
+        card.cardImageUrl || ''
+      ).trim();
+
+
+    if (!imageRef) {
+      return;
+    }
+
+
+    try {
+
+      const imageSrc =
+        await resolvePrivateImage(
+          imageRef
+        );
+
+
+      if (!imageSrc) {
+        return;
+      }
+
+
+      cardImageSources.set(
+        index,
+        imageSrc
+      );
+
+
+      setCardImage(
+        element,
+        imageSrc,
+        card.cardName ||
+        'Whale Love Card'
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        '卡面載入失敗',
+        error
+      );
+
+      element.dataset.loaded =
+        '0';
+
+    }
+
+  }
+
+
+  function setCardImage(
+    container,
+    src,
+    alt
+  ) {
+
+    const img =
+      document.createElement(
+        'img'
+      );
+
+
+    img.alt =
+      alt || 'card';
+
+    img.loading =
+      'lazy';
+
+    img.decoding =
+      'async';
+
+
+    img.onload =
+      function() {
+
+        container.innerHTML =
+          '';
+
+        container.appendChild(
+          img
+        );
+
+      };
+
+
+    img.onerror =
+      function() {
+
+        container.innerHTML = `
+          <div class="card-placeholder">
+            ♠
+          </div>
+        `;
+
+      };
+
+
+    img.src =
+      src;
+
+  }
+
+
+  /* =========================
+     PRIVATE IMAGE
+     ========================= */
+
+  async function resolvePrivateImage(
+    imageRef
+  ) {
+
+    imageRef =
+      String(
+        imageRef || ''
+      ).trim();
+
+
+    if (!imageRef) {
+      return '';
+    }
+
+
+    // 舊資料若本來就是可用網址，
+    // 仍保留相容性。
+    if (
+      /^https?:\/\//i.test(
+        imageRef
+      ) ||
+      /^data:image\//i.test(
+        imageRef
+      ) ||
+      /^blob:/i.test(
+        imageRef
+      )
+    ) {
+
+      return imageRef;
+
+    }
+
+
+    const cached =
+      await getCachedImage(
+        imageRef
+      );
+
+
+    if (cached) {
+
+      touchCachedImage(
+        imageRef,
+        cached
+      ).catch(
+        () => {}
+      );
+
+      return cached;
+
+    }
+
+
+    const imageSrc =
+      await fetchPrivatePhoto(
+        imageRef
+      );
+
+
+    if (imageSrc) {
+
+      putCachedImage(
+        imageRef,
+        imageSrc
+      ).catch(
+        error => {
+          console.warn(
+            '圖片快取失敗',
+            error
+          );
+        }
+      );
+
+    }
+
+
+    return imageSrc;
+
+  }
+
+
+  async function fetchPrivatePhoto(
+    fileId
+  ) {
+
+    const response =
+      await fetch(
+        '/api/photo',
+        {
+          method:
+            'POST',
+
+          headers: {
+            'Content-Type':
+              'application/json'
+          },
+
+          body:
+            JSON.stringify({
+              idToken:
+                idToken,
+              fileId:
+                fileId
+            })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+      const message =
+        String(
+          data.message || ''
+        );
+
+
+      if (
+        message
+          .toLowerCase()
+          .includes('expired')
+      ) {
+
+        refreshLogin();
+
+        throw new Error(
+          'LINE 登入已過期'
+        );
+
+      }
+
+
+      throw new Error(
+        message ||
+        '卡片圖片讀取失敗'
+      );
+
+    }
+
+
+    if (
+      !data.mimeType ||
+      !data.base64Data
+    ) {
+
+      throw new Error(
+        '卡片圖片資料不完整'
+      );
+
+    }
+
+
+    return (
+      'data:' +
+      data.mimeType +
+      ';base64,' +
+      data.base64Data
+    );
+
+  }
+
+
+  /* =========================
+     INDEXEDDB CACHE
+     ========================= */
+
+  function openImageDb() {
+
+    return new Promise(
+      (resolve, reject) => {
+
+        if (
+          !('indexedDB' in window)
+        ) {
+
+          resolve(null);
+          return;
+
+        }
+
+
+        const request =
+          indexedDB.open(
+            IMAGE_DB_NAME,
+            IMAGE_DB_VERSION
+          );
+
+
+        request.onupgradeneeded =
+          function(event) {
+
+            const db =
+              event.target.result;
+
+
+            if (
+              !db.objectStoreNames.contains(
+                IMAGE_STORE_NAME
+              )
+            ) {
+
+              const store =
+                db.createObjectStore(
+                  IMAGE_STORE_NAME,
+                  {
+                    keyPath:
+                      'fileId'
+                  }
+                );
+
+
+              store.createIndex(
+                'lastAccess',
+                'lastAccess',
+                {
+                  unique:
+                    false
+                }
+              );
+
+            }
+
+          };
+
+
+        request.onsuccess =
+          function() {
+
+            resolve(
+              request.result
+            );
+
+          };
+
+
+        request.onerror =
+          function() {
+
+            reject(
+              request.error
+            );
+
+          };
+
+      }
+    );
+
+  }
+
+
+  async function getCachedImage(
+    fileId
+  ) {
+
+    try {
+
+      const db =
+        await openImageDb();
+
+
+      if (!db) {
+        return '';
+      }
+
+
+      return await new Promise(
+        (resolve, reject) => {
+
+          const tx =
+            db.transaction(
+              IMAGE_STORE_NAME,
+              'readonly'
+            );
+
+
+          const store =
+            tx.objectStore(
+              IMAGE_STORE_NAME
+            );
+
+
+          const request =
+            store.get(
+              fileId
+            );
+
+
+          request.onsuccess =
+            function() {
+
+              const record =
+                request.result;
+
+              resolve(
+                record &&
+                record.dataUrl
+                  ? record.dataUrl
+                  : ''
+              );
+
+            };
+
+
+          request.onerror =
+            function() {
+
+              reject(
+                request.error
+              );
+
+            };
+
+        }
+      );
+
+
+    } catch (error) {
+
+      console.warn(
+        '讀取圖片快取失敗',
+        error
+      );
+
+      return '';
+
+    }
+
+  }
+
+
+  async function putCachedImage(
+    fileId,
+    dataUrl
+  ) {
+
+    const db =
+      await openImageDb();
+
+
+    if (!db) {
+      return;
+    }
+
+
+    const size =
+      estimateDataUrlBytes(
+        dataUrl
+      );
+
+
+    await new Promise(
+      (resolve, reject) => {
+
+        const tx =
+          db.transaction(
+            IMAGE_STORE_NAME,
+            'readwrite'
+          );
+
+
+        tx.objectStore(
+          IMAGE_STORE_NAME
+        )
+          .put({
+            fileId:
+              fileId,
+            dataUrl:
+              dataUrl,
+            size:
+              size,
+            lastAccess:
+              Date.now()
+          });
+
+
+        tx.oncomplete =
+          function() {
+            resolve();
+          };
+
+
+        tx.onerror =
+          function() {
+            reject(
+              tx.error
+            );
+          };
+
+      }
+    );
+
+
+    await trimImageCache(
+      db
+    );
+
+  }
+
+
+  async function touchCachedImage(
+    fileId,
+    dataUrl
+  ) {
+
+    const db =
+      await openImageDb();
+
+
+    if (!db) {
+      return;
+    }
+
+
+    const size =
+      estimateDataUrlBytes(
+        dataUrl
+      );
+
+
+    await new Promise(
+      (resolve, reject) => {
+
+        const tx =
+          db.transaction(
+            IMAGE_STORE_NAME,
+            'readwrite'
+          );
+
+
+        tx.objectStore(
+          IMAGE_STORE_NAME
+        )
+          .put({
+            fileId:
+              fileId,
+            dataUrl:
+              dataUrl,
+            size:
+              size,
+            lastAccess:
+              Date.now()
+          });
+
+
+        tx.oncomplete =
+          function() {
+            resolve();
+          };
+
+
+        tx.onerror =
+          function() {
+            reject(
+              tx.error
+            );
+          };
+
+      }
+    );
+
+  }
+
+
+  async function trimImageCache(
+    db
+  ) {
+
+    const records =
+      await new Promise(
+        (resolve, reject) => {
+
+          const tx =
+            db.transaction(
+              IMAGE_STORE_NAME,
+              'readonly'
+            );
+
+
+          const request =
+            tx.objectStore(
+              IMAGE_STORE_NAME
+            )
+              .getAll();
+
+
+          request.onsuccess =
+            function() {
+
+              resolve(
+                request.result || []
+              );
+
+            };
+
+
+          request.onerror =
+            function() {
+
+              reject(
+                request.error
+              );
+
+            };
+
+        }
+      );
+
+
+    let totalBytes =
+      records.reduce(
+        (sum, item) =>
+          sum +
+          Number(
+            item.size || 0
+          ),
+        0
+      );
+
+
+    if (
+      records.length <=
+        IMAGE_CACHE_MAX_ITEMS &&
+      totalBytes <=
+        IMAGE_CACHE_MAX_BYTES
+    ) {
+
+      return;
+
+    }
+
+
+    records.sort(
+      (a, b) =>
+        Number(
+          a.lastAccess || 0
+        ) -
+        Number(
+          b.lastAccess || 0
+        )
+    );
+
+
+    const dbTx =
+      db.transaction(
+        IMAGE_STORE_NAME,
+        'readwrite'
+      );
+
+
+    const store =
+      dbTx.objectStore(
+        IMAGE_STORE_NAME
+      );
+
+
+    let remainingCount =
+      records.length;
+
+
+    for (
+      const item of records
+    ) {
+
+      if (
+        remainingCount <=
+          IMAGE_CACHE_MAX_ITEMS &&
+        totalBytes <=
+          IMAGE_CACHE_MAX_BYTES
+      ) {
+        break;
+      }
+
+
+      store.delete(
+        item.fileId
+      );
+
+
+      remainingCount--;
+
+      totalBytes -=
+        Number(
+          item.size || 0
+        );
+
+    }
+
+
+    await new Promise(
+      (resolve, reject) => {
+
+        dbTx.oncomplete =
+          resolve;
+
+        dbTx.onerror =
+          () =>
+            reject(
+              dbTx.error
+            );
+
+      }
+    );
+
+  }
+
+
+  function estimateDataUrlBytes(
+    dataUrl
+  ) {
+
+    const text =
+      String(
+        dataUrl || ''
+      );
+
+
+    const comma =
+      text.indexOf(',');
+
+
+    const base64Length =
+      comma >= 0
+        ? text.length -
+          comma -
+          1
+        : text.length;
+
+
+    return Math.ceil(
+      base64Length *
+      0.75
+    );
+
+  }
 
 
   /* =========================
      DETAIL
      ========================= */
 
-  function openDetail(index) {
-
+  async function openDetail(
+    index
+  ) {
 
     const card =
       cardData[index];
@@ -1895,33 +2719,11 @@
       );
 
 
-    if (card.cardImageUrl) {
-
-
-      detailImage.innerHTML = `
-
-        <img
-          src="${escapeAttribute(
-            card.cardImageUrl
-          )}"
-          alt="card"
-        >
-
-      `;
-
-
-    } else {
-
-
-      detailImage.innerHTML = `
-
-        <div class="card-placeholder">
-          ♠
-        </div>
-
-      `;
-
-    }
+    detailImage.innerHTML = `
+      <div class="card-placeholder">
+        ♠
+      </div>
+    `;
 
 
     document
@@ -2004,12 +2806,61 @@
       .classList
       .add('show');
 
+
+    const imageRef =
+      String(
+        card.cardImageUrl || ''
+      ).trim();
+
+
+    if (!imageRef) {
+      return;
+    }
+
+
+    try {
+
+      const imageSrc =
+        cardImageSources.get(
+          index
+        ) ||
+        await resolvePrivateImage(
+          imageRef
+        );
+
+
+      if (!imageSrc) {
+        return;
+      }
+
+
+      cardImageSources.set(
+        index,
+        imageSrc
+      );
+
+
+      setCardImage(
+        detailImage,
+        imageSrc,
+        card.cardName ||
+        'Whale Love Card'
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        '卡片詳情圖片載入失敗',
+        error
+      );
+
+    }
+
   }
 
 
-
   function closeDetail() {
-
 
     document
       .getElementById(
@@ -2025,41 +2876,31 @@
   }
 
 
-
   /* =========================
      MEMORY
      ========================= */
 
   function openMemory() {
 
-
     if (!currentMemoryId) {
       return;
     }
 
 
-    /*
-     * 下一階段我們會建立：
-     *
-     * memory.html?id=MEM-XXXX
-     *
-     * 現在先不要跳 404
-     */
-
-    showToast(
-      '回憶相簿功能下一步開放 ♡'
-    );
+    window.location.href =
+      '/memory.html?id=' +
+      encodeURIComponent(
+        currentMemoryId
+      );
 
   }
 
 
-
   /* =========================
-     HELPERS
+     REWARD TEXT
      ========================= */
 
   function rewardText(card) {
-
 
     const type =
       String(
@@ -2091,7 +2932,8 @@
 
 
     if (
-      type === 'MASSAGE_POINTS'
+      type ===
+      'MASSAGE_POINTS'
     ) {
 
       return (
@@ -2126,6 +2968,9 @@
   }
 
 
+  /* =========================
+     HELPERS
+     ========================= */
 
   function goHome() {
 
@@ -2135,9 +2980,7 @@
   }
 
 
-
   function refreshLogin() {
-
 
     try {
 
@@ -2147,18 +2990,14 @@
 
 
     liff.login({
-
       redirectUri:
         window.location.href
-
     });
 
   }
 
 
-
   function showToast(message) {
-
 
     const toast =
       document.getElementById(
@@ -2189,7 +3028,6 @@
     );
 
   }
-
 
 
   function escapeHtml(value) {
@@ -2224,15 +3062,6 @@
       );
 
   }
-
-
-
-  function escapeAttribute(value) {
-
-    return escapeHtml(value);
-
-  }
-
 
 
   init();
