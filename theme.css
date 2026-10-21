@@ -1,0 +1,162 @@
+/* =========================================================
+   Whale Love Club - Global Theme
+   File: /theme.css
+   Themes:
+   - black-gold
+   - cute-pastel
+   ========================================================= */
+
+:root {
+  --wlc-bg: #070707;
+  --wlc-bg-soft: #101010;
+  --wlc-panel: #0f0f0f;
+  --wlc-panel-2: #151515;
+
+  --wlc-text: #f7f3ed;
+  --wlc-text-soft: #b8afa4;
+  --wlc-text-muted: #918b84;
+
+  --wlc-accent: #d7b184;
+  --wlc-accent-strong: #e3c099;
+  --wlc-accent-dark: #a87b55;
+
+  --wlc-border: rgba(215, 177, 132, 0.22);
+  --wlc-border-soft: rgba(255, 255, 255, 0.08);
+
+  --wlc-success: #9fcca9;
+  --wlc-danger: #e7a8a8;
+
+  --wlc-shadow: 0 20px 55px rgba(0, 0, 0, 0.35);
+
+  --wlc-radius-sm: 12px;
+  --wlc-radius-md: 16px;
+  --wlc-radius-lg: 22px;
+  --wlc-radius-xl: 28px;
+
+  --wlc-font-ui:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "PingFang TC",
+    "Noto Sans TC",
+    sans-serif;
+
+  --wlc-font-title:
+    Georgia,
+    "Noto Serif TC",
+    serif;
+}
+
+
+/* =========================
+   BLACK GOLD
+   ========================= */
+
+:root[data-theme="black-gold"] {
+  --wlc-bg: #070707;
+  --wlc-bg-soft: #101010;
+  --wlc-panel: #0f0f0f;
+  --wlc-panel-2: #151515;
+
+  --wlc-text: #f7f3ed;
+  --wlc-text-soft: #b8afa4;
+  --wlc-text-muted: #918b84;
+
+  --wlc-accent: #d7b184;
+  --wlc-accent-strong: #e3c099;
+  --wlc-accent-dark: #a87b55;
+
+  --wlc-border: rgba(215, 177, 132, 0.22);
+  --wlc-border-soft: rgba(255, 255, 255, 0.08);
+
+  --wlc-success: #9fcca9;
+  --wlc-danger: #e7a8a8;
+
+  --wlc-shadow: 0 20px 55px rgba(0, 0, 0, 0.35);
+}
+
+
+/* =========================
+   CUTE PASTEL
+   ========================= */
+
+:root[data-theme="cute-pastel"] {
+  --wlc-bg: #fff7fb;
+  --wlc-bg-soft: #fff0f7;
+  --wlc-panel: #ffffff;
+  --wlc-panel-2: #fff8fc;
+
+  --wlc-text: #594650;
+  --wlc-text-soft: #7f6874;
+  --wlc-text-muted: #a18b97;
+
+  --wlc-accent: #dfa3bd;
+  --wlc-accent-strong: #edb8cf;
+  --wlc-accent-dark: #c982a2;
+
+  --wlc-border: rgba(201, 130, 162, 0.22);
+  --wlc-border-soft: rgba(89, 70, 80, 0.08);
+
+  --wlc-success: #84b894;
+  --wlc-danger: #d88f9b;
+
+  --wlc-shadow: 0 18px 46px rgba(192, 133, 158, 0.18);
+}
+
+
+/* =========================
+   OPTIONAL GLOBAL HELPERS
+   ========================= */
+
+html,
+body {
+  background: var(--wlc-bg);
+  color: var(--wlc-text);
+}
+
+body {
+  font-family: var(--wlc-font-ui);
+}
+
+.wlc-panel {
+  background: var(--wlc-panel);
+  border: 1px solid var(--wlc-border-soft);
+  border-radius: var(--wlc-radius-lg);
+  box-shadow: var(--wlc-shadow);
+}
+
+.wlc-title {
+  color: var(--wlc-text);
+  font-family: var(--wlc-font-title);
+}
+
+.wlc-muted {
+  color: var(--wlc-text-muted);
+}
+
+.wlc-accent {
+  color: var(--wlc-accent);
+}
+
+.wlc-button-primary {
+  border: 0;
+  color: #111;
+  background:
+    linear-gradient(
+      135deg,
+      var(--wlc-accent-strong),
+      var(--wlc-accent-dark)
+    );
+}
+
+.wlc-button-secondary {
+  color: var(--wlc-text);
+  background: var(--wlc-panel-2);
+  border: 1px solid var(--wlc-border);
+}
+
+.wlc-input {
+  color: var(--wlc-text);
+  background: var(--wlc-panel);
+  border: 1px solid var(--wlc-border);
+}
