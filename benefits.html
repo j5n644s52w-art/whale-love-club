@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,viewport-fit=cover"
+  >
+
+  <title>我的專屬福利 | Whale Love Club</title>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <link rel="stylesheet" href="/theme.css?v=5">
+  <script src="/theme.js?v=5"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--wlc-bg);
+      color: var(--wlc-text);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "PingFang TC",
+        "Noto Sans TC",
+        sans-serif;
+      padding-bottom:
+        calc(42px + env(safe-area-inset-bottom));
+    }
+
+    :root[data-theme="black-gold"] body {
+      background:
+        radial-gradient(
+          circle at 50% -8%,
+          rgba(215,177,132,.14),
+          transparent 32%
+        ),
+        var(--wlc-bg);
+    }
+
+    :root[data-theme="ocean-blue"] body {
+      background:
+        radial-gradient(
+          circle at 50% -8%,
+          rgba(118,200,232,.15),
+          transparent 32%
+        ),
+        linear-gradient(
+          180deg,
+          #061521,
+          #081b29 50%,
+          #0b2534
+        );
+    }
+
+    :root[data-theme="lavender-dream"] body {
+      background:
+        linear-gradient(
+          135deg,
+          #f8f5ff,
+          #f1eaff 50%,
+          #fff8fb
+        );
+    }
+
+    :root[data-theme="cream-cafe"] body {
+      background:
+        linear-gradient(
+          135deg,
+          #fffaf1,
+          #f7efe4 52%,
+          #efe1d0
+        );
+    }
+
+    :root[data-theme="cute-pastel"] body {
+      background:
+        linear-gradient(
+          135deg,
+          #ffe6ef,
+          #fff2f6 42%,
+          #dff4ff
+        );
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .page {
+      width: min(100%, 720px);
+      margin: 0 auto;
+      padding:
+        calc(20px + env(safe-area-inset-top))
+        18px
+        40px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+
+    .back {
+      border: 0;
+      background: transparent;
+      color: var(--wlc-text-muted);
+      padding: 8px 0;
+    }
+
+    .brand {
+      text-align: right;
+    }
+
+    .brand small {
+      color: var(--wlc-accent);
+      letter-spacing: 3px;
+      font-size: 10px;
+    }
+
+    .brand div {
+      margin-top: 4px;
+      font-family: Georgia, serif;
+      font-size: 15px;
+    }
+
+    .eyebrow {
+      color: var(--wlc-accent);
+      font-size: 10px;
+      letter-spacing: 4px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-family:
+        Georgia,
+        "Noto Serif TC",
+        serif;
+      font-size: 31px;
+      font-weight: 400;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: var(--wlc-text-muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .summary {
+      margin-top: 25px;
+      padding: 18px 20px;
+      border-radius: 20px;
+      border: 1px solid var(--wlc-border);
+      background: var(--wlc-panel);
+      box-shadow: var(--wlc-shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .summary-label {
+      color: var(--wlc-text-muted);
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    .summary-value {
+      margin-top: 7px;
+      font-family: Georgia, serif;
+      font-size: 30px;
+      color: var(--wlc-accent-strong);
+    }
+
+    .summary-icon {
+      font-size: 30px;
+      color: var(--wlc-accent);
+    }
+
+    .tabs {
+      margin-top: 26px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .tab {
+      border: 1px solid var(--wlc-border-soft);
+      background: var(--wlc-panel);
+      color: var(--wlc-text-muted);
+      border-radius: 999px;
+      padding: 10px 8px;
+      font-size: 11px;
+    }
+
+    .tab.active {
+      color: var(--wlc-accent-strong);
+      border-color: var(--wlc-border);
+      background:
+        color-mix(
+          in srgb,
+          var(--wlc-accent) 8%,
+          var(--wlc-panel)
+        );
+    }
+
+    .list {
+      margin-top: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .benefit {
+      border: 1px solid var(--wlc-border-soft);
+      border-radius: 18px;
+      background: var(--wlc-panel);
+      box-shadow: var(--wlc-shadow);
+      padding: 17px;
+    }
+
+    .benefit.used {
+      opacity: .55;
+    }
+
+    .benefit-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .benefit-name {
+      font-family:
+        Georgia,
+        "Noto Serif TC",
+        serif;
+      font-size: 18px;
+      line-height: 1.45;
+    }
+
+    .qty {
+      min-width: 42px;
+      text-align: center;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background:
+        color-mix(
+          in srgb,
+          var(--wlc-accent) 9%,
+          transparent
+        );
+      color: var(--wlc-accent-strong);
+      font-size: 11px;
+    }
+
+    .meta {
+      margin-top: 10px;
+      color: var(--wlc-text-muted);
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .source {
+      margin-top: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 6px 9px;
+      border: 1px solid var(--wlc-border-soft);
+      color: var(--wlc-text-muted);
+      font-size: 10px;
+    }
+
+    .use-btn {
+      width: 100%;
+      margin-top: 14px;
+      border: 0;
+      border-radius: 12px;
+      padding: 12px;
+      background:
+        linear-gradient(
+          135deg,
+          var(--wlc-accent-strong),
+          var(--wlc-accent-dark)
+        );
+      color: #111;
+      font-weight: 800;
+    }
+
+    .use-btn:disabled {
+      opacity: .45;
+      cursor: default;
+    }
+
+    .empty,
+    .loading {
+      padding: 42px 20px;
+      border: 1px dashed var(--wlc-border-soft);
+      border-radius: 18px;
+      background: var(--wlc-panel);
+      color: var(--wlc-text-muted);
+      text-align: center;
+      line-height: 1.8;
+      font-size: 13px;
+    }
+
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0,0,0,.62);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-mask.show {
+      display: flex;
+    }
+
+    .modal {
+      width: min(100%, 720px);
+      background: var(--wlc-panel);
+      border: 1px solid var(--wlc-border);
+      border-radius: 26px 26px 0 0;
+      padding:
+        18px
+        20px
+        calc(24px + env(safe-area-inset-bottom));
+      box-shadow: var(--wlc-shadow);
+    }
+
+    .handle {
+      width: 42px;
+      height: 4px;
+      margin: 0 auto 20px;
+      border-radius: 999px;
+      background: var(--wlc-border);
+    }
+
+    .modal-title {
+      font-family: Georgia, serif;
+      font-size: 22px;
+    }
+
+    .modal-text {
+      margin-top: 10px;
+      color: var(--wlc-text-muted);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .modal-actions {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: .8fr 1.2fr;
+      gap: 10px;
+    }
+
+    .cancel-btn,
+    .confirm-btn {
+      border-radius: 13px;
+      padding: 14px;
+    }
+
+    .cancel-btn {
+      border: 1px solid var(--wlc-border);
+      background: transparent;
+      color: var(--wlc-text-muted);
+    }
+
+    .confirm-btn {
+      border: 0;
+      background:
+        linear-gradient(
+          135deg,
+          var(--wlc-accent-strong),
+          var(--wlc-accent-dark)
+        );
+      color: #111;
+      font-weight: 800;
+    }
+
+    .confirm-btn:disabled {
+      opacity: .5;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom:
+        calc(25px + env(safe-area-inset-bottom));
+      transform:
+        translate(-50%,30px);
+      opacity: 0;
+      background: var(--wlc-panel-2);
+      color: var(--wlc-text);
+      border: 1px solid var(--wlc-border);
+      padding: 12px 18px;
+      border-radius: 999px;
+      z-index: 2000;
+      font-size: 12px;
+      transition: .25s;
+      pointer-events: none;
+      white-space: nowrap;
+      max-width: calc(100% - 40px);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform:
+        translate(-50%,0);
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="page">
+
+    <div class="topbar">
+
+      <button
+        class="back"
+        onclick="location.href='/'"
+      >
+        ← 會員中心
+      </button>
+
+      <div class="brand">
+        <small>♡ PRIVATE MEMBERS</small>
+        <div>Whale Love Club</div>
+      </div>
+
+    </div>
+
+
+    <div class="eyebrow">
+      MEMBER BENEFITS
+    </div>
+
+    <h1>
+      我的專屬福利
+    </h1>
+
+    <div class="subtitle">
+      商城兌換與 NFC 卡解鎖得到的福利，都會收藏在這裡 ♡
+    </div>
+
+
+    <section class="summary">
+
+      <div>
+        <div class="summary-label">
+          AVAILABLE BENEFITS
+        </div>
+
+        <div
+          class="summary-value"
+          id="availableCount"
+        >
+          0
+        </div>
+      </div>
+
+      <div class="summary-icon">
+        🎟
+      </div>
+
+    </section>
+
+
+    <div class="tabs">
+
+      <button
+        class="tab active"
+        data-filter="ALL"
+        onclick="setFilter('ALL', this)"
+      >
+        全部
+      </button>
+
+      <button
+        class="tab"
+        data-filter="AVAILABLE"
+        onclick="setFilter('AVAILABLE', this)"
+      >
+        可使用
+      </button>
+
+      <button
+        class="tab"
+        data-filter="USED"
+        onclick="setFilter('USED', this)"
+      >
+        已使用
+      </button>
+
+    </div>
+
+
+    <section
+      class="list"
+      id="benefitList"
+    >
+
+      <div class="loading">
+        正在整理你的專屬福利...
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <div
+    class="modal-mask"
+    id="useMask"
+    onclick="closeUseFromMask(event)"
+  >
+
+    <div class="modal">
+
+      <div class="handle"></div>
+
+      <div
+        class="modal-title"
+        id="useTitle"
+      >
+        使用福利
+      </div>
+
+      <div class="modal-text">
+        確定要使用一次這個福利嗎？使用後數量會減少 1。
+      </div>
+
+      <div class="modal-actions">
+
+        <button
+          class="cancel-btn"
+          onclick="closeUse()"
+        >
+          取消
+        </button>
+
+        <button
+          class="confirm-btn"
+          id="confirmUseButton"
+          onclick="confirmUse()"
+        >
+          確認使用
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div
+    class="toast"
+    id="toast"
+  ></div>
+
+
+<script>
+
+  const LIFF_ID =
+    '2011857714-fZwEK6lN';
+
+
+  let idToken = '';
+
+  let benefits = [];
+
+  let currentFilter =
+    'ALL';
+
+  let currentBenefit =
+    null;
+
+
+
+  async function init() {
+
+    try {
+
+      await liff.init({
+        liffId:
+          LIFF_ID
+      });
+
+
+      if (!liff.isLoggedIn()) {
+
+        liff.login({
+          redirectUri:
+            window.location.href
+        });
+
+        return;
+
+      }
+
+
+      idToken =
+        liff.getIDToken();
+
+
+      if (!idToken) {
+
+        throw new Error(
+          '無法取得 LINE 登入資訊'
+        );
+
+      }
+
+
+      await loadBenefits();
+
+
+    } catch (error) {
+
+      renderError(
+        error.message ||
+        '福利載入失敗'
+      );
+
+    }
+
+  }
+
+
+
+  async function loadBenefits() {
+
+    const response =
+      await fetch(
+        '/api/benefits',
+        {
+          method:
+            'POST',
+
+          headers: {
+            'Content-Type':
+              'application/json'
+          },
+
+          body:
+            JSON.stringify({
+              idToken:
+                idToken,
+              action:
+                'getBenefits'
+            })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+      const message =
+        String(
+          data.message || ''
+        );
+
+
+      if (
+        message
+          .toLowerCase()
+          .includes('expired')
+      ) {
+
+        refreshLogin();
+
+        return;
+
+      }
+
+
+      throw new Error(
+        message ||
+        '讀取福利失敗'
+      );
+
+    }
+
+
+    benefits =
+      Array.isArray(
+        data.benefits
+      )
+        ? data.benefits
+        : [];
+
+
+    renderBenefits();
+
+  }
+
+
+
+  function renderBenefits() {
+
+    const availableCount =
+      benefits.filter(
+        function(item) {
+
+          return (
+            item.status === 'AVAILABLE' &&
+            Number(
+              item.quantity || 0
+            ) > 0
+          );
+
+        }
+      ).length;
+
+
+    document
+      .getElementById(
+        'availableCount'
+      )
+      .textContent =
+      availableCount;
+
+
+    const filtered =
+      benefits.filter(
+        function(item) {
+
+          if (
+            currentFilter === 'ALL'
+          ) {
+
+            return true;
+
+          }
+
+
+          return (
+            String(
+              item.status || ''
+            ).toUpperCase() ===
+            currentFilter
+          );
+
+        }
+      );
+
+
+    const list =
+      document.getElementById(
+        'benefitList'
+      );
+
+
+    if (!filtered.length) {
+
+      list.innerHTML = `
+        <div class="empty">
+          這裡目前還沒有符合條件的福利 ♡
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    list.innerHTML =
+      filtered
+        .map(
+          function(item) {
+
+            const status =
+              String(
+                item.status || ''
+              )
+                .toUpperCase();
+
+
+            const quantity =
+              Number(
+                item.quantity || 0
+              );
+
+
+            const available =
+              status === 'AVAILABLE' &&
+              quantity > 0;
+
+
+            const sourceText =
+              item.sourceType === 'SHOP'
+                ? 'LOVE SHOP'
+                : 'NFC CARD';
+
+
+            return `
+              <article
+                class="benefit ${
+                  available
+                    ? ''
+                    : 'used'
+                }"
+              >
+
+                <div class="benefit-top">
+
+                  <div class="benefit-name">
+                    ${escapeHtml(
+                      item.name ||
+                      '專屬福利'
+                    )}
+                  </div>
+
+                  <div class="qty">
+                    ×${quantity}
+                  </div>
+
+                </div>
+
+
+                <div class="meta">
+                  狀態：${
+                    available
+                      ? '可使用'
+                      : '已使用'
+                  }<br>
+                  取得時間：${
+                    escapeHtml(
+                      item.issuedAt ||
+                      '-'
+                    )
+                  }
+                </div>
+
+
+                <div class="source">
+                  ${
+                    item.sourceType === 'SHOP'
+                      ? '🛍'
+                      : '🎟'
+                  }
+                  ${sourceText}
+                </div>
+
+
+                <button
+                  class="use-btn"
+                  ${
+                    available
+                      ? ''
+                      : 'disabled'
+                  }
+                  onclick="openUse('${
+                    escapeJs(
+                      item.benefitId
+                    )
+                  }')"
+                >
+                  ${
+                    available
+                      ? '使用一次'
+                      : '已使用'
+                  }
+                </button>
+
+              </article>
+            `;
+
+          }
+        )
+        .join('');
+
+  }
+
+
+
+  function setFilter(
+    filter,
+    button
+  ) {
+
+    currentFilter =
+      filter;
+
+
+    document
+      .querySelectorAll(
+        '.tab'
+      )
+      .forEach(
+        function(tab) {
+
+          tab.classList.remove(
+            'active'
+          );
+
+        }
+      );
+
+
+    button.classList.add(
+      'active'
+    );
+
+
+    renderBenefits();
+
+  }
+
+
+
+  function openUse(
+    benefitId
+  ) {
+
+    const benefit =
+      benefits.find(
+        function(item) {
+
+          return (
+            String(
+              item.benefitId
+            ) ===
+            String(
+              benefitId
+            )
+          );
+
+        }
+      );
+
+
+    if (!benefit) {
+      return;
+    }
+
+
+    currentBenefit =
+      benefit;
+
+
+    document
+      .getElementById(
+        'useTitle'
+      )
+      .textContent =
+      benefit.name ||
+      '使用福利';
+
+
+    document
+      .getElementById(
+        'useMask'
+      )
+      .classList
+      .add('show');
+
+  }
+
+
+
+  function closeUse() {
+
+    document
+      .getElementById(
+        'useMask'
+      )
+      .classList
+      .remove('show');
+
+
+    currentBenefit =
+      null;
+
+  }
+
+
+
+  function closeUseFromMask(
+    event
+  ) {
+
+    if (
+      event.target.id ===
+      'useMask'
+    ) {
+
+      closeUse();
+
+    }
+
+  }
+
+
+
+  async function confirmUse() {
+
+    if (!currentBenefit) {
+      return;
+    }
+
+
+    const button =
+      document.getElementById(
+        'confirmUseButton'
+      );
+
+
+    button.disabled =
+      true;
+
+
+    button.textContent =
+      '使用中...';
+
+
+    try {
+
+      const response =
+        await fetch(
+          '/api/benefits',
+          {
+            method:
+              'POST',
+
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+
+            body:
+              JSON.stringify({
+                idToken:
+                  idToken,
+
+                action:
+                  'useBenefit',
+
+                benefitId:
+                  currentBenefit
+                    .benefitId
+              })
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!data.success) {
+
+        throw new Error(
+          translateError(
+            data.message ||
+            '使用福利失敗'
+          )
+        );
+
+      }
+
+
+      closeUse();
+
+
+      showToast(
+        '福利已使用一次 ♡'
+      );
+
+
+      await loadBenefits();
+
+
+    } catch (error) {
+
+      showToast(
+        error.message ||
+        '使用福利失敗'
+      );
+
+
+    } finally {
+
+      button.disabled =
+        false;
+
+
+      button.textContent =
+        '確認使用';
+
+    }
+
+  }
+
+
+
+  function translateError(
+    message
+  ) {
+
+    const value =
+      String(
+        message || ''
+      );
+
+
+    if (
+      value.includes(
+        'BENEFIT_ALREADY_USED'
+      )
+    ) {
+
+      return '這個福利已經使用完了';
+
+    }
+
+
+    if (
+      value.includes(
+        'BENEFIT_NOT_FOUND'
+      )
+    ) {
+
+      return '找不到這個福利';
+
+    }
+
+
+    if (
+      value.includes(
+        'BENEFIT_NOT_FOR_MEMBER'
+      )
+    ) {
+
+      return '這個福利不屬於目前會員';
+
+    }
+
+
+    return value;
+
+  }
+
+
+
+  function renderError(
+    message
+  ) {
+
+    document
+      .getElementById(
+        'benefitList'
+      )
+      .innerHTML = `
+        <div class="empty">
+          無法載入專屬福利<br>
+          ${escapeHtml(
+            message
+          )}
+        </div>
+      `;
+
+  }
+
+
+
+  function showToast(
+    message
+  ) {
+
+    const toast =
+      document.getElementById(
+        'toast'
+      );
+
+
+    toast.textContent =
+      message;
+
+
+    toast.classList.add(
+      'show'
+    );
+
+
+    setTimeout(
+      function() {
+
+        toast.classList.remove(
+          'show'
+        );
+
+      },
+      2400
+    );
+
+  }
+
+
+
+  function refreshLogin() {
+
+    try {
+      liff.logout();
+    } catch (error) {}
+
+
+    liff.login({
+      redirectUri:
+        window.location.href
+    });
+
+  }
+
+
+
+  function escapeHtml(
+    value
+  ) {
+
+    return String(
+      value ?? ''
+    )
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'",'&#039;');
+
+  }
+
+
+
+  function escapeJs(
+    value
+  ) {
+
+    return String(
+      value ?? ''
+    )
+      .replaceAll('\\','\\\\')
+      .replaceAll("'","\\'");
+
+  }
+
+
+
+  init();
+
+</script>
+
+</body>
+</html>
