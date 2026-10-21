@@ -276,14 +276,27 @@ async function showSuccess(data) {
         const img =
           document.createElement('img');
 
-        img.src =
-          imageUrl;
-
         img.alt =
           card.cardName ||
           'Card';
 
+        img.decoding =
+          'async';
+
+        img.onerror =
+          function() {
+
+            box.innerHTML =
+              '<div class="card-placeholder">♠</div>';
+
+          };
+
+        // 先把 img 放進 DOM，再指定 src。
+        // LINE WebView 在重複掃描、快取命中時會比較穩定。
         box.appendChild(img);
+
+        img.src =
+          imageUrl;
       }
     } catch (error) {
       console.warn(
