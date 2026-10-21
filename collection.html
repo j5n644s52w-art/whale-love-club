@@ -1819,7 +1819,37 @@
         .join('');
 
 
-    observeCardImages();
+    // LINE WebView 某些版本的 IntersectionObserver
+    // 可能不會穩定觸發，因此收藏頁直接載入已解鎖卡面。
+    loadAllCardImages();
+
+  }
+
+
+  async function loadAllCardImages() {
+
+    const elements =
+      Array.from(
+        document.querySelectorAll(
+          '.private-card-image'
+        )
+      );
+
+
+    for (const element of elements) {
+
+      loadCardImageElement(
+        element
+      ).catch(
+        error => {
+          console.error(
+            '卡面直接載入失敗',
+            error
+          );
+        }
+      );
+
+    }
 
   }
 
@@ -2011,24 +2041,8 @@
     img.alt =
       alt || 'card';
 
-    img.loading =
-      'lazy';
-
     img.decoding =
       'async';
-
-
-    img.onload =
-      function() {
-
-        container.innerHTML =
-          '';
-
-        container.appendChild(
-          img
-        );
-
-      };
 
 
     img.onerror =
@@ -2042,6 +2056,15 @@
 
       };
 
+
+    // 先把 img 放進 DOM，再指定 src。
+    // 對 LINE WebView / data URL 會比 detached image 穩定。
+    container.innerHTML =
+      '';
+
+    container.appendChild(
+      img
+    );
 
     img.src =
       src;
@@ -2197,7 +2220,6 @@
     }
 
 
-    // 相容目前與舊版 /api/photo 回傳格式
     if (data.dataUrl) {
       return data.dataUrl;
     }
