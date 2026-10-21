@@ -515,19 +515,44 @@
         <div class="field">
 
           <div class="label">
-            庫存 *
+            庫存模式 *
           </div>
 
-          <input
+          <select
             class="input"
-            id="stock"
-            type="number"
-            min="0"
-            step="1"
-            value="1"
+            id="stockMode"
+            onchange="toggleStockInput()"
           >
+            <option value="LIMITED">
+              限量
+            </option>
+            <option value="UNLIMITED">
+              無限制
+            </option>
+          </select>
 
         </div>
+
+      </div>
+
+
+      <div
+        class="field"
+        id="stockField"
+      >
+
+        <div class="label">
+          限量數量 *
+        </div>
+
+        <input
+          class="input"
+          id="stock"
+          type="number"
+          min="1"
+          step="1"
+          value="1"
+        >
 
       </div>
 
@@ -672,6 +697,8 @@
 
 
       await verifyAdmin();
+
+      toggleStockInput();
 
 
     } catch (error) {
@@ -1061,6 +1088,30 @@
 
 
 
+  function toggleStockInput() {
+
+    const mode =
+      document
+        .getElementById(
+          'stockMode'
+        )
+        .value;
+
+
+    document
+      .getElementById(
+        'stockField'
+      )
+      .style
+      .display =
+      mode === 'UNLIMITED'
+        ? 'none'
+        : 'block';
+
+  }
+
+
+
   /* ======================================
      CREATE ITEM
      ====================================== */
@@ -1093,6 +1144,14 @@
           )
           .value
       );
+
+
+    const stockMode =
+      document
+        .getElementById(
+          'stockMode'
+        )
+        .value;
 
 
     const stock =
@@ -1131,12 +1190,15 @@
 
 
     if (
-      !Number.isFinite(stock) ||
-      stock < 0
+      stockMode === 'LIMITED' &&
+      (
+        !Number.isFinite(stock) ||
+        stock < 1
+      )
     ) {
 
       toast(
-        '請輸入正確的庫存'
+        '限量商品至少需要 1 個庫存'
       );
 
       return;
@@ -1213,10 +1275,15 @@
                       price
                     ),
 
+                  stockMode:
+                    stockMode,
+
                   stock:
-                    Math.floor(
-                      stock
-                    ),
+                    stockMode === 'UNLIMITED'
+                      ? 0
+                      : Math.floor(
+                          stock
+                        ),
 
                   imageFileId:
                     imageFileId
@@ -1341,11 +1408,22 @@
 
     if (
       value.includes(
+        'INVALID_STOCK_MODE'
+      )
+    ) {
+
+      return '庫存模式不正確';
+
+    }
+
+
+    if (
+      value.includes(
         'INVALID_STOCK'
       )
     ) {
 
-      return '庫存格式不正確';
+      return '限量商品至少需要 1 個庫存';
 
     }
 

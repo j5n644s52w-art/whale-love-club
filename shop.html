@@ -901,6 +901,14 @@
               );
 
 
+            const stockMode =
+              String(
+                item.stockMode || 'LIMITED'
+              )
+                .trim()
+                .toUpperCase();
+
+
             const stock =
               Number(
                 item.stock || 0
@@ -913,6 +921,7 @@
 
 
             const available =
+              stockMode === 'UNLIMITED' ||
               stock > 0;
 
 
@@ -976,7 +985,11 @@
                     </div>
 
                     <div class="stock">
-                      剩餘 ${stock}
+                      ${
+                        stockMode === 'UNLIMITED'
+                          ? '無限制兌換'
+                          : `剩餘 ${stock}`
+                      }
                     </div>
 
                     <button
