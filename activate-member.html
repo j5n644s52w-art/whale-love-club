@@ -14,6 +14,9 @@
 </title>
 
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<link rel="stylesheet" href="/theme.css?v=6">
+<script src="/theme.js?v=6"></script>
+<script src="/fast-cache.js?v=1"></script>
 
 <style>
 
@@ -473,6 +476,53 @@ h1 {
   line-height: 1.8;
 }
 
+</style>
+
+
+<style id="wlc-theme-bridge">
+html body {
+  background:
+    radial-gradient(
+      circle at 50% -10%,
+      color-mix(in srgb, var(--wlc-accent) 20%, transparent),
+      transparent 35%
+    ),
+    var(--wlc-bg) !important;
+  color: var(--wlc-text) !important;
+}
+.panel,
+.success {
+  background: var(--wlc-panel) !important;
+  border-color: var(--wlc-border-soft) !important;
+}
+.brand small,
+.symbol,
+.eyebrow,
+.success .big {
+  color: var(--wlc-accent) !important;
+}
+.note,
+.friendship-status,
+.success p {
+  color: var(--wlc-text-muted) !important;
+}
+.notice {
+  background: color-mix(in srgb, var(--wlc-accent) 8%, transparent) !important;
+  border-color: var(--wlc-border) !important;
+  color: var(--wlc-text-soft) !important;
+}
+.btn-primary {
+  background: linear-gradient(
+    135deg,
+    var(--wlc-accent-strong),
+    var(--wlc-accent-dark)
+  ) !important;
+}
+.btn-secondary {
+  background: var(--wlc-panel-2) !important;
+  color: var(--wlc-text) !important;
+  border-color: var(--wlc-border) !important;
+}
 </style>
 
 </head>

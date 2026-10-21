@@ -10,8 +10,9 @@
   <title>我的專屬福利 | Whale Love Club</title>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <link rel="stylesheet" href="/theme.css?v=5">
-  <script src="/theme.js?v=5"></script>
+  <link rel="stylesheet" href="/theme.css?v=6">
+  <script src="/theme.js?v=6"></script>
+<script src="/fast-cache.js?v=1"></script>
 
   <style>
     * {
@@ -629,7 +630,46 @@
       }
 
 
-      await loadBenefits();
+      const cachedBenefits =
+        window.WLCFastCache
+          ? WLCFastCache.getJSON(
+              'benefits',
+              'list'
+            )
+          : null;
+
+
+      if (
+        cachedBenefits &&
+        Array.isArray(
+          cachedBenefits.benefits
+        )
+      ) {
+
+        benefits =
+          cachedBenefits.benefits;
+
+        renderBenefits();
+
+      }
+
+
+      try {
+
+        await loadBenefits();
+
+      } catch (error) {
+
+        if (!cachedBenefits) {
+          throw error;
+        }
+
+        console.warn(
+          '背景更新福利失敗，暫時顯示快取',
+          error
+        );
+
+      }
 
 
     } catch (error) {
@@ -709,6 +749,18 @@
       )
         ? data.benefits
         : [];
+
+
+    if (window.WLCFastCache) {
+      WLCFastCache.setJSON(
+        'benefits',
+        'list',
+        {
+          benefits:
+            benefits
+        }
+      );
+    }
 
 
     renderBenefits();

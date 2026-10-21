@@ -13,8 +13,9 @@
   <title>Our Memory | Whale Love Club</title>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<link rel="stylesheet" href="/theme.css?v=5">
-<script src="/theme.js?v=5"></script>
+<link rel="stylesheet" href="/theme.css?v=6">
+<script src="/theme.js?v=6"></script>
+<script src="/fast-cache.js?v=1"></script>
 
 
   <style>
@@ -891,9 +892,53 @@
       }
 
 
-      await loadMemory(
-        memoryId
-      );
+      const cachedMemory =
+        window.WLCFastCache
+          ? WLCFastCache.getJSON(
+              'memory',
+              memoryId
+            )
+          : null;
+
+
+      if (cachedMemory) {
+
+        renderMemoryShell(
+          cachedMemory
+        );
+
+        hydrateMemoryImages(
+          cachedMemory
+        ).catch(
+          function(error) {
+            console.warn(
+              '快取圖片載入失敗',
+              error
+            );
+          }
+        );
+
+      }
+
+
+      try {
+
+        await loadMemory(
+          memoryId
+        );
+
+      } catch (error) {
+
+        if (!cachedMemory) {
+          throw error;
+        }
+
+        console.warn(
+          '背景更新回憶失敗，暫時顯示快取',
+          error
+        );
+
+      }
 
 
     } catch (error) {
@@ -973,6 +1018,20 @@
       throw new Error(
         message ||
         '讀取回憶失敗'
+      );
+
+    }
+
+
+    if (
+      window.WLCFastCache &&
+      data.memory
+    ) {
+
+      WLCFastCache.setJSON(
+        'memory',
+        memoryId,
+        data.memory
       );
 
     }
@@ -1422,7 +1481,6 @@
 
 
     const result = {};
-
     const missing = [];
 
 
@@ -1437,9 +1495,11 @@
 
 
       const cached =
-        readPhotoCache(
-          fileId
-        );
+        window.WLCFastCache
+          ? await WLCFastCache.getImage(
+              fileId
+            )
+          : '';
 
 
       if (cached) {
@@ -1565,10 +1625,14 @@
         ] = src;
 
 
-        writePhotoCache(
-          photo.fileId,
-          src
-        );
+        if (window.WLCFastCache) {
+          WLCFastCache.setImage(
+            photo.fileId,
+            src
+          ).catch(
+            function() {}
+          );
+        }
 
       }
 
@@ -1576,51 +1640,6 @@
 
 
     return result;
-
-  }
-
-
-  function readPhotoCache(
-    fileId
-  ) {
-
-    try {
-
-      return sessionStorage.getItem(
-        'wlc-photo-v2:' +
-        fileId
-      ) || '';
-
-    } catch (error) {
-
-      return '';
-
-    }
-
-  }
-
-
-  function writePhotoCache(
-    fileId,
-    src
-  ) {
-
-    try {
-
-      sessionStorage.setItem(
-        'wlc-photo-v2:' +
-        fileId,
-        src
-      );
-
-    } catch (error) {
-
-      /*
-       * WebView 儲存空間不足時，
-       * 不影響照片當次顯示。
-       */
-
-    }
 
   }
 

@@ -10,8 +10,9 @@
   <title>LOVE SHOP | Whale Love Club</title>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <link rel="stylesheet" href="/theme.css?v=5">
-  <script src="/theme.js?v=5"></script>
+  <link rel="stylesheet" href="/theme.css?v=6">
+  <script src="/theme.js?v=6"></script>
+<script src="/fast-cache.js?v=1"></script>
 
   <style>
     * {
@@ -732,7 +733,51 @@
       }
 
 
-      await loadShop();
+      const cachedShop =
+        window.WLCFastCache
+          ? WLCFastCache.getJSON(
+              'shop',
+              'items'
+            )
+          : null;
+
+
+      if (cachedShop) {
+
+        lovePoints =
+          Number(
+            cachedShop.lovePoints || 0
+          );
+
+        shopItems =
+          Array.isArray(
+            cachedShop.items
+          )
+            ? cachedShop.items
+            : [];
+
+        renderPoints();
+        renderItems();
+
+      }
+
+
+      try {
+
+        await loadShop();
+
+      } catch (error) {
+
+        if (!cachedShop) {
+          throw error;
+        }
+
+        console.warn(
+          '背景更新商城失敗，暫時顯示快取',
+          error
+        );
+
+      }
 
 
     } catch (error) {
@@ -825,6 +870,20 @@
       )
         ? data.items
         : [];
+
+
+    if (window.WLCFastCache) {
+      WLCFastCache.setJSON(
+        'shop',
+        'items',
+        {
+          lovePoints:
+            lovePoints,
+          items:
+            shopItems
+        }
+      );
+    }
 
 
     renderPoints();

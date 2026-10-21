@@ -13,8 +13,9 @@
   <title>卡片收藏 | Whale Love Club</title>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<link rel="stylesheet" href="/theme.css?v=5">
-<script src="/theme.js?v=5"></script>
+<link rel="stylesheet" href="/theme.css?v=6">
+<script src="/theme.js?v=6"></script>
+<script src="/fast-cache.js?v=1"></script>
 
 
   <style>
@@ -1824,7 +1825,52 @@
       }
 
 
-      await loadCollection();
+      const cached =
+        window.WLCFastCache
+          ? WLCFastCache.getJSON(
+              'collection',
+              'list'
+            )
+          : null;
+
+
+      if (
+        cached &&
+        Array.isArray(
+          cached.cards
+        )
+      ) {
+
+        cardData =
+          cached.cards;
+
+        renderSummary(
+          cached
+        );
+
+        renderCards(
+          cardData
+        );
+
+      }
+
+
+      try {
+
+        await loadCollection();
+
+      } catch (error) {
+
+        if (!cached) {
+          throw error;
+        }
+
+        console.warn(
+          '背景更新收藏失敗，暫時顯示快取',
+          error
+        );
+
+      }
 
 
     } catch (error) {
@@ -1905,6 +1951,24 @@
 
     cardData =
       data.cards || [];
+
+
+    if (window.WLCFastCache) {
+      WLCFastCache.setJSON(
+        'collection',
+        'list',
+        {
+          total:
+            Number(data.total || 0),
+          collected:
+            Number(data.collected || 0),
+          locked:
+            Number(data.locked || 0),
+          cards:
+            cardData
+        }
+      );
+    }
 
 
     renderSummary(data);

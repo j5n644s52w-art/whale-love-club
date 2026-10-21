@@ -855,8 +855,9 @@
 
   </style>
 
-<link rel="stylesheet" href="/theme.css?v=1">
-<script src="/theme.js?v=1"></script>
+<link rel="stylesheet" href="/theme.css?v=6">
+<script src="/theme.js?v=6"></script>
+<script src="/fast-cache.js?v=1"></script>
 
 <style>
   /* =====================================================
@@ -2228,8 +2229,36 @@
       }
 
 
+      /*
+       * 先顯示上次會員資料，再背景更新。
+       */
+      const cachedMember =
+        window.WLCFastCache
+          ? WLCFastCache.getJSON(
+              'member',
+              'profile'
+            )
+          : null;
+
+
+      if (cachedMember) {
+        renderMember(
+          cachedMember
+        );
+      }
+
+
       const member =
         await loadMember();
+
+
+      if (window.WLCFastCache) {
+        WLCFastCache.setJSON(
+          'member',
+          'profile',
+          member
+        );
+      }
 
 
       renderMember(member);

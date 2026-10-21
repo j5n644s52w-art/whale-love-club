@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>解鎖限定卡片 | Whale Love Club</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<link rel="stylesheet" href="/theme.css?v=5">
-<script src="/theme.js?v=5"></script>
+<link rel="stylesheet" href="/theme.css?v=6">
+<script src="/theme.js?v=6"></script>
+<script src="/fast-cache.js?v=1"></script>
 <style>
 *{box-sizing:border-box}
 body{
@@ -624,6 +625,15 @@ function renderRewards(
     );
   }
 
+  if (
+    pointsAdded &&
+    Number(pointsAdded.massagePoints || 0) > 0
+  ) {
+    lines.push(
+      'Massage Points +' +
+      Number(pointsAdded.massagePoints)
+    );
+  }
 
   for (const reward of rewards) {
     const type =
@@ -632,7 +642,8 @@ function renderRewards(
       ).toUpperCase();
 
     if (
-      type === 'LOVE_POINTS'
+      type === 'LOVE_POINTS' ||
+      type === 'MASSAGE_POINTS'
     ) {
       continue;
     }

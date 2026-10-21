@@ -11,8 +11,9 @@
   <title>記帳本 | Whale Love Club</title>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<link rel="stylesheet" href="/theme.css?v=5">
-<script src="/theme.js?v=5"></script>
+<link rel="stylesheet" href="/theme.css?v=6">
+<script src="/theme.js?v=6"></script>
+<script src="/fast-cache.js?v=1"></script>
 
   <style>
     * {
@@ -1546,15 +1547,48 @@ let selectedType =
 
   async function loadLedger() {
 
-    document
-      .getElementById('entries')
-      .innerHTML = `
+    const cacheSuffix =
+      String(selectedYear) +
+      '-' +
+      String(selectedMonth)
+        .padStart(2, '0');
 
-        <div class="loading">
-          正在讀取記帳資料...
-        </div>
 
-      `;
+    const cached =
+      window.WLCFastCache
+        ? WLCFastCache.getJSON(
+            'ledger',
+            cacheSuffix
+          )
+        : null;
+
+
+    if (cached) {
+
+      renderSummary(
+        cached.summary || {}
+      );
+
+      ledgerEntries =
+        cached.entries || [];
+
+      renderEntries(
+        ledgerEntries
+      );
+
+    } else {
+
+      document
+        .getElementById('entries')
+        .innerHTML = `
+
+          <div class="loading">
+            正在讀取記帳資料...
+          </div>
+
+        `;
+
+    }
 
 
     const params =
@@ -1606,18 +1640,34 @@ let selectedType =
     }
 
 
+    if (window.WLCFastCache) {
+
+      WLCFastCache.setJSON(
+        'ledger',
+        cacheSuffix,
+        {
+          summary:
+            data.summary || {},
+          entries:
+            data.entries || []
+        }
+      );
+
+    }
+
+
     renderSummary(
-  data.summary || {}
-);
+      data.summary || {}
+    );
 
 
-ledgerEntries =
-  data.entries || [];
+    ledgerEntries =
+      data.entries || [];
 
 
-renderEntries(
-  ledgerEntries
-);
+    renderEntries(
+      ledgerEntries
+    );
 
   }
 

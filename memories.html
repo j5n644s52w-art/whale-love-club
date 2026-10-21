@@ -13,6 +13,9 @@
   <title>回憶相簿 | Whale Love Club</title>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<link rel="stylesheet" href="/theme.css?v=6">
+<script src="/theme.js?v=6"></script>
+<script src="/fast-cache.js?v=1"></script>
 
 
   <style>
@@ -756,10 +759,303 @@
     }
 
   </style>
-<link
-  rel="stylesheet"
-  href="/black-gold-theme.css?v=2"
->
+
+<style id="wlc-global-theme-bridge">
+  /* =========================================================
+     Whale Love Club - Global theme bridge
+     將此頁原本的黑金變數接到全站 theme.css
+     ========================================================= */
+
+  :root {
+    --bg: var(--wlc-bg) !important;
+    --card: var(--wlc-panel) !important;
+    --card-2: var(--wlc-panel-2) !important;
+    --card2: var(--wlc-panel-2) !important;
+    --line: var(--wlc-border-soft) !important;
+    --text: var(--wlc-text) !important;
+    --muted: var(--wlc-text-muted) !important;
+    --gold: var(--wlc-accent) !important;
+    --gold-soft: var(--wlc-accent-strong) !important;
+    --green: var(--wlc-success) !important;
+    --red: var(--wlc-danger) !important;
+  }
+
+  html,
+  body {
+    background: var(--wlc-bg) !important;
+    color: var(--wlc-text) !important;
+  }
+
+  body {
+    transition:
+      background .22s ease,
+      color .22s ease;
+  }
+
+  .brand-small,
+  .eyebrow,
+  .summary-heart,
+  .add-memory-plus,
+  .corner-star,
+  .card-edition,
+  .detail-edition,
+  .edition,
+  .symbol,
+  .reward-title {
+    color: var(--wlc-accent) !important;
+  }
+
+  .subtitle,
+  .section-sub,
+  .summary-title,
+  .summary-small,
+  .entry-meta,
+  .field label,
+  .back,
+  .note,
+  .small,
+  .card-meta,
+  .detail-label,
+  .locked-text {
+    color: var(--wlc-text-muted) !important;
+  }
+
+  .summary-number,
+  .balance,
+  .add-memory-text,
+  .memory-button,
+  .view,
+  .btn-secondary {
+    color: var(--wlc-accent-strong) !important;
+  }
+
+  .summary-card,
+  .entry,
+  .memory,
+  .collection-card,
+  .locked-card,
+  .stage,
+  .card-wrap,
+  .reward-box,
+  .modal,
+  .detail-modal {
+    background: var(--wlc-panel) !important;
+    border-color: var(--wlc-border-soft) !important;
+    box-shadow: var(--wlc-shadow);
+  }
+
+  .summary,
+  .collection-summary,
+  .add-memory-btn,
+  .add-button,
+  .memory-button,
+  .detail-action {
+    border-color: var(--wlc-border) !important;
+    background:
+      linear-gradient(
+        145deg,
+        color-mix(in srgb, var(--wlc-accent) 10%, transparent),
+        color-mix(in srgb, var(--wlc-panel) 94%, transparent)
+      ) !important;
+    color: var(--wlc-text) !important;
+  }
+
+  .input,
+  input,
+  select,
+  textarea {
+    background: var(--wlc-bg-soft) !important;
+    color: var(--wlc-text) !important;
+    border-color: var(--wlc-border-soft) !important;
+  }
+
+  .input:focus,
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--wlc-accent) !important;
+  }
+
+  .type-tabs {
+    background: var(--wlc-bg-soft) !important;
+  }
+
+  .type-tab {
+    color: var(--wlc-text-muted) !important;
+  }
+
+  .type-tab.active {
+    background: var(--wlc-panel-2) !important;
+    color: var(--wlc-accent-strong) !important;
+  }
+
+  .cancel,
+  .close-button,
+  .btn-secondary {
+    background: transparent !important;
+    color: var(--wlc-text-soft) !important;
+    border-color: var(--wlc-border) !important;
+  }
+
+  .save,
+  .btn-primary {
+    background:
+      linear-gradient(
+        135deg,
+        var(--wlc-accent-strong),
+        var(--wlc-accent-dark)
+      ) !important;
+    color: #111 !important;
+  }
+
+  .modal-handle,
+  .handle {
+    background: var(--wlc-border) !important;
+  }
+
+  .modal-mask {
+    background: rgba(0,0,0,.62) !important;
+  }
+
+  .toast {
+    background: var(--wlc-panel-2) !important;
+    color: var(--wlc-text) !important;
+    border: 1px solid var(--wlc-border) !important;
+  }
+
+  .card-image,
+  .detail-image,
+  .memory-cover {
+    background:
+      radial-gradient(
+        circle at 50% 22%,
+        color-mix(in srgb, var(--wlc-accent) 14%, transparent),
+        transparent 48%
+      ),
+      var(--wlc-bg-soft) !important;
+  }
+
+  .date-badge {
+    background:
+      color-mix(in srgb, var(--wlc-panel) 88%, transparent) !important;
+    border-color: var(--wlc-border-soft) !important;
+    color: var(--wlc-text) !important;
+  }
+
+  .card-placeholder,
+  .cover-placeholder {
+    color: var(--wlc-accent) !important;
+    border-color: var(--wlc-border) !important;
+  }
+
+  .progress {
+    background: var(--wlc-border-soft) !important;
+  }
+
+  .progress-fill {
+    background:
+      linear-gradient(
+        90deg,
+        var(--wlc-accent-dark),
+        var(--wlc-accent-strong)
+      ) !important;
+  }
+
+  .detail-line,
+  .memory-footer,
+  .month-control {
+    border-color: var(--wlc-border-soft) !important;
+  }
+
+  .error {
+    background:
+      color-mix(in srgb, var(--wlc-danger) 7%, var(--wlc-panel)) !important;
+    border-color:
+      color-mix(in srgb, var(--wlc-danger) 28%, transparent) !important;
+    color: var(--wlc-danger) !important;
+  }
+
+  /* 各主題背景細節 */
+  :root[data-theme="black-gold"] body {
+    background:
+      radial-gradient(
+        circle at 50% -8%,
+        rgba(215,177,132,.14),
+        transparent 32%
+      ),
+      var(--wlc-bg) !important;
+  }
+
+  :root[data-theme="ocean-blue"] body {
+    background:
+      radial-gradient(
+        circle at 50% -8%,
+        rgba(118,200,232,.15),
+        transparent 32%
+      ),
+      linear-gradient(
+        180deg,
+        #061521,
+        #081b29 50%,
+        #0b2534
+      ) !important;
+  }
+
+  :root[data-theme="lavender-dream"] body {
+    background:
+      linear-gradient(
+        135deg,
+        #f8f5ff,
+        #f1eaff 50%,
+        #fff8fb
+      ) !important;
+  }
+
+  :root[data-theme="cream-cafe"] body {
+    background:
+      linear-gradient(
+        135deg,
+        #fffaf1,
+        #f7efe4 52%,
+        #efe1d0
+      ) !important;
+  }
+
+  :root[data-theme="cute-pastel"] body {
+    background:
+      linear-gradient(
+        135deg,
+        #ffe6ef,
+        #fff2f6 42%,
+        #dff4ff
+      ) !important;
+  }
+</style>
+
+
+<style id="wlc-memories-theme-extra">
+  .memory,
+  .summary {
+    color: var(--wlc-text) !important;
+  }
+
+  .memory-location,
+  .date-month {
+    color: var(--wlc-accent) !important;
+  }
+
+  .memory-description,
+  .unlocked,
+  .date-year {
+    color: var(--wlc-text-muted) !important;
+  }
+
+  .empty-heart {
+    color: var(--wlc-accent) !important;
+    opacity: .6;
+  }
+</style>
+
 </head>
 
 
@@ -899,19 +1195,6 @@
 
   let idToken = '';
 
-  /*
-   * 回憶清單快取：
-   * 只存文字資料與 Drive file ID，不存 LINE Token。
-   * 圖片本身仍使用下方既有的 IndexedDB 快取。
-   */
-  const MEMORY_LIST_CACHE_PREFIX =
-    'wlc-memory-list-v1:';
-
-  const MEMORY_LIST_CACHE_MAX_AGE =
-    30 * 24 * 60 * 60 * 1000;
-
-  let memoryCacheUserKey = '';
-
 
   /* =========================================
      初始化
@@ -951,42 +1234,46 @@
       }
 
 
-      /*
-       * 只用來區分這台手機上的不同 LINE 使用者。
-       * 不把 token 寫進任何快取。
-       */
-      try {
-
-        const decoded =
-          typeof liff.getDecodedIDToken ===
-            'function'
-            ? liff.getDecodedIDToken()
-            : null;
+      const cached =
+        window.WLCFastCache
+          ? WLCFastCache.getJSON(
+              'memories',
+              'list'
+            )
+          : null;
 
 
-        memoryCacheUserKey =
-          String(
-            decoded &&
-            decoded.sub
-              ? decoded.sub
-              : ''
-          ).trim();
+      if (
+        cached &&
+        Array.isArray(
+          cached.memories
+        )
+      ) {
 
-      } catch (error) {
+        renderSummary(
+          Number(
+            cached.total ||
+            cached.memories.length ||
+            0
+          )
+        );
 
-        memoryCacheUserKey =
-          '';
+        renderMemories(
+          cached.memories
+        );
+
+        hydrateMemoryCovers(
+          cached.memories
+        ).catch(
+          function(error) {
+            console.warn(
+              '快取封面載入失敗',
+              error
+            );
+          }
+        );
 
       }
-
-
-      /*
-       * 先顯示上次快取。
-       * 有快取時，使用者會立刻看到相簿；
-       * 同時背景再向 Google Sheet / Drive 更新。
-       */
-      const hadCache =
-        showCachedMemories();
 
 
       try {
@@ -995,19 +1282,13 @@
 
       } catch (error) {
 
-        if (!hadCache) {
+        if (!cached) {
           throw error;
         }
 
-
         console.warn(
-          '背景更新回憶失敗，暫時顯示快取：',
+          '背景更新回憶失敗，暫時顯示快取',
           error
-        );
-
-
-        showToast(
-          '目前顯示上次內容，背景更新稍後再試'
         );
 
       }
@@ -1087,16 +1368,20 @@
       data.memories || [];
 
 
-    /*
-     * 最新資料成功拿到後立刻更新本機清單快取。
-     * 圖片不放 localStorage；圖片仍由 IndexedDB 管理。
-     */
-    writeMemoriesCache({
-      total:
-        Number(data.total || 0),
-      memories:
-        memories
-    });
+    if (window.WLCFastCache) {
+      WLCFastCache.setJSON(
+        'memories',
+        'list',
+        {
+          total:
+            Number(
+              data.total || 0
+            ),
+          memories:
+            memories
+        }
+      );
+    }
 
 
     renderSummary(
@@ -1207,11 +1492,6 @@
                 <div
                   class="memory-cover"
                   data-cover-index="${index}"
-                  data-cover-file-id="${escapeHtml(
-                    String(
-                      memory.coverImageUrl || ''
-                    ).trim()
-                  )}"
                 >
 
                   <div class="cover-placeholder">
@@ -1467,8 +1747,7 @@
 
                   applyMemoryCover(
                     job.index,
-                    src,
-                    job.fileId
+                    src
                   );
 
                 }
@@ -1611,8 +1890,7 @@
 
   function applyMemoryCover(
     index,
-    src,
-    expectedFileId
+    src
   ) {
 
     const cover =
@@ -1624,23 +1902,6 @@
     if (
       !cover ||
       !src
-    ) {
-      return;
-    }
-
-
-    /*
-     * 如果背景更新後清單順序已改變，
-     * 舊快取的圖片不要套到新的卡片上。
-     */
-    if (
-      expectedFileId &&
-      String(
-        cover.dataset.coverFileId || ''
-      ).trim() !==
-        String(
-          expectedFileId
-        ).trim()
     ) {
       return;
     }
@@ -1735,205 +1996,6 @@
     );
 
   }
-
-
-  /* =========================================
-     回憶清單：localStorage 快取
-     ========================================= */
-
-  function getMemoriesCacheKey() {
-
-    if (!memoryCacheUserKey) {
-      return '';
-    }
-
-
-    return (
-      MEMORY_LIST_CACHE_PREFIX +
-      memoryCacheUserKey
-    );
-
-  }
-
-
-  function showCachedMemories() {
-
-    const cached =
-      readMemoriesCache();
-
-
-    if (
-      !cached ||
-      !Array.isArray(
-        cached.memories
-      )
-    ) {
-      return false;
-    }
-
-
-    renderSummary(
-      Number(
-        cached.total ||
-        cached.memories.length ||
-        0
-      )
-    );
-
-
-    renderMemories(
-      cached.memories
-    );
-
-
-    /*
-     * 這裡會先讀既有 IndexedDB 圖片快取。
-     * 命中的圖片不需要重新向 Drive 下載。
-     */
-    hydrateMemoryCovers(
-      cached.memories
-    ).catch(
-      function(error) {
-        console.warn(
-          '快取封面讀取失敗',
-          error
-        );
-      }
-    );
-
-
-    return true;
-
-  }
-
-
-  function readMemoriesCache() {
-
-    const key =
-      getMemoriesCacheKey();
-
-
-    if (!key) {
-      return null;
-    }
-
-
-    try {
-
-      const raw =
-        localStorage.getItem(
-          key
-        );
-
-
-      if (!raw) {
-        return null;
-      }
-
-
-      const parsed =
-        JSON.parse(
-          raw
-        );
-
-
-      if (
-        !parsed ||
-        !parsed.savedAt ||
-        !Array.isArray(
-          parsed.memories
-        )
-      ) {
-
-        localStorage.removeItem(
-          key
-        );
-
-        return null;
-
-      }
-
-
-      if (
-        Date.now() -
-        Number(parsed.savedAt) >
-        MEMORY_LIST_CACHE_MAX_AGE
-      ) {
-
-        localStorage.removeItem(
-          key
-        );
-
-        return null;
-
-      }
-
-
-      return parsed;
-
-
-    } catch (error) {
-
-      return null;
-
-    }
-
-  }
-
-
-  function writeMemoriesCache(
-    data
-  ) {
-
-    const key =
-      getMemoriesCacheKey();
-
-
-    if (!key) {
-      return;
-    }
-
-
-    try {
-
-      localStorage.setItem(
-        key,
-        JSON.stringify({
-          savedAt:
-            Date.now(),
-          total:
-            Number(
-              data &&
-              data.total
-                ? data.total
-                : 0
-            ),
-          memories:
-            Array.isArray(
-              data &&
-              data.memories
-            )
-              ? data.memories
-              : []
-        })
-      );
-
-
-    } catch (error) {
-
-      /*
-       * localStorage 滿了或被停用時，
-       * 不影響正式資料與相簿使用。
-       */
-      console.warn(
-        '回憶清單快取寫入失敗',
-        error
-      );
-
-    }
-
-  }
-
 
 
   /* =========================================
