@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <title>商城管理 | Whale Love Club</title>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <link rel="stylesheet" href="/theme.css?v=5">
+  <script src="/theme.js?v=5"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--wlc-bg);
+      color: var(--wlc-text);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "PingFang TC",
+        "Noto Sans TC",
+        sans-serif;
+      padding-bottom:
+        calc(42px + env(safe-area-inset-bottom));
+    }
+
+    :root[data-theme="black-gold"] body {
+      background:
+        radial-gradient(
+          circle at 50% -8%,
+          rgba(215,177,132,.14),
+          transparent 32%
+        ),
+        var(--wlc-bg);
+    }
+
+    :root[data-theme="ocean-blue"] body {
+      background:
+        radial-gradient(
+          circle at 50% -8%,
+          rgba(118,200,232,.15),
+          transparent 32%
+        ),
+        linear-gradient(
+          180deg,
+          #061521,
+          #081b29 50%,
+          #0b2534
+        );
+    }
+
+    :root[data-theme="lavender-dream"] body {
+      background:
+        linear-gradient(
+          135deg,
+          #f8f5ff,
+          #f1eaff 50%,
+          #fff8fb
+        );
+    }
+
+    :root[data-theme="cream-cafe"] body {
+      background:
+        linear-gradient(
+          135deg,
+          #fffaf1,
+          #f7efe4 52%,
+          #efe1d0
+        );
+    }
+
+    :root[data-theme="cute-pastel"] body {
+      background:
+        linear-gradient(
+          135deg,
+          #ffe6ef,
+          #fff2f6 42%,
+          #dff4ff
+        );
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .page {
+      width: min(100%, 720px);
+      margin: 0 auto;
+      padding:
+        calc(20px + env(safe-area-inset-top))
+        18px
+        40px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+
+    .back {
+      border: 0;
+      background: transparent;
+      color: var(--wlc-text-muted);
+      padding: 8px 0;
+      cursor: pointer;
+    }
+
+    .brand {
+      text-align: right;
+    }
+
+    .brand small {
+      color: var(--wlc-accent);
+      letter-spacing: 3px;
+      font-size: 10px;
+    }
+
+    .brand div {
+      margin-top: 4px;
+      font-family: Georgia, serif;
+      font-size: 15px;
+    }
+
+    .eyebrow {
+      color: var(--wlc-accent);
+      font-size: 10px;
+      letter-spacing: 4px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-family:
+        Georgia,
+        "Noto Serif TC",
+        serif;
+      font-weight: 400;
+      font-size: 31px;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: var(--wlc-text-muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .badge {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 7px 11px;
+      border: 1px solid var(--wlc-border);
+      border-radius: 999px;
+      color: var(--wlc-accent-strong);
+      background:
+        color-mix(
+          in srgb,
+          var(--wlc-accent) 7%,
+          transparent
+        );
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    .panel {
+      margin-top: 24px;
+      padding: 19px;
+      border: 1px solid var(--wlc-border-soft);
+      border-radius: 20px;
+      background: var(--wlc-panel);
+      box-shadow: var(--wlc-shadow);
+    }
+
+    .panel-title {
+      font-family: Georgia, serif;
+      font-size: 15px;
+      letter-spacing: 2px;
+    }
+
+    .panel-note {
+      margin-top: 7px;
+      color: var(--wlc-text-muted);
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .field {
+      margin-top: 18px;
+    }
+
+    .label {
+      margin-bottom: 8px;
+      color: var(--wlc-accent-strong);
+      font-size: 11px;
+    }
+
+    .input,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--wlc-border-soft);
+      border-radius: 13px;
+      background: var(--wlc-bg-soft);
+      color: var(--wlc-text);
+      padding: 13px 14px;
+      outline: none;
+    }
+
+    .input:focus,
+    .textarea:focus {
+      border-color: var(--wlc-accent);
+    }
+
+    .textarea {
+      min-height: 100px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .photo-box {
+      min-height: 175px;
+      border: 1px dashed var(--wlc-border);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      background: var(--wlc-bg-soft);
+    }
+
+    .photo-box img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .placeholder {
+      padding: 30px 20px;
+      color: var(--wlc-text-muted);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .plus {
+      color: var(--wlc-accent);
+      font-size: 30px;
+      margin-bottom: 5px;
+    }
+
+    .photo-btn {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      border: 1px solid var(--wlc-border);
+      border-radius: 12px;
+      padding: 12px;
+      background:
+        color-mix(
+          in srgb,
+          var(--wlc-accent) 6%,
+          var(--wlc-panel)
+        );
+      color: var(--wlc-accent-strong);
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .hidden-input {
+      display: none;
+    }
+
+    .save {
+      width: 100%;
+      margin-top: 24px;
+      border: 0;
+      border-radius: 14px;
+      padding: 15px;
+      background:
+        linear-gradient(
+          135deg,
+          var(--wlc-accent-strong),
+          var(--wlc-accent-dark)
+        );
+      color: #111;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .save:disabled {
+      opacity: .55;
+      cursor: default;
+    }
+
+    .error {
+      display: none;
+      margin-top: 22px;
+      padding: 16px;
+      border-radius: 15px;
+      border: 1px solid
+        color-mix(
+          in srgb,
+          var(--wlc-danger) 28%,
+          transparent
+        );
+      background:
+        color-mix(
+          in srgb,
+          var(--wlc-danger) 6%,
+          var(--wlc-panel)
+        );
+      color: var(--wlc-danger);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    .result {
+      display: none;
+      margin-top: 22px;
+      padding: 17px;
+      border-radius: 16px;
+      border: 1px solid var(--wlc-border);
+      background:
+        color-mix(
+          in srgb,
+          var(--wlc-accent) 6%,
+          var(--wlc-panel)
+        );
+      color: var(--wlc-text);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .result strong {
+      color: var(--wlc-accent-strong);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom:
+        calc(25px + env(safe-area-inset-bottom));
+      transform:
+        translate(-50%, 30px);
+      opacity: 0;
+      background: var(--wlc-panel-2);
+      color: var(--wlc-text);
+      border: 1px solid var(--wlc-border);
+      padding: 12px 18px;
+      border-radius: 999px;
+      z-index: 999;
+      font-size: 12px;
+      transition: .25s;
+      pointer-events: none;
+      white-space: nowrap;
+      max-width: calc(100% - 40px);
+    }
+
+    .toast.on {
+      opacity: 1;
+      transform:
+        translate(-50%, 0);
+    }
+
+    @media (max-width: 480px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="page">
+
+    <div class="topbar">
+
+      <button
+        class="back"
+        onclick="location.href='/shop.html'"
+      >
+        ← 返回商城
+      </button>
+
+      <div class="brand">
+
+        <small>
+          ♡ PRIVATE MEMBERS
+        </small>
+
+        <div>
+          Whale Love Club
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="eyebrow">
+      ADMIN · SHOP MANAGEMENT
+    </div>
+
+    <h1>
+      新增商城商品
+    </h1>
+
+    <div class="subtitle">
+      設定商品圖片、Love Points 售價與庫存。
+    </div>
+
+    <div class="badge">
+      ADMIN ONLY
+    </div>
+
+
+    <div
+      id="errorBox"
+      class="error"
+    ></div>
+
+
+    <section class="panel">
+
+      <div class="panel-title">
+        ITEM INFORMATION
+      </div>
+
+      <div class="panel-note">
+        商品建立後會直接出現在 LOVE SHOP。
+      </div>
+
+
+      <div class="field">
+
+        <div class="label">
+          商品名稱 *
+        </div>
+
+        <input
+          class="input"
+          id="itemName"
+          maxlength="80"
+          placeholder="例如：指定晚餐一次"
+        >
+
+      </div>
+
+
+      <div class="field">
+
+        <div class="label">
+          商品說明
+        </div>
+
+        <textarea
+          class="textarea"
+          id="description"
+          maxlength="300"
+          placeholder="例如：可以指定一間想吃的餐廳 ♡"
+        ></textarea>
+
+      </div>
+
+
+      <div class="row">
+
+        <div class="field">
+
+          <div class="label">
+            Love Points 售價 *
+          </div>
+
+          <input
+            class="input"
+            id="price"
+            type="number"
+            min="0"
+            step="1"
+            value="100"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <div class="label">
+            庫存 *
+          </div>
+
+          <input
+            class="input"
+            id="stock"
+            type="number"
+            min="0"
+            step="1"
+            value="1"
+          >
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <section class="panel">
+
+      <div class="panel-title">
+        ITEM IMAGE
+      </div>
+
+      <div class="panel-note">
+        圖片會存進私人 Google Drive。
+      </div>
+
+
+      <div class="field">
+
+        <div
+          class="photo-box"
+          id="photoPreview"
+        >
+
+          <div class="placeholder">
+
+            <div class="plus">
+              ＋
+            </div>
+
+            選擇商品圖片<br>
+            JPG / PNG / WebP
+
+          </div>
+
+        </div>
+
+
+        <label
+          class="photo-btn"
+          for="itemImageInput"
+        >
+          選擇圖片
+        </label>
+
+
+        <input
+          class="hidden-input"
+          id="itemImageInput"
+          type="file"
+          accept="image/*"
+        >
+
+      </div>
+
+    </section>
+
+
+    <button
+      class="save"
+      id="saveButton"
+      onclick="createItem()"
+    >
+      建立商城商品
+    </button>
+
+
+    <div
+      class="result"
+      id="resultBox"
+    >
+
+      <strong>
+        商品建立完成 ♡
+      </strong>
+
+      <div
+        id="resultItemId"
+        style="margin-top:8px"
+      ></div>
+
+    </div>
+
+  </main>
+
+
+  <div
+    class="toast"
+    id="toast"
+  ></div>
+
+
+<script>
+
+  const LIFF_ID =
+    '2011857714-fZwEK6lN';
+
+
+  let idToken = '';
+
+  let selectedImageFile = null;
+
+
+
+  /* ======================================
+     INIT
+     ====================================== */
+
+  async function init() {
+
+    try {
+
+      await liff.init({
+        liffId:
+          LIFF_ID
+      });
+
+
+      if (!liff.isLoggedIn()) {
+
+        liff.login({
+          redirectUri:
+            window.location.href
+        });
+
+        return;
+
+      }
+
+
+      idToken =
+        liff.getIDToken();
+
+
+      if (!idToken) {
+
+        throw new Error(
+          '無法取得 LINE 登入資訊'
+        );
+
+      }
+
+
+      await verifyAdmin();
+
+
+    } catch (error) {
+
+      showError(
+        error.message ||
+        '初始化失敗'
+      );
+
+    }
+
+  }
+
+
+
+  /* ======================================
+     ADMIN CHECK
+     ====================================== */
+
+  async function verifyAdmin() {
+
+    const response =
+      await fetch(
+        '/api/member',
+        {
+          method:
+            'POST',
+
+          headers: {
+            'Content-Type':
+              'application/json'
+          },
+
+          body:
+            JSON.stringify({
+              idToken:
+                idToken
+            })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+      throw new Error(
+        data.message ||
+        '無法取得會員資料'
+      );
+
+    }
+
+
+    const member =
+      data.member ||
+      data;
+
+
+    const role =
+      String(
+        member.role || ''
+      )
+        .trim()
+        .toUpperCase();
+
+
+    if (
+      role !== 'ADMIN'
+    ) {
+
+      throw new Error(
+        'ADMIN_ONLY'
+      );
+
+    }
+
+  }
+
+
+
+  /* ======================================
+     IMAGE
+     ====================================== */
+
+  document
+    .getElementById(
+      'itemImageInput'
+    )
+    .addEventListener(
+      'change',
+      function(event) {
+
+        const file =
+          event.target.files[0];
+
+
+        if (!file) {
+          return;
+        }
+
+
+        selectedImageFile =
+          file;
+
+
+        const url =
+          URL.createObjectURL(
+            file
+          );
+
+
+        document
+          .getElementById(
+            'photoPreview'
+          )
+          .innerHTML = `
+            <img
+              src="${url}"
+              alt="item preview"
+            >
+          `;
+
+      }
+    );
+
+
+  function readFile(file) {
+
+    return new Promise(
+      function(resolve, reject) {
+
+        const reader =
+          new FileReader();
+
+
+        reader.onload =
+          function() {
+            resolve(
+              reader.result
+            );
+          };
+
+
+        reader.onerror =
+          function() {
+            reject(
+              new Error(
+                '圖片讀取失敗'
+              )
+            );
+          };
+
+
+        reader.readAsDataURL(
+          file
+        );
+
+      }
+    );
+
+  }
+
+
+  function loadImage(src) {
+
+    return new Promise(
+      function(resolve, reject) {
+
+        const image =
+          new Image();
+
+
+        image.onload =
+          function() {
+            resolve(image);
+          };
+
+
+        image.onerror =
+          function() {
+            reject(
+              new Error(
+                '圖片格式無法讀取'
+              )
+            );
+          };
+
+
+        image.src =
+          src;
+
+      }
+    );
+
+  }
+
+
+  async function compressImage(
+    file
+  ) {
+
+    const src =
+      await readFile(
+        file
+      );
+
+
+    const image =
+      await loadImage(
+        src
+      );
+
+
+    const max =
+      1400;
+
+
+    let width =
+      image.naturalWidth;
+
+
+    let height =
+      image.naturalHeight;
+
+
+    if (
+      width > max ||
+      height > max
+    ) {
+
+      const scale =
+        Math.min(
+          max / width,
+          max / height
+        );
+
+
+      width =
+        Math.round(
+          width * scale
+        );
+
+
+      height =
+        Math.round(
+          height * scale
+        );
+
+    }
+
+
+    const canvas =
+      document.createElement(
+        'canvas'
+      );
+
+
+    canvas.width =
+      width;
+
+
+    canvas.height =
+      height;
+
+
+    const context =
+      canvas.getContext(
+        '2d',
+        {
+          alpha: false
+        }
+      );
+
+
+    context.fillStyle =
+      '#ffffff';
+
+
+    context.fillRect(
+      0,
+      0,
+      width,
+      height
+    );
+
+
+    context.drawImage(
+      image,
+      0,
+      0,
+      width,
+      height
+    );
+
+
+    return {
+      fileName:
+        'shop_' +
+        Date.now() +
+        '.jpg',
+
+      mimeType:
+        'image/jpeg',
+
+      base64Data:
+        canvas.toDataURL(
+          'image/jpeg',
+          .82
+        )
+    };
+
+  }
+
+
+  async function uploadItemImage() {
+
+    if (!selectedImageFile) {
+      return '';
+    }
+
+
+    const prepared =
+      await compressImage(
+        selectedImageFile
+      );
+
+
+    const response =
+      await fetch(
+        '/api/upload-photo',
+        {
+          method:
+            'POST',
+
+          headers: {
+            'Content-Type':
+              'application/json'
+          },
+
+          body:
+            JSON.stringify({
+              idToken:
+                idToken,
+
+              fileName:
+                prepared.fileName,
+
+              mimeType:
+                prepared.mimeType,
+
+              base64Data:
+                prepared.base64Data,
+
+              folderType:
+                'Cards',
+
+              subfolderName:
+                'ShopItems'
+            })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+      throw new Error(
+        data.message ||
+        '商品圖片上傳失敗'
+      );
+
+    }
+
+
+    return (
+      data.fileId ||
+      ''
+    );
+
+  }
+
+
+
+  /* ======================================
+     CREATE ITEM
+     ====================================== */
+
+  async function createItem() {
+
+    const itemName =
+      document
+        .getElementById(
+          'itemName'
+        )
+        .value
+        .trim();
+
+
+    const description =
+      document
+        .getElementById(
+          'description'
+        )
+        .value
+        .trim();
+
+
+    const price =
+      Number(
+        document
+          .getElementById(
+            'price'
+          )
+          .value
+      );
+
+
+    const stock =
+      Number(
+        document
+          .getElementById(
+            'stock'
+          )
+          .value
+      );
+
+
+    if (!itemName) {
+
+      toast(
+        '請輸入商品名稱'
+      );
+
+      return;
+
+    }
+
+
+    if (
+      !Number.isFinite(price) ||
+      price < 0
+    ) {
+
+      toast(
+        '請輸入正確的 Love Points 售價'
+      );
+
+      return;
+
+    }
+
+
+    if (
+      !Number.isFinite(stock) ||
+      stock < 0
+    ) {
+
+      toast(
+        '請輸入正確的庫存'
+      );
+
+      return;
+
+    }
+
+
+    const button =
+      document
+        .getElementById(
+          'saveButton'
+        );
+
+
+    button.disabled =
+      true;
+
+
+    hideError();
+
+
+    try {
+
+      let imageFileId = '';
+
+
+      if (
+        selectedImageFile
+      ) {
+
+        button.textContent =
+          '正在上傳商品圖片...';
+
+
+        imageFileId =
+          await uploadItemImage();
+
+      }
+
+
+      button.textContent =
+        '正在建立商品...';
+
+
+      const response =
+        await fetch(
+          '/api/shop',
+          {
+            method:
+              'POST',
+
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+
+            body:
+              JSON.stringify({
+                idToken:
+                  idToken,
+
+                action:
+                  'createItem',
+
+                item: {
+                  itemName:
+                    itemName,
+
+                  description:
+                    description,
+
+                  price:
+                    Math.floor(
+                      price
+                    ),
+
+                  stock:
+                    Math.floor(
+                      stock
+                    ),
+
+                  imageFileId:
+                    imageFileId
+                }
+              })
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!data.success) {
+
+        throw new Error(
+          translateError(
+            data.message ||
+            '建立商品失敗'
+          )
+        );
+
+      }
+
+
+      document
+        .getElementById(
+          'resultItemId'
+        )
+        .textContent =
+        'Item ID：' +
+        (
+          data.itemId ||
+          '-'
+        );
+
+
+      document
+        .getElementById(
+          'resultBox'
+        )
+        .classList
+        .add('show');
+
+
+      toast(
+        '商城商品建立完成 ♡'
+      );
+
+
+    } catch (error) {
+
+      showError(
+        translateError(
+          error.message ||
+          '建立商品失敗'
+        )
+      );
+
+
+    } finally {
+
+      button.disabled =
+        false;
+
+
+      button.textContent =
+        '建立商城商品';
+
+    }
+
+  }
+
+
+
+  /* ======================================
+     HELPERS
+     ====================================== */
+
+  function translateError(
+    message
+  ) {
+
+    const value =
+      String(
+        message || ''
+      );
+
+
+    if (
+      value.includes(
+        'ADMIN_ONLY'
+      )
+    ) {
+
+      return '此頁面只有 ADMIN 可以使用';
+
+    }
+
+
+    if (
+      value.includes(
+        'ITEM_NAME_REQUIRED'
+      )
+    ) {
+
+      return '請輸入商品名稱';
+
+    }
+
+
+    if (
+      value.includes(
+        'INVALID_PRICE'
+      )
+    ) {
+
+      return 'Love Points 售價格式不正確';
+
+    }
+
+
+    if (
+      value.includes(
+        'INVALID_STOCK'
+      )
+    ) {
+
+      return '庫存格式不正確';
+
+    }
+
+
+    if (
+      value
+        .toLowerCase()
+        .includes('expired')
+    ) {
+
+      return 'LINE 登入已過期，請重新開啟';
+
+    }
+
+
+    return value;
+
+  }
+
+
+  function showError(
+    message
+  ) {
+
+    const box =
+      document
+        .getElementById(
+          'errorBox'
+        );
+
+
+    box.textContent =
+      message;
+
+
+    box.classList.add(
+      'show'
+    );
+
+  }
+
+
+  function hideError() {
+
+    document
+      .getElementById(
+        'errorBox'
+      )
+      .classList
+      .remove('show');
+
+  }
+
+
+  function toast(
+    message
+  ) {
+
+    const box =
+      document
+        .getElementById(
+          'toast'
+        );
+
+
+    box.textContent =
+      message;
+
+
+    box.classList.add(
+      'on'
+    );
+
+
+    setTimeout(
+      function() {
+
+        box.classList.remove(
+          'on'
+        );
+
+      },
+      2400
+    );
+
+  }
+
+
+
+  init();
+
+</script>
+
+</body>
+</html>
