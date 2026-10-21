@@ -1422,6 +1422,9 @@
       calc(20px + env(safe-area-inset-bottom));
     background: rgba(0,0,0,.45);
     backdrop-filter: blur(7px);
+
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .theme-panel-mask.show {
@@ -1430,6 +1433,16 @@
 
   .theme-panel {
     width: min(100%, 520px);
+    max-height:
+      calc(
+        100vh
+        - 40px
+        - env(safe-area-inset-top)
+        - env(safe-area-inset-bottom)
+      );
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+
     background: var(--wlc-panel);
     border: 1px solid var(--wlc-border);
     border-radius: 24px;
