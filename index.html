@@ -855,10 +855,347 @@
 
   </style>
 
-<link
-  rel="stylesheet"
-  href="/black-gold-theme.css?v=1"
->
+<link rel="stylesheet" href="/theme.css?v=1">
+<script src="/theme.js?v=1"></script>
+
+<style>
+  /* =====================================================
+     Whale Love Club - index.html theme bridge
+     Existing page structure stays unchanged.
+     This block only maps the current homepage design
+     to the shared global theme variables.
+     ===================================================== */
+
+  html,
+  body {
+    background: var(--wlc-bg);
+    color: var(--wlc-text);
+  }
+
+  body {
+    transition:
+      background .25s ease,
+      color .25s ease;
+  }
+
+  .brand-small,
+  .welcome-title span,
+  .card-heart,
+  .footer-heart {
+    color: var(--wlc-accent);
+  }
+
+  .brand-title,
+  .welcome-title,
+  .member-name,
+  .section-title,
+  .menu-name,
+  .coupon-title,
+  .point-value {
+    color: var(--wlc-text);
+  }
+
+  .hello,
+  .member-meta,
+  .point-label,
+  .point-unit,
+  .menu-sub,
+  .coupon-text,
+  .footer {
+    color: var(--wlc-text-muted);
+  }
+
+  .mini-heart,
+  .vip-badge,
+  .point-icon,
+  .menu-icon,
+  .coupon-box,
+  .loading-logo,
+  .error-box {
+    background: var(--wlc-panel);
+    color: var(--wlc-text);
+    border-color: var(--wlc-border);
+    box-shadow: var(--wlc-shadow);
+  }
+
+  .member-card,
+  .point-card,
+  .menu-card,
+  .coupon-box {
+    box-shadow: var(--wlc-shadow);
+  }
+
+  .member-number {
+    color: var(--wlc-text);
+    background: var(--wlc-panel-2);
+    border-color: var(--wlc-border);
+  }
+
+  .coupon-box {
+    border-color: var(--wlc-accent);
+  }
+
+  .coupon-icon {
+    background: var(--wlc-bg-soft);
+    color: var(--wlc-text);
+    border-color: var(--wlc-border);
+  }
+
+  .loading-screen {
+    background: var(--wlc-bg);
+    color: var(--wlc-text);
+  }
+
+
+  /* =========================
+     BLACK GOLD HOMEPAGE
+     ========================= */
+
+  :root[data-theme="black-gold"] body {
+    background:
+      radial-gradient(
+        circle at 50% -8%,
+        rgba(215,177,132,.12),
+        transparent 30%
+      ),
+      var(--wlc-bg);
+  }
+
+  :root[data-theme="black-gold"] .bubble {
+    border-color: rgba(215,177,132,.10);
+    box-shadow:
+      inset 0 0 0 1px rgba(215,177,132,.08);
+  }
+
+  :root[data-theme="black-gold"] .bubble.b1,
+  :root[data-theme="black-gold"] .bubble.b4 {
+    background: rgba(215,177,132,.07);
+  }
+
+  :root[data-theme="black-gold"] .bubble.b2,
+  :root[data-theme="black-gold"] .bubble.b3 {
+    background: rgba(255,255,255,.03);
+  }
+
+  :root[data-theme="black-gold"] .member-card {
+    border: 1px solid var(--wlc-border);
+    background:
+      linear-gradient(
+        145deg,
+        #17130f 0%,
+        #0d0d0d 58%,
+        #17100b 100%
+      );
+  }
+
+  :root[data-theme="black-gold"] .member-card::after {
+    background: rgba(215,177,132,.06);
+    border-color: rgba(215,177,132,.10);
+  }
+
+  :root[data-theme="black-gold"] .vip-badge {
+    border-width: 1px;
+  }
+
+  :root[data-theme="black-gold"] .member-meta {
+    color: var(--wlc-text-muted);
+  }
+
+  :root[data-theme="black-gold"] .member-number {
+    border-width: 1px;
+    border-style: solid;
+  }
+
+  :root[data-theme="black-gold"] .point-card,
+  :root[data-theme="black-gold"] .menu-card {
+    border: 1px solid var(--wlc-border-soft);
+    background: var(--wlc-panel);
+  }
+
+  :root[data-theme="black-gold"] .point-card.pink,
+  :root[data-theme="black-gold"] .point-card.blue,
+  :root[data-theme="black-gold"] .menu-ledger,
+  :root[data-theme="black-gold"] .menu-collection,
+  :root[data-theme="black-gold"] .menu-memories,
+  :root[data-theme="black-gold"] .menu-ticket {
+    background:
+      linear-gradient(
+        145deg,
+        rgba(255,255,255,.035),
+        rgba(215,177,132,.025)
+      ),
+      var(--wlc-panel);
+  }
+
+  :root[data-theme="black-gold"] .point-icon,
+  :root[data-theme="black-gold"] .menu-icon,
+  :root[data-theme="black-gold"] .mini-heart {
+    border-width: 1px;
+  }
+
+  :root[data-theme="black-gold"] .corner-star,
+  :root[data-theme="black-gold"] .section-title .sparkle,
+  :root[data-theme="black-gold"] .vip-star {
+    color: var(--wlc-accent);
+  }
+
+  :root[data-theme="black-gold"] .coupon-box,
+  :root[data-theme="black-gold"] .error-box {
+    background: var(--wlc-panel);
+  }
+
+
+  /* =========================
+     CUTE PASTEL HOMEPAGE
+     ========================= */
+
+  :root[data-theme="cute-pastel"] body {
+    color: #654545;
+    background:
+      radial-gradient(
+        circle at 12% 9%,
+        rgba(255,255,255,.9) 0 5px,
+        transparent 6px
+      ),
+      linear-gradient(
+        135deg,
+        #ffe6ef 0%,
+        #fff2f6 37%,
+        #e8f7ff 70%,
+        #dff4ff 100%
+      );
+  }
+
+  :root[data-theme="cute-pastel"] .brand-title,
+  :root[data-theme="cute-pastel"] .welcome-title,
+  :root[data-theme="cute-pastel"] .member-name,
+  :root[data-theme="cute-pastel"] .section-title,
+  :root[data-theme="cute-pastel"] .menu-name,
+  :root[data-theme="cute-pastel"] .coupon-title,
+  :root[data-theme="cute-pastel"] .point-value {
+    color: #654545;
+  }
+
+  :root[data-theme="cute-pastel"] .hello,
+  :root[data-theme="cute-pastel"] .member-meta,
+  :root[data-theme="cute-pastel"] .point-label,
+  :root[data-theme="cute-pastel"] .point-unit,
+  :root[data-theme="cute-pastel"] .menu-sub,
+  :root[data-theme="cute-pastel"] .coupon-text,
+  :root[data-theme="cute-pastel"] .footer {
+    color: #8a6969;
+  }
+
+  :root[data-theme="cute-pastel"] .brand-small,
+  :root[data-theme="cute-pastel"] .welcome-title span,
+  :root[data-theme="cute-pastel"] .card-heart,
+  :root[data-theme="cute-pastel"] .footer-heart {
+    color: #e989ad;
+  }
+
+  :root[data-theme="cute-pastel"] .bubble.b1,
+  :root[data-theme="cute-pastel"] .bubble.b4 {
+    background: rgba(247,184,207,.72);
+  }
+
+  :root[data-theme="cute-pastel"] .bubble.b2,
+  :root[data-theme="cute-pastel"] .bubble.b3 {
+    background: rgba(169,218,245,.72);
+  }
+
+  :root[data-theme="cute-pastel"] .member-card {
+    border: 3px solid #654545;
+    background:
+      linear-gradient(
+        135deg,
+        #ffc4d9 0%,
+        #ffd8b5 20%,
+        #fff29c 37%,
+        #c9f0c4 53%,
+        #b9e8ff 70%,
+        #dac9ff 86%,
+        #ffc7de 100%
+      );
+  }
+
+  :root[data-theme="cute-pastel"] .member-name {
+    color: #654545;
+  }
+
+  :root[data-theme="cute-pastel"] .member-meta {
+    color: rgba(101,69,69,.82);
+  }
+
+  :root[data-theme="cute-pastel"] .member-number {
+    background: rgba(255,255,255,.72);
+    color: #654545;
+    border: 2px dashed rgba(101,69,69,.42);
+  }
+
+  :root[data-theme="cute-pastel"] .point-card,
+  :root[data-theme="cute-pastel"] .menu-card {
+    border: 3px solid #654545;
+  }
+
+  :root[data-theme="cute-pastel"] .point-card.pink {
+    background: #ffe2ed;
+  }
+
+  :root[data-theme="cute-pastel"] .point-card.blue {
+    background: #dcf3ff;
+  }
+
+  :root[data-theme="cute-pastel"] .menu-ledger {
+    background: #ffe3ec;
+  }
+
+  :root[data-theme="cute-pastel"] .menu-collection {
+    background: #e4f5ff;
+  }
+
+  :root[data-theme="cute-pastel"] .menu-memories {
+    background: #ffe6f0;
+  }
+
+  :root[data-theme="cute-pastel"] .menu-ticket {
+    background: #eaf7ff;
+  }
+
+  :root[data-theme="cute-pastel"] .mini-heart,
+  :root[data-theme="cute-pastel"] .vip-badge,
+  :root[data-theme="cute-pastel"] .point-icon,
+  :root[data-theme="cute-pastel"] .menu-icon,
+  :root[data-theme="cute-pastel"] .coupon-icon,
+  :root[data-theme="cute-pastel"] .loading-logo {
+    background: #fff;
+    color: #654545;
+    border-color: #654545;
+  }
+
+  :root[data-theme="cute-pastel"] .coupon-box {
+    background: rgba(255,255,255,.68);
+    border-color: #e989ad;
+  }
+
+  :root[data-theme="cute-pastel"] .coupon-icon {
+    background: #fde7ef;
+  }
+
+  :root[data-theme="cute-pastel"] .loading-screen {
+    background:
+      linear-gradient(
+        135deg,
+        #ffe6ef,
+        #e3f5ff
+      );
+    color: #654545;
+  }
+
+  :root[data-theme="cute-pastel"] .error-box {
+    background: rgba(255,255,255,.78);
+    border-color: #e989ad;
+  }
+</style>
 
 </head>
 
