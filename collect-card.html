@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>解鎖限定卡片 | Whale Love Club</title>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;background:
+  radial-gradient(circle at 50% -10%,rgba(215,177,132,.20),transparent 35%),
+  #070707;color:#f7f3ed;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC",sans-serif;
+  padding-bottom:calc(36px + env(safe-area-inset-bottom))
+}
+.page{
+  width:min(100%,680px);margin:auto;
+  padding:calc(22px + env(safe-area-inset-top)) 18px 40px
+}
+.brand{text-align:center;margin-top:4px}
+.brand small{color:#d7b184;letter-spacing:3px;font-size:9px}
+.brand div{margin-top:6px;font-family:Georgia,serif;font-size:15px}
+.stage{
+  margin-top:34px;text-align:center;padding:28px 18px;
+  border:1px solid rgba(255,255,255,.08);border-radius:24px;
+  background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.012))
+}
+.symbol{font-size:34px;color:#d7b184;margin-bottom:16px}
+.eyebrow{font-size:10px;letter-spacing:4px;color:#d7b184}
+h1{
+  margin:10px 0 0;font-family:Georgia,"Noto Serif TC",serif;
+  font-size:30px;font-weight:400
+}
+.note{margin:12px auto 0;max-width:460px;color:#918b84;font-size:13px;line-height:1.8}
+.spinner{
+  width:34px;height:34px;margin:26px auto 4px;border-radius:50%;
+  border:2px solid rgba(215,177,132,.18);border-top-color:#d7b184;
+  animation:spin .9s linear infinite
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
+.card-wrap{
+  margin:26px auto 0;width:min(100%,390px);border-radius:22px;overflow:hidden;
+  border:1px solid rgba(215,177,132,.28);
+  background:#0c0c0c;box-shadow:0 24px 60px rgba(0,0,0,.35)
+}
+.card-image{
+  aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,#17130f,#080808);overflow:hidden
+}
+.card-image img{width:100%;height:100%;object-fit:cover;display:block}
+.card-placeholder{color:#d7b184;font-size:48px}
+.card-info{padding:18px;text-align:left}
+.edition{font-size:9px;letter-spacing:3px;color:#d7b184;text-transform:uppercase}
+.card-name{
+  margin-top:7px;font-family:Georgia,"Noto Serif TC",serif;
+  font-size:23px;line-height:1.35
+}
+.reward-box{
+  margin-top:18px;padding:15px;border-radius:15px;
+  background:rgba(215,177,132,.06);border:1px solid rgba(215,177,132,.18);
+  text-align:left
+}
+.reward-title{font-size:10px;letter-spacing:2px;color:#d7b184}
+.reward-item{margin-top:9px;font-size:13px;color:#eee7dd;line-height:1.6}
+.actions{margin-top:22px;display:grid;gap:10px}
+.btn{
+  width:100%;border-radius:14px;padding:14px 16px;text-decoration:none;
+  text-align:center;font-size:13px
+}
+.btn-primary{
+  border:0;background:linear-gradient(135deg,#e3c099,#a87b55);
+  color:#080808;font-weight:800
+}
+.btn-secondary{
+  border:1px solid rgba(215,177,132,.25);
+  background:rgba(215,177,132,.05);color:#f0d5b2
+}
+.error{
+  margin-top:28px;padding:20px;border-radius:18px;text-align:center;
+  border:1px solid rgba(231,168,168,.25);
+  background:rgba(231,168,168,.05);color:#e7a8a8
+}
+.error strong{display:block;color:#f2c1c1;font-size:17px;margin-bottom:9px}
+.small{margin-top:8px;color:#918b84;font-size:11px;line-height:1.7}
+</style>
+</head>
+<body>
+<main class="page">
+
+  <div class="brand">
+    <small>♡ PRIVATE MEMBERS</small>
+    <div>Whale Love Club</div>
+  </div>
+
+  <section id="loadingState" class="stage">
+    <div class="symbol">◇</div>
+    <div class="eyebrow">NFC · CARD REVEAL</div>
+    <h1>正在確認這張卡片</h1>
+    <div class="note">確認會員身分與卡片資格後，會自動完成解鎖。</div>
+    <div class="spinner"></div>
+  </section>
+
+  <section id="successState" class="stage hidden">
+    <div class="symbol">♡</div>
+    <div id="successEyebrow" class="eyebrow">CARD UNLOCKED</div>
+    <h1 id="successTitle">限定卡片已解鎖</h1>
+    <div id="successNote" class="note">這張卡已加入你的私人收藏。</div>
+
+    <div class="card-wrap">
+      <div id="cardImage" class="card-image">
+        <div class="card-placeholder">♠</div>
+      </div>
+
+      <div class="card-info">
+        <div id="edition" class="edition">WHALE LOVE CLUB</div>
+        <div id="cardName" class="card-name">限定卡片</div>
+
+        <div id="rewardBox" class="reward-box hidden">
+          <div class="reward-title">UNLOCK REWARD</div>
+          <div id="rewardList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <a class="btn btn-primary" href="/collection.html">查看卡片收藏</a>
+      <a id="memoryButton" class="btn btn-secondary hidden" href="#">查看這張卡的回憶</a>
+    </div>
+  </section>
+
+  <section id="errorState" class="error hidden">
+    <strong id="errorTitle">無法解鎖卡片</strong>
+    <div id="errorMessage"></div>
+    <div class="actions">
+      <a class="btn btn-secondary" href="/collection.html">返回卡片收藏</a>
+    </div>
+  </section>
+
+</main>
+
+<script>
+const LIFF_ID = '2011857714-fZwEK6lN';
+
+let idToken = '';
+
+async function init() {
+  try {
+    const token =
+      new URLSearchParams(location.search)
+        .get('token');
+
+    if (!token) {
+      throw new Error('MISSING_TOKEN');
+    }
+
+    await liff.init({
+      liffId: LIFF_ID
+    });
+
+    if (!liff.isLoggedIn()) {
+      liff.login({
+        redirectUri: location.href
+      });
+      return;
+    }
+
+    idToken =
+      liff.getIDToken();
+
+    if (!idToken) {
+      throw new Error('NO_LINE_TOKEN');
+    }
+
+    const response =
+      await fetch(
+        '/api/collect-card',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type':
+              'application/json'
+          },
+          body: JSON.stringify({
+            idToken,
+            token
+          })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (!data.success) {
+      throw new Error(
+        data.status ||
+        data.message ||
+        'COLLECT_FAILED'
+      );
+    }
+
+    await showSuccess(data);
+
+  } catch (error) {
+    showError(
+      error.message ||
+      'UNKNOWN_ERROR'
+    );
+  }
+}
+
+
+async function showSuccess(data) {
+  document
+    .getElementById('loadingState')
+    .classList.add('hidden');
+
+  document
+    .getElementById('successState')
+    .classList.remove('hidden');
+
+  const card =
+    data.card || {};
+
+  document.getElementById('cardName').textContent =
+    card.cardName ||
+    '限定卡片';
+
+  document.getElementById('edition').textContent =
+    card.edition ||
+    'WHALE LOVE CLUB';
+
+  if (data.alreadyCollected) {
+    document.getElementById('successEyebrow').textContent =
+      'ALREADY COLLECTED';
+
+    document.getElementById('successTitle').textContent =
+      '這張卡已經收藏過了';
+
+    document.getElementById('successNote').textContent =
+      '不會再次發放點數或福利，可以放心重新查看。';
+  }
+
+  renderRewards(
+    data.rewards || [],
+    data.pointsAdded || null
+  );
+
+  if (card.memoryId) {
+    const button =
+      document.getElementById('memoryButton');
+
+    button.href =
+      '/memory.html?id=' +
+      encodeURIComponent(
+        card.memoryId
+      );
+
+    button.classList.remove('hidden');
+  }
+
+  if (card.cardImageFileId) {
+    try {
+      const imageUrl =
+        await loadPrivateImage(
+          card.cardImageFileId
+        );
+
+      if (imageUrl) {
+        const box =
+          document.getElementById('cardImage');
+
+        box.innerHTML = '';
+
+        const img =
+          document.createElement('img');
+
+        img.src =
+          imageUrl;
+
+        img.alt =
+          card.cardName ||
+          'Card';
+
+        box.appendChild(img);
+      }
+    } catch (error) {
+      console.warn(
+        'Card image load failed',
+        error
+      );
+    }
+  }
+}
+
+
+function renderRewards(
+  rewards,
+  pointsAdded
+) {
+  const box =
+    document.getElementById('rewardBox');
+
+  const list =
+    document.getElementById('rewardList');
+
+  const lines = [];
+
+  if (
+    pointsAdded &&
+    Number(pointsAdded.lovePoints || 0) > 0
+  ) {
+    lines.push(
+      '♡ Love Points +' +
+      Number(pointsAdded.lovePoints)
+    );
+  }
+
+  if (
+    pointsAdded &&
+    Number(pointsAdded.massagePoints || 0) > 0
+  ) {
+    lines.push(
+      'Massage Points +' +
+      Number(pointsAdded.massagePoints)
+    );
+  }
+
+  for (const reward of rewards) {
+    const type =
+      String(
+        reward.type || ''
+      ).toUpperCase();
+
+    if (
+      type === 'LOVE_POINTS' ||
+      type === 'MASSAGE_POINTS'
+    ) {
+      continue;
+    }
+
+    if (type === 'COUPON') {
+      lines.push(
+        '票券：' +
+        (
+          reward.name ||
+          '限定票券'
+        )
+      );
+    } else if (type === 'CUSTOM') {
+      lines.push(
+        '福利：' +
+        (
+          reward.name ||
+          '限定福利'
+        )
+      );
+    }
+  }
+
+  if (!lines.length) {
+    return;
+  }
+
+  list.innerHTML =
+    lines
+      .map(
+        x =>
+          '<div class="reward-item">' +
+          escapeHtml(x) +
+          '</div>'
+      )
+      .join('');
+
+  box.classList.remove('hidden');
+}
+
+
+async function loadPrivateImage(fileId) {
+  const response =
+    await fetch(
+      '/api/photo',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type':
+            'application/json'
+        },
+        body: JSON.stringify({
+          idToken,
+          fileId
+        })
+      }
+    );
+
+  const data =
+    await response.json();
+
+  if (!data.success) {
+    return '';
+  }
+
+  if (data.dataUrl) {
+    return data.dataUrl;
+  }
+
+  if (data.imageUrl) {
+    return data.imageUrl;
+  }
+
+  if (
+    data.image &&
+    data.image.dataUrl
+  ) {
+    return data.image.dataUrl;
+  }
+
+  if (
+    data.mimeType &&
+    data.base64Data
+  ) {
+    return (
+      'data:' +
+      data.mimeType +
+      ';base64,' +
+      data.base64Data
+    );
+  }
+
+  if (
+    data.photo &&
+    data.photo.mimeType &&
+    data.photo.base64Data
+  ) {
+    return (
+      'data:' +
+      data.photo.mimeType +
+      ';base64,' +
+      data.photo.base64Data
+    );
+  }
+
+  return '';
+}
+
+
+function showError(code) {
+  document
+    .getElementById('loadingState')
+    .classList.add('hidden');
+
+  document
+    .getElementById('successState')
+    .classList.add('hidden');
+
+  const box =
+    document.getElementById('errorState');
+
+  box.classList.remove('hidden');
+
+  const translated =
+    translateError(code);
+
+  document.getElementById('errorTitle').textContent =
+    translated.title;
+
+  document.getElementById('errorMessage').textContent =
+    translated.message;
+}
+
+
+function translateError(code) {
+  const value =
+    String(code || '');
+
+  if (
+    value.includes('CARD_NOT_FOR_MEMBER')
+  ) {
+    return {
+      title: '這張卡不是你的',
+      message: '這張限定卡指定給另一位會員，無法在目前帳號解鎖。'
+    };
+  }
+
+  if (
+    value.includes('CARD_ALREADY_USED')
+  ) {
+    return {
+      title: '卡片已被領取',
+      message: '這張 NFC 卡片已由其他會員完成收藏。'
+    };
+  }
+
+  if (
+    value.includes('MEMBER_INACTIVE')
+  ) {
+    return {
+      title: '會員目前無法使用',
+      message: '請先確認會員帳號狀態。'
+    };
+  }
+
+  if (
+    value.includes('INVALID_CARD_TYPE')
+  ) {
+    return {
+      title: '卡片類型不符',
+      message: '這不是限定收藏卡，無法從這個頁面解鎖。'
+    };
+  }
+
+  if (
+    value.includes('INVALID_CARD') ||
+    value.includes('MISSING_TOKEN')
+  ) {
+    return {
+      title: '找不到這張卡',
+      message: 'NFC 內容可能不完整，或這張卡已不是有效卡片。'
+    };
+  }
+
+  if (
+    value.includes('NO_LINE_TOKEN')
+  ) {
+    return {
+      title: 'LINE 登入失敗',
+      message: '請關閉頁面後，再從 LINE 重新開啟。'
+    };
+  }
+
+  return {
+    title: '無法解鎖卡片',
+    message: value || '請稍後再試一次。'
+  };
+}
+
+
+function escapeHtml(value) {
+  return String(
+    value ?? ''
+  )
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'","&#039;");
+}
+
+
+init();
+</script>
+</body>
+</html>
