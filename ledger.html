@@ -11,6 +11,8 @@
   <title>記帳本 | Whale Love Club</title>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<link rel="stylesheet" href="/theme.css?v=5">
+<script src="/theme.js?v=5"></script>
 
   <style>
     * {
@@ -566,10 +568,312 @@
       }
     }
   </style>
-<link
-  rel="stylesheet"
-  href="/black-gold-theme.css?v=2"
->
+
+<style id="wlc-global-theme-bridge">
+  /* =========================================================
+     Whale Love Club - Global theme bridge
+     將此頁原本的黑金變數接到全站 theme.css
+     ========================================================= */
+
+  :root {
+    --bg: var(--wlc-bg) !important;
+    --card: var(--wlc-panel) !important;
+    --card-2: var(--wlc-panel-2) !important;
+    --card2: var(--wlc-panel-2) !important;
+    --line: var(--wlc-border-soft) !important;
+    --text: var(--wlc-text) !important;
+    --muted: var(--wlc-text-muted) !important;
+    --gold: var(--wlc-accent) !important;
+    --gold-soft: var(--wlc-accent-strong) !important;
+    --green: var(--wlc-success) !important;
+    --red: var(--wlc-danger) !important;
+  }
+
+  html,
+  body {
+    background: var(--wlc-bg) !important;
+    color: var(--wlc-text) !important;
+  }
+
+  body {
+    transition:
+      background .22s ease,
+      color .22s ease;
+  }
+
+  .brand-small,
+  .eyebrow,
+  .summary-heart,
+  .add-memory-plus,
+  .corner-star,
+  .card-edition,
+  .detail-edition,
+  .edition,
+  .symbol,
+  .reward-title {
+    color: var(--wlc-accent) !important;
+  }
+
+  .subtitle,
+  .section-sub,
+  .summary-title,
+  .summary-small,
+  .entry-meta,
+  .field label,
+  .back,
+  .note,
+  .small,
+  .card-meta,
+  .detail-label,
+  .locked-text {
+    color: var(--wlc-text-muted) !important;
+  }
+
+  .summary-number,
+  .balance,
+  .add-memory-text,
+  .memory-button,
+  .view,
+  .btn-secondary {
+    color: var(--wlc-accent-strong) !important;
+  }
+
+  .summary-card,
+  .entry,
+  .memory,
+  .collection-card,
+  .locked-card,
+  .stage,
+  .card-wrap,
+  .reward-box,
+  .modal,
+  .detail-modal {
+    background: var(--wlc-panel) !important;
+    border-color: var(--wlc-border-soft) !important;
+    box-shadow: var(--wlc-shadow);
+  }
+
+  .summary,
+  .collection-summary,
+  .add-memory-btn,
+  .add-button,
+  .memory-button,
+  .detail-action {
+    border-color: var(--wlc-border) !important;
+    background:
+      linear-gradient(
+        145deg,
+        color-mix(in srgb, var(--wlc-accent) 10%, transparent),
+        color-mix(in srgb, var(--wlc-panel) 94%, transparent)
+      ) !important;
+    color: var(--wlc-text) !important;
+  }
+
+  .input,
+  input,
+  select,
+  textarea {
+    background: var(--wlc-bg-soft) !important;
+    color: var(--wlc-text) !important;
+    border-color: var(--wlc-border-soft) !important;
+  }
+
+  .input:focus,
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--wlc-accent) !important;
+  }
+
+  .type-tabs {
+    background: var(--wlc-bg-soft) !important;
+  }
+
+  .type-tab {
+    color: var(--wlc-text-muted) !important;
+  }
+
+  .type-tab.active {
+    background: var(--wlc-panel-2) !important;
+    color: var(--wlc-accent-strong) !important;
+  }
+
+  .cancel,
+  .close-button,
+  .btn-secondary {
+    background: transparent !important;
+    color: var(--wlc-text-soft) !important;
+    border-color: var(--wlc-border) !important;
+  }
+
+  .save,
+  .btn-primary {
+    background:
+      linear-gradient(
+        135deg,
+        var(--wlc-accent-strong),
+        var(--wlc-accent-dark)
+      ) !important;
+    color: #111 !important;
+  }
+
+  .modal-handle,
+  .handle {
+    background: var(--wlc-border) !important;
+  }
+
+  .modal-mask {
+    background: rgba(0,0,0,.62) !important;
+  }
+
+  .toast {
+    background: var(--wlc-panel-2) !important;
+    color: var(--wlc-text) !important;
+    border: 1px solid var(--wlc-border) !important;
+  }
+
+  .card-image,
+  .detail-image,
+  .memory-cover {
+    background:
+      radial-gradient(
+        circle at 50% 22%,
+        color-mix(in srgb, var(--wlc-accent) 14%, transparent),
+        transparent 48%
+      ),
+      var(--wlc-bg-soft) !important;
+  }
+
+  .date-badge {
+    background:
+      color-mix(in srgb, var(--wlc-panel) 88%, transparent) !important;
+    border-color: var(--wlc-border-soft) !important;
+    color: var(--wlc-text) !important;
+  }
+
+  .card-placeholder,
+  .cover-placeholder {
+    color: var(--wlc-accent) !important;
+    border-color: var(--wlc-border) !important;
+  }
+
+  .progress {
+    background: var(--wlc-border-soft) !important;
+  }
+
+  .progress-fill {
+    background:
+      linear-gradient(
+        90deg,
+        var(--wlc-accent-dark),
+        var(--wlc-accent-strong)
+      ) !important;
+  }
+
+  .detail-line,
+  .memory-footer,
+  .month-control {
+    border-color: var(--wlc-border-soft) !important;
+  }
+
+  .error {
+    background:
+      color-mix(in srgb, var(--wlc-danger) 7%, var(--wlc-panel)) !important;
+    border-color:
+      color-mix(in srgb, var(--wlc-danger) 28%, transparent) !important;
+    color: var(--wlc-danger) !important;
+  }
+
+  /* 各主題背景細節 */
+  :root[data-theme="black-gold"] body {
+    background:
+      radial-gradient(
+        circle at 50% -8%,
+        rgba(215,177,132,.14),
+        transparent 32%
+      ),
+      var(--wlc-bg) !important;
+  }
+
+  :root[data-theme="ocean-blue"] body {
+    background:
+      radial-gradient(
+        circle at 50% -8%,
+        rgba(118,200,232,.15),
+        transparent 32%
+      ),
+      linear-gradient(
+        180deg,
+        #061521,
+        #081b29 50%,
+        #0b2534
+      ) !important;
+  }
+
+  :root[data-theme="lavender-dream"] body {
+    background:
+      linear-gradient(
+        135deg,
+        #f8f5ff,
+        #f1eaff 50%,
+        #fff8fb
+      ) !important;
+  }
+
+  :root[data-theme="cream-cafe"] body {
+    background:
+      linear-gradient(
+        135deg,
+        #fffaf1,
+        #f7efe4 52%,
+        #efe1d0
+      ) !important;
+  }
+
+  :root[data-theme="cute-pastel"] body {
+    background:
+      linear-gradient(
+        135deg,
+        #ffe6ef,
+        #fff2f6 42%,
+        #dff4ff
+      ) !important;
+  }
+</style>
+
+
+<style id="wlc-ledger-theme-extra">
+  .summary-card,
+  .entry,
+  .modal {
+    color: var(--wlc-text) !important;
+  }
+
+  .entry-note {
+    color: var(--wlc-text-soft) !important;
+  }
+
+  .add-button {
+    color: var(--wlc-accent-strong) !important;
+  }
+
+  .delete-button {
+    background:
+      color-mix(in srgb, var(--wlc-danger) 5%, transparent) !important;
+    border-color:
+      color-mix(in srgb, var(--wlc-danger) 26%, transparent) !important;
+    color: var(--wlc-danger) !important;
+  }
+
+  .income { color: var(--wlc-success) !important; }
+  .expense { color: var(--wlc-danger) !important; }
+
+  option {
+    background: var(--wlc-panel) !important;
+    color: var(--wlc-text) !important;
+  }
+</style>
+
 </head>
 
 
@@ -2406,4 +2710,3 @@ async function saveEntry() {
 
 </body>
 </html>
-
