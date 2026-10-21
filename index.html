@@ -1580,6 +1580,60 @@
   }
 </style>
 
+
+<style id="wlc-member-center-shop-benefit">
+  .shop-card,
+  .benefit-box {
+    cursor: pointer;
+  }
+
+  .shop-card:active,
+  .benefit-box:active {
+    transform: scale(.985);
+  }
+
+  .shop-card {
+    transition:
+      transform .13s ease,
+      border-color .18s ease;
+  }
+
+  .shop-title {
+    margin-top: 3px;
+    font-size: 23px;
+    font-weight: 900;
+    color: var(--wlc-text);
+  }
+
+  .shop-sub {
+    margin-top: 5px;
+    font-size: 10px;
+    line-height: 1.45;
+    color: var(--wlc-text-muted);
+  }
+
+  .benefit-box {
+    position: relative;
+    transition: transform .13s ease;
+    padding-right: 46px;
+  }
+
+  .benefit-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .benefit-arrow {
+    position: absolute;
+    right: 17px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--wlc-accent);
+    font-size: 28px;
+    line-height: 1;
+  }
+</style>
+
 </head>
 
 
@@ -1785,29 +1839,28 @@
 
 
 
-      <div class="point-card blue">
+      <div
+        class="point-card blue shop-card"
+        onclick="goShop()"
+        role="button"
+        tabindex="0"
+        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goShop();}"
+      >
 
         <div class="point-icon">
-          💆
+          🛍
         </div>
 
         <div class="point-label">
-          MASSAGE
+          LOVE SHOP
         </div>
 
-        <div>
+        <div class="shop-title">
+          商城
+        </div>
 
-          <span
-            class="point-value"
-            id="massagePoints"
-          >
-            0
-          </span>
-
-          <span class="point-unit">
-            次
-          </span>
-
+        <div class="shop-sub">
+          使用 Love Points 兌換
         </div>
 
       </div>
@@ -1830,24 +1883,33 @@
     </div>
 
 
-    <section class="coupon-box">
+    <section
+      class="coupon-box benefit-box"
+      onclick="goBenefits()"
+      role="button"
+      tabindex="0"
+      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goBenefits();}"
+    >
 
       <div class="coupon-icon">
         🎟
       </div>
 
 
-      <div>
+      <div class="benefit-content">
 
         <div class="coupon-title">
-          Whale Love Coupon
+          我的專屬福利
         </div>
 
         <div class="coupon-text">
-          節日卡片、專屬票券與驚喜獎勵，
-          之後都會收藏在你的會員中心 ♡
+          NFC 卡解鎖取得的票券與限定福利，都會收藏在這裡 ♡
         </div>
 
+      </div>
+
+      <div class="benefit-arrow">
+        ›
       </div>
 
     </section>
@@ -2354,10 +2416,7 @@
       );
 
 
-    const massagePoints =
-      Number(
-        member.massagePoints || 0
-      );
+
 
 
     document
@@ -2404,15 +2463,7 @@
         );
 
 
-    document
-      .getElementById(
-        'massagePoints'
-      )
-      .textContent =
-      massagePoints
-        .toLocaleString(
-          'zh-TW'
-        );
+
 
 
     document
@@ -2486,6 +2537,22 @@
 
     window.location.href =
       '/ledger.html';
+
+  }
+
+
+  function goShop() {
+
+    window.location.href =
+      '/shop.html';
+
+  }
+
+
+  function goBenefits() {
+
+    window.location.href =
+      '/benefits.html';
 
   }
 
