@@ -15,6 +15,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({
       success: true,
       service: 'Whale Love Club Member Activation API',
+      auth: 'LINE access token / ID token',
       message: 'API is running'
     });
 
@@ -22,7 +23,7 @@ module.exports = async function handler(req, res) {
 
 
   /* =========================================
-     只允許 POST 執行啟用
+     只允許 POST
      ========================================= */
 
   if (req.method !== 'POST') {
@@ -38,16 +39,18 @@ module.exports = async function handler(req, res) {
   try {
 
     const {
+      accessToken,
       idToken,
       token
     } = req.body || {};
 
 
-    if (!idToken) {
+    if (!accessToken && !idToken) {
 
       return res.status(400).json({
         success: false,
-        message: 'ID token is required'
+        status: 'NO_LINE_TOKEN',
+        message: 'LINE login token is required'
       });
 
     }
@@ -57,6 +60,7 @@ module.exports = async function handler(req, res) {
 
       return res.status(400).json({
         success: false,
+        status: 'MISSING_TOKEN',
         message: 'NFC token is required'
       });
 
@@ -86,71 +90,8 @@ module.exports = async function handler(req, res) {
 
       return res.status(500).json({
         success: false,
-        message: 'Server configuration is incomplete'
-      });
-
-    }
-
-
-
-    /* =========================================
-       1. 向 LINE 官方驗證 ID Token
-       ========================================= */
-
-    const form =
-      new URLSearchParams();
-
-
-    form.append(
-      'id_token',
-      idToken
-    );
-
-
-    form.append(
-      'client_id',
-      channelId
-    );
-
-
-    const lineResponse =
-      await fetch(
-        'https://api.line.me/oauth2/v2.1/verify',
-        {
-          method: 'POST',
-
-          headers: {
-            'Content-Type':
-              'application/x-www-form-urlencoded'
-          },
-
-          body:
-            form.toString()
-        }
-      );
-
-
-    const lineData =
-      await lineResponse.json();
-
-
-
-    if (!lineResponse.ok) {
-
-      console.error(
-        'LINE verification failed:',
-        lineData
-      );
-
-      return res.status(401).json({
-        success: false,
-
-        status: 'LINE_AUTH_ERROR',
-
         message:
-          lineData.error_description ||
-          lineData.error ||
-          'LINE verification failed'
+          'Server configuration is incomplete'
       });
 
     }
@@ -158,26 +99,252 @@ module.exports = async function handler(req, res) {
 
 
     /* =========================================
-       2. 確認 Token 是我們 MINI App 的
+       1. LINE 身分驗證
+       優先使用 Access Token
        ========================================= */
 
-    if (
-      String(lineData.aud) !==
-      String(channelId)
-    ) {
+    let lineUserId = '';
 
-      return res.status(401).json({
-        success: false,
-        status: 'INVALID_LINE_CHANNEL',
-        message: 'Invalid LINE channel'
-      });
+
+    if (accessToken) {
+
+      /*
+       * 1A. 驗證 Access Token
+       */
+      const verifyUrl =
+        'https://api.line.me/oauth2/v2.1/verify' +
+        '?access_token=' +
+        encodeURIComponent(
+          accessToken
+        );
+
+
+      const verifyResponse =
+        await fetch(
+          verifyUrl,
+          {
+            method: 'GET'
+          }
+        );
+
+
+      const verifyData =
+        await verifyResponse.json();
+
+
+      if (!verifyResponse.ok) {
+
+        console.error(
+          'LINE access token verification failed:',
+          verifyData
+        );
+
+
+        return res.status(401).json({
+          success: false,
+          status: 'LINE_AUTH_ERROR',
+          message:
+            verifyData.error_description ||
+            verifyData.error ||
+            'LINE access token verification failed'
+        });
+
+      }
+
+
+      /*
+       * 確認 Access Token 屬於目前 Published Channel
+       */
+      if (
+        String(
+          verifyData.client_id
+        ) !==
+        String(
+          channelId
+        )
+      ) {
+
+        return res.status(401).json({
+          success: false,
+          status: 'INVALID_LINE_CHANNEL',
+          message:
+            'Invalid LINE channel'
+        });
+
+      }
+
+
+      if (
+        Number(
+          verifyData.expires_in || 0
+        ) <= 0
+      ) {
+
+        return res.status(401).json({
+          success: false,
+          status: 'LINE_TOKEN_EXPIRED',
+          message:
+            'LINE access token expired'
+        });
+
+      }
+
+
+      /*
+       * 1B. 從 LINE 官方取得 User ID
+       */
+      const profileResponse =
+        await fetch(
+          'https://api.line.me/v2/profile',
+          {
+            method: 'GET',
+
+            headers: {
+              Authorization:
+                'Bearer ' +
+                accessToken
+            }
+          }
+        );
+
+
+      const profileData =
+        await profileResponse.json();
+
+
+      if (
+        !profileResponse.ok ||
+        !profileData.userId
+      ) {
+
+        console.error(
+          'LINE profile request failed:',
+          profileData
+        );
+
+
+        return res.status(401).json({
+          success: false,
+          status: 'LINE_PROFILE_ERROR',
+          message:
+            profileData.message ||
+            'Unable to get LINE profile'
+        });
+
+      }
+
+
+      lineUserId =
+        String(
+          profileData.userId
+        ).trim();
+
+    } else {
+
+      /*
+       * 備援：
+       * 如果前端沒有 Access Token，
+       * 才使用原本 ID Token 驗證。
+       */
+      const form =
+        new URLSearchParams();
+
+
+      form.append(
+        'id_token',
+        idToken
+      );
+
+
+      form.append(
+        'client_id',
+        channelId
+      );
+
+
+      const lineResponse =
+        await fetch(
+          'https://api.line.me/oauth2/v2.1/verify',
+          {
+            method: 'POST',
+
+            headers: {
+              'Content-Type':
+                'application/x-www-form-urlencoded'
+            },
+
+            body:
+              form.toString()
+          }
+        );
+
+
+      const lineData =
+        await lineResponse.json();
+
+
+      if (!lineResponse.ok) {
+
+        console.error(
+          'LINE ID token verification failed:',
+          lineData
+        );
+
+
+        return res.status(401).json({
+          success: false,
+          status: 'LINE_AUTH_ERROR',
+          message:
+            lineData.error_description ||
+            lineData.error ||
+            'LINE ID token verification failed'
+        });
+
+      }
+
+
+      if (
+        String(
+          lineData.aud
+        ) !==
+        String(
+          channelId
+        )
+      ) {
+
+        return res.status(401).json({
+          success: false,
+          status: 'INVALID_LINE_CHANNEL',
+          message:
+            'Invalid LINE channel'
+        });
+
+      }
+
+
+      if (!lineData.sub) {
+
+        return res.status(401).json({
+          success: false,
+          status: 'LINE_USER_ID_MISSING',
+          message:
+            'LINE user ID missing'
+        });
+
+      }
+
+
+      lineUserId =
+        String(
+          lineData.sub
+        ).trim();
 
     }
 
 
 
     /* =========================================
-       3. 呼叫 Apps Script
+       2. 呼叫 Apps Script
        ========================================= */
 
     const appsResponse =
@@ -204,14 +371,14 @@ module.exports = async function handler(req, res) {
                 token,
 
               lineUserId:
-                lineData.sub
+                lineUserId
 
             }),
 
-          redirect: 'follow'
+          redirect:
+            'follow'
         }
       );
-
 
 
     const responseText =
@@ -235,6 +402,7 @@ module.exports = async function handler(req, res) {
         responseText
       );
 
+
       return res.status(502).json({
         success: false,
         message:
@@ -246,7 +414,7 @@ module.exports = async function handler(req, res) {
 
 
     /* =========================================
-       4. Apps Script 拒絕
+       3. Apps Script 拒絕
        ========================================= */
 
     if (!appsData.success) {
@@ -270,7 +438,7 @@ module.exports = async function handler(req, res) {
 
 
     /* =========================================
-       5. 啟用成功
+       4. 啟用成功
        ========================================= */
 
     return res.status(200).json({
@@ -299,7 +467,9 @@ module.exports = async function handler(req, res) {
 
     return res.status(500).json({
       success: false,
-      message: 'Server error'
+      message:
+        error.message ||
+        'Server error'
     });
 
   }
