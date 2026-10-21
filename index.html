@@ -1197,6 +1197,159 @@
   }
 </style>
 
+
+<style>
+  /* =========================
+     ADMIN THEME SWITCHER
+     ========================= */
+
+  .theme-switch-button {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--wlc-border);
+    background: var(--wlc-panel);
+    color: var(--wlc-accent);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    box-shadow: var(--wlc-shadow);
+    transition: transform .15s ease;
+  }
+
+  .theme-switch-button:active {
+    transform: scale(.96);
+  }
+
+  .theme-switch-button.show {
+    display: flex;
+  }
+
+  .theme-panel-mask {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    padding:
+      20px
+      16px
+      calc(20px + env(safe-area-inset-bottom));
+    background: rgba(0,0,0,.45);
+    backdrop-filter: blur(7px);
+  }
+
+  .theme-panel-mask.show {
+    display: flex;
+  }
+
+  .theme-panel {
+    width: min(100%, 520px);
+    background: var(--wlc-panel);
+    border: 1px solid var(--wlc-border);
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: var(--wlc-shadow);
+  }
+
+  .theme-panel-title {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--wlc-text);
+  }
+
+  .theme-panel-note {
+    margin-top: 5px;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--wlc-text-muted);
+  }
+
+  .theme-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .theme-option {
+    border: 1px solid var(--wlc-border);
+    background: var(--wlc-panel-2);
+    color: var(--wlc-text);
+    border-radius: 18px;
+    padding: 16px 12px;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .theme-option.active {
+    outline: 2px solid var(--wlc-accent);
+    outline-offset: 2px;
+  }
+
+  .theme-preview {
+    height: 58px;
+    border-radius: 13px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+
+  .theme-preview.black-gold {
+    background:
+      radial-gradient(
+        circle at 30% 20%,
+        rgba(215,177,132,.35),
+        transparent 35%
+      ),
+      linear-gradient(
+        135deg,
+        #070707,
+        #17130f
+      );
+  }
+
+  .theme-preview.cute-pastel {
+    background:
+      linear-gradient(
+        135deg,
+        #ffe6ef,
+        #fff2f6 40%,
+        #dff4ff
+      );
+  }
+
+  .theme-option-name {
+    font-size: 13px;
+    font-weight: 900;
+  }
+
+  .theme-option-sub {
+    margin-top: 3px;
+    color: var(--wlc-text-muted);
+    font-size: 10px;
+  }
+
+  .theme-close {
+    width: 100%;
+    margin-top: 14px;
+    border-radius: 14px;
+    padding: 13px;
+    border: 1px solid var(--wlc-border);
+    background: transparent;
+    color: var(--wlc-text);
+    cursor: pointer;
+  }
+
+  @media (max-width: 390px) {
+    .theme-options {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
 </head>
 
 
@@ -1253,8 +1406,22 @@
       </div>
 
 
-      <div class="mini-heart">
-        ♡
+      <div style="display:flex;align-items:center;gap:9px">
+
+        <button
+          id="themeSwitchButton"
+          class="theme-switch-button"
+          type="button"
+          aria-label="切換網站風格"
+          onclick="openThemePanel()"
+        >
+          ◐
+        </button>
+
+        <div class="mini-heart">
+          ♡
+        </div>
+
       </div>
 
     </header>
@@ -1585,6 +1752,61 @@
 
   </main>
 
+
+
+  <!-- ADMIN THEME PANEL -->
+
+  <div
+    id="themePanelMask"
+    class="theme-panel-mask"
+    onclick="closeThemePanelFromMask(event)"
+  >
+    <div class="theme-panel">
+
+      <div class="theme-panel-title">
+        網站風格
+      </div>
+
+      <div class="theme-panel-note">
+        只有 ADMIN 會看到這個入口。選擇後會立即套用並記住。
+      </div>
+
+      <div class="theme-options">
+
+        <button
+          id="themeOptionBlackGold"
+          class="theme-option"
+          type="button"
+          onclick="chooseTheme('black-gold')"
+        >
+          <div class="theme-preview black-gold"></div>
+          <div class="theme-option-name">Black Gold</div>
+          <div class="theme-option-sub">深色・金色・會員質感</div>
+        </button>
+
+        <button
+          id="themeOptionCutePastel"
+          class="theme-option"
+          type="button"
+          onclick="chooseTheme('cute-pastel')"
+        >
+          <div class="theme-preview cute-pastel"></div>
+          <div class="theme-option-name">Cute Pastel</div>
+          <div class="theme-option-sub">粉彩・可愛・柔和風格</div>
+        </button>
+
+      </div>
+
+      <button
+        class="theme-close"
+        type="button"
+        onclick="closeThemePanel()"
+      >
+        關閉
+      </button>
+
+    </div>
+  </div>
 
 
   <!-- ERROR -->
@@ -1943,6 +2165,24 @@
         : 'PRIVATE MEMBER';
 
 
+    const themeButton =
+      document.getElementById(
+        'themeSwitchButton'
+      );
+
+
+    if (
+      themeButton &&
+      role === 'ADMIN'
+    ) {
+
+      themeButton
+        .classList
+        .add('show');
+
+    }
+
+
     document
       .getElementById(
         'joinDate'
@@ -2008,6 +2248,119 @@
     alert(
       '驚喜盒子會和 NFC 限定卡一起開放 ♡'
     );
+
+  }
+
+
+
+
+  /* ======================================
+     ADMIN THEME SWITCHER
+     ====================================== */
+
+  function openThemePanel() {
+
+    updateThemeOptionState();
+
+    document
+      .getElementById(
+        'themePanelMask'
+      )
+      .classList
+      .add('show');
+
+  }
+
+
+  function closeThemePanel() {
+
+    document
+      .getElementById(
+        'themePanelMask'
+      )
+      .classList
+      .remove('show');
+
+  }
+
+
+  function closeThemePanelFromMask(
+    event
+  ) {
+
+    if (
+      event.target.id ===
+      'themePanelMask'
+    ) {
+
+      closeThemePanel();
+
+    }
+
+  }
+
+
+  function chooseTheme(theme) {
+
+    if (
+      window.WLCTheme &&
+      typeof window.WLCTheme.setTheme ===
+        'function'
+    ) {
+
+      window.WLCTheme.setTheme(
+        theme
+      );
+
+    }
+
+    updateThemeOptionState();
+
+  }
+
+
+  function updateThemeOptionState() {
+
+    const current =
+      window.WLCTheme &&
+      typeof window.WLCTheme.getTheme ===
+        'function'
+
+        ? window.WLCTheme.getTheme()
+
+        : 'black-gold';
+
+
+    const blackGold =
+      document.getElementById(
+        'themeOptionBlackGold'
+      );
+
+
+    const cutePastel =
+      document.getElementById(
+        'themeOptionCutePastel'
+      );
+
+
+    if (blackGold) {
+
+      blackGold.classList.toggle(
+        'active',
+        current === 'black-gold'
+      );
+
+    }
+
+
+    if (cutePastel) {
+
+      cutePastel.classList.toggle(
+        'active',
+        current === 'cute-pastel'
+      );
+
+    }
 
   }
 
