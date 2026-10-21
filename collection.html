@@ -1941,7 +1941,11 @@
 
     const imageRef =
       String(
-        card.cardImageUrl || ''
+        card.cardImageUrl ||
+        card.cardImageFileId ||
+        card.imageFileId ||
+        card.imageUrl ||
+        ''
       ).trim();
 
 
@@ -2193,23 +2197,74 @@
     }
 
 
+    // 相容目前與舊版 /api/photo 回傳格式
+    if (data.dataUrl) {
+      return data.dataUrl;
+    }
+
+
+    if (data.imageUrl) {
+      return data.imageUrl;
+    }
+
+
     if (
-      !data.mimeType ||
-      !data.base64Data
+      data.image &&
+      data.image.dataUrl
+    ) {
+      return data.image.dataUrl;
+    }
+
+
+    if (
+      data.mimeType &&
+      data.base64Data
     ) {
 
-      throw new Error(
-        '卡片圖片資料不完整'
+      return (
+        'data:' +
+        data.mimeType +
+        ';base64,' +
+        data.base64Data
       );
 
     }
 
 
-    return (
-      'data:' +
-      data.mimeType +
-      ';base64,' +
-      data.base64Data
+    if (
+      data.photo &&
+      data.photo.mimeType &&
+      data.photo.base64Data
+    ) {
+
+      return (
+        'data:' +
+        data.photo.mimeType +
+        ';base64,' +
+        data.photo.base64Data
+      );
+
+    }
+
+
+    if (
+      data.image &&
+      data.image.mimeType &&
+      data.image.base64Data
+    ) {
+
+      return (
+        'data:' +
+        data.image.mimeType +
+        ';base64,' +
+        data.image.base64Data
+      );
+
+    }
+
+
+    throw new Error(
+      '卡片圖片資料不完整'
     );
 
   }
@@ -2809,7 +2864,11 @@
 
     const imageRef =
       String(
-        card.cardImageUrl || ''
+        card.cardImageUrl ||
+        card.cardImageFileId ||
+        card.imageFileId ||
+        card.imageUrl ||
+        ''
       ).trim();
 
 
