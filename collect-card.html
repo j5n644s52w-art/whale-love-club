@@ -624,15 +624,6 @@ function renderRewards(
     );
   }
 
-  if (
-    pointsAdded &&
-    Number(pointsAdded.massagePoints || 0) > 0
-  ) {
-    lines.push(
-      'Massage Points +' +
-      Number(pointsAdded.massagePoints)
-    );
-  }
 
   for (const reward of rewards) {
     const type =
@@ -641,8 +632,7 @@ function renderRewards(
       ).toUpperCase();
 
     if (
-      type === 'LOVE_POINTS' ||
-      type === 'MASSAGE_POINTS'
+      type === 'LOVE_POINTS'
     ) {
       continue;
     }
