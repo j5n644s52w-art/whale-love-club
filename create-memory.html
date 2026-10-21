@@ -13,6 +13,9 @@
   <title>新增回憶 | Whale Love Club</title>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<link rel="stylesheet" href="/theme.css?v=5">
+<script src="/theme.js?v=5"></script>
+
 
 
   <style>
@@ -640,12 +643,6 @@
     }
 
   </style>
-
-
-  <link
-    rel="stylesheet"
-    href="/cute-theme.css?v=3"
-  >
 <style>
 
   /* =========================================
@@ -851,6 +848,169 @@
   }
 
 </style>
+
+<style id="wlc-create-memory-theme">
+  :root {
+    --bg: var(--wlc-bg) !important;
+    --card: var(--wlc-panel) !important;
+    --line: var(--wlc-border-soft) !important;
+    --text: var(--wlc-text) !important;
+    --muted: var(--wlc-text-muted) !important;
+    --gold: var(--wlc-accent) !important;
+    --gold-soft: var(--wlc-accent-strong) !important;
+  }
+
+  html,
+  body {
+    background: var(--wlc-bg) !important;
+    color: var(--wlc-text) !important;
+  }
+
+  body {
+    transition: background .22s ease, color .22s ease;
+  }
+
+  .back,
+  .subtitle,
+  .photo-note {
+    color: var(--wlc-text-muted) !important;
+  }
+
+  .brand-small,
+  .eyebrow,
+  .required,
+  .photo-plus {
+    color: var(--wlc-accent) !important;
+  }
+
+  .brand-name,
+  h1,
+  .photo-title {
+    color: var(--wlc-text) !important;
+  }
+
+  .label {
+    color: var(--wlc-accent-strong) !important;
+  }
+
+  .form-card {
+    background: var(--wlc-panel) !important;
+    border: 1px solid var(--wlc-border) !important;
+    box-shadow: var(--wlc-shadow) !important;
+  }
+
+  .input,
+  .textarea,
+  input,
+  textarea {
+    background: var(--wlc-bg-soft) !important;
+    color: var(--wlc-text) !important;
+    border-color: var(--wlc-border-soft) !important;
+    -webkit-text-fill-color: var(--wlc-text) !important;
+  }
+
+  .input::placeholder,
+  .textarea::placeholder {
+    color: var(--wlc-text-muted) !important;
+    opacity: 1;
+  }
+
+  .input:focus,
+  .textarea:focus {
+    background: var(--wlc-panel-2) !important;
+    border-color: var(--wlc-accent) !important;
+  }
+
+  .photo-box {
+    background:
+      linear-gradient(
+        145deg,
+        color-mix(in srgb, var(--wlc-accent) 7%, var(--wlc-panel)),
+        var(--wlc-panel)
+      ) !important;
+    border-color: var(--wlc-border) !important;
+    color: var(--wlc-text) !important;
+  }
+
+  .photo-grid img,
+  .cover-preview img {
+    border-color: var(--wlc-border-soft) !important;
+  }
+
+  .save-btn {
+    background:
+      linear-gradient(
+        135deg,
+        var(--wlc-accent-strong),
+        var(--wlc-accent-dark)
+      ) !important;
+    border-color: var(--wlc-border) !important;
+    color: #111 !important;
+    font-weight: 700;
+  }
+
+  .toast {
+    background: var(--wlc-panel-2) !important;
+    color: var(--wlc-text) !important;
+    border: 1px solid var(--wlc-border) !important;
+  }
+
+  :root[data-theme="black-gold"] body {
+    background:
+      radial-gradient(
+        circle at 50% -8%,
+        rgba(215,177,132,.14),
+        transparent 32%
+      ),
+      var(--wlc-bg) !important;
+  }
+
+  :root[data-theme="ocean-blue"] body {
+    background:
+      radial-gradient(
+        circle at 50% -8%,
+        rgba(118,200,232,.14),
+        transparent 32%
+      ),
+      linear-gradient(
+        180deg,
+        #061521,
+        #081b29 50%,
+        #0b2534
+      ) !important;
+  }
+
+  :root[data-theme="lavender-dream"] body {
+    background:
+      linear-gradient(
+        135deg,
+        #f8f5ff,
+        #f1eaff 50%,
+        #fff8fb
+      ) !important;
+  }
+
+  :root[data-theme="cream-cafe"] body {
+    background:
+      linear-gradient(
+        135deg,
+        #fffaf1,
+        #f7efe4 52%,
+        #efe1d0
+      ) !important;
+  }
+
+  :root[data-theme="cute-pastel"] body {
+    background:
+      linear-gradient(
+        135deg,
+        #ffe6ef,
+        #fff2f6 42%,
+        #dff4ff
+      ) !important;
+  }
+</style>
+
 </head>
 
 
