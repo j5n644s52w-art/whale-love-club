@@ -19,7 +19,10 @@
 
   const ALLOWED_THEMES = [
     'black-gold',
-    'cute-pastel'
+    'cute-pastel',
+    'ocean-blue',
+    'lavender-dream',
+    'cream-cafe'
   ];
 
 
@@ -115,11 +118,16 @@
     const current =
       getSavedTheme();
 
+    const index =
+      ALLOWED_THEMES.indexOf(
+        current
+      );
+
     const next =
-      current ===
-      'black-gold'
-        ? 'cute-pastel'
-        : 'black-gold';
+      ALLOWED_THEMES[
+        (index + 1) %
+        ALLOWED_THEMES.length
+      ];
 
     return saveTheme(next);
 

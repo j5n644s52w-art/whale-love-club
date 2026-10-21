@@ -1045,6 +1045,188 @@
   }
 
 
+
+  /* =========================
+     OCEAN BLUE HOMEPAGE
+     ========================= */
+
+  :root[data-theme="ocean-blue"] body {
+    background:
+      radial-gradient(
+        circle at 50% -8%,
+        rgba(118,200,232,.15),
+        transparent 32%
+      ),
+      linear-gradient(
+        180deg,
+        #061521 0%,
+        #081b29 45%,
+        #0b2534 100%
+      );
+  }
+
+  :root[data-theme="ocean-blue"] .bubble {
+    border-color: rgba(118,200,232,.14);
+    box-shadow: inset 0 0 0 1px rgba(118,200,232,.06);
+  }
+
+  :root[data-theme="ocean-blue"] .bubble.b1,
+  :root[data-theme="ocean-blue"] .bubble.b4 {
+    background: rgba(118,200,232,.08);
+  }
+
+  :root[data-theme="ocean-blue"] .bubble.b2,
+  :root[data-theme="ocean-blue"] .bubble.b3 {
+    background: rgba(255,255,255,.025);
+  }
+
+  :root[data-theme="ocean-blue"] .member-card {
+    border: 1px solid var(--wlc-border);
+    background:
+      linear-gradient(
+        145deg,
+        #0b2232,
+        #0b1822 58%,
+        #0e3041
+      );
+  }
+
+  :root[data-theme="ocean-blue"] .point-card,
+  :root[data-theme="ocean-blue"] .menu-card {
+    border: 1px solid var(--wlc-border-soft);
+    background: var(--wlc-panel);
+  }
+
+  :root[data-theme="ocean-blue"] .point-card.pink,
+  :root[data-theme="ocean-blue"] .point-card.blue,
+  :root[data-theme="ocean-blue"] .menu-ledger,
+  :root[data-theme="ocean-blue"] .menu-collection,
+  :root[data-theme="ocean-blue"] .menu-memories,
+  :root[data-theme="ocean-blue"] .menu-ticket {
+    background:
+      linear-gradient(
+        145deg,
+        rgba(118,200,232,.05),
+        rgba(255,255,255,.018)
+      ),
+      var(--wlc-panel);
+  }
+
+  :root[data-theme="ocean-blue"] .corner-star,
+  :root[data-theme="ocean-blue"] .section-title .sparkle,
+  :root[data-theme="ocean-blue"] .vip-star {
+    color: var(--wlc-accent);
+  }
+
+
+  /* =========================
+     LAVENDER DREAM HOMEPAGE
+     ========================= */
+
+  :root[data-theme="lavender-dream"] body {
+    background:
+      radial-gradient(
+        circle at 12% 8%,
+        rgba(255,255,255,.9) 0 5px,
+        transparent 6px
+      ),
+      linear-gradient(
+        135deg,
+        #f8f5ff 0%,
+        #f1eaff 42%,
+        #fff8fb 100%
+      );
+  }
+
+  :root[data-theme="lavender-dream"] .member-card {
+    border: 2px solid #8266b5;
+    background:
+      linear-gradient(
+        135deg,
+        #e7dcff,
+        #f7efff 52%,
+        #fff8fc
+      );
+  }
+
+  :root[data-theme="lavender-dream"] .point-card,
+  :root[data-theme="lavender-dream"] .menu-card {
+    border: 2px solid #8266b5;
+  }
+
+  :root[data-theme="lavender-dream"] .point-card.pink,
+  :root[data-theme="lavender-dream"] .menu-ledger,
+  :root[data-theme="lavender-dream"] .menu-memories {
+    background: #f4ecff;
+  }
+
+  :root[data-theme="lavender-dream"] .point-card.blue,
+  :root[data-theme="lavender-dream"] .menu-collection,
+  :root[data-theme="lavender-dream"] .menu-ticket {
+    background: #fbf8ff;
+  }
+
+  :root[data-theme="lavender-dream"] .corner-star,
+  :root[data-theme="lavender-dream"] .section-title .sparkle,
+  :root[data-theme="lavender-dream"] .vip-star {
+    color: var(--wlc-accent);
+  }
+
+
+  /* =========================
+     CREAM CAFE HOMEPAGE
+     ========================= */
+
+  :root[data-theme="cream-cafe"] body {
+    background:
+      radial-gradient(
+        circle at 10% 8%,
+        rgba(255,255,255,.8) 0 5px,
+        transparent 6px
+      ),
+      linear-gradient(
+        135deg,
+        #fffaf1,
+        #f7efe4 50%,
+        #efe1d0
+      );
+  }
+
+  :root[data-theme="cream-cafe"] .member-card {
+    border: 2px solid #9d6f4c;
+    background:
+      linear-gradient(
+        135deg,
+        #f3ddc4,
+        #fff7ea 54%,
+        #e9c9aa
+      );
+  }
+
+  :root[data-theme="cream-cafe"] .point-card,
+  :root[data-theme="cream-cafe"] .menu-card {
+    border: 2px solid #9d6f4c;
+  }
+
+  :root[data-theme="cream-cafe"] .point-card.pink,
+  :root[data-theme="cream-cafe"] .menu-ledger,
+  :root[data-theme="cream-cafe"] .menu-memories {
+    background: #f7eadc;
+  }
+
+  :root[data-theme="cream-cafe"] .point-card.blue,
+  :root[data-theme="cream-cafe"] .menu-collection,
+  :root[data-theme="cream-cafe"] .menu-ticket {
+    background: #fffaf3;
+  }
+
+  :root[data-theme="cream-cafe"] .corner-star,
+  :root[data-theme="cream-cafe"] .section-title .sparkle,
+  :root[data-theme="cream-cafe"] .vip-star {
+    color: var(--wlc-accent);
+  }
+
+
   /* =========================
      CUTE PASTEL HOMEPAGE
      ========================= */
@@ -1318,6 +1500,41 @@
         #ffe6ef,
         #fff2f6 40%,
         #dff4ff
+      );
+  }
+
+
+  .theme-preview.ocean-blue {
+    background:
+      radial-gradient(
+        circle at 70% 25%,
+        rgba(118,200,232,.42),
+        transparent 34%
+      ),
+      linear-gradient(
+        135deg,
+        #061521,
+        #12394f
+      );
+  }
+
+  .theme-preview.lavender-dream {
+    background:
+      linear-gradient(
+        135deg,
+        #f8f5ff,
+        #e9ddff 48%,
+        #cbb8ee
+      );
+  }
+
+  .theme-preview.cream-cafe {
+    background:
+      linear-gradient(
+        135deg,
+        #fffaf1,
+        #ead8c3 48%,
+        #b78b67
       );
   }
 
@@ -1793,6 +2010,39 @@
           <div class="theme-preview cute-pastel"></div>
           <div class="theme-option-name">Cute Pastel</div>
           <div class="theme-option-sub">粉彩・可愛・柔和風格</div>
+        </button>
+
+        <button
+          id="themeOptionOceanBlue"
+          class="theme-option"
+          type="button"
+          onclick="chooseTheme('ocean-blue')"
+        >
+          <div class="theme-preview ocean-blue"></div>
+          <div class="theme-option-name">Ocean Blue</div>
+          <div class="theme-option-sub">深海・鯨魚・清爽藍調</div>
+        </button>
+
+        <button
+          id="themeOptionLavenderDream"
+          class="theme-option"
+          type="button"
+          onclick="chooseTheme('lavender-dream')"
+        >
+          <div class="theme-preview lavender-dream"></div>
+          <div class="theme-option-name">Lavender Dream</div>
+          <div class="theme-option-sub">薰衣草・奶白・夢幻柔和</div>
+        </button>
+
+        <button
+          id="themeOptionCreamCafe"
+          class="theme-option"
+          type="button"
+          onclick="chooseTheme('cream-cafe')"
+        >
+          <div class="theme-preview cream-cafe"></div>
+          <div class="theme-option-name">Cream Café</div>
+          <div class="theme-option-sub">奶油・咖啡・溫暖日常</div>
         </button>
 
       </div>
@@ -2331,34 +2581,31 @@
         : 'black-gold';
 
 
-    const blackGold =
-      document.getElementById(
-        'themeOptionBlackGold'
-      );
+    const options = [
+      ['themeOptionBlackGold', 'black-gold'],
+      ['themeOptionCutePastel', 'cute-pastel'],
+      ['themeOptionOceanBlue', 'ocean-blue'],
+      ['themeOptionLavenderDream', 'lavender-dream'],
+      ['themeOptionCreamCafe', 'cream-cafe']
+    ];
 
 
-    const cutePastel =
-      document.getElementById(
-        'themeOptionCutePastel'
-      );
+    for (const item of options) {
+
+      const element =
+        document.getElementById(
+          item[0]
+        );
 
 
-    if (blackGold) {
+      if (element) {
 
-      blackGold.classList.toggle(
-        'active',
-        current === 'black-gold'
-      );
+        element.classList.toggle(
+          'active',
+          current === item[1]
+        );
 
-    }
-
-
-    if (cutePastel) {
-
-      cutePastel.classList.toggle(
-        'active',
-        current === 'cute-pastel'
-      );
+      }
 
     }
 
