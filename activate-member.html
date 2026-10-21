@@ -465,6 +465,14 @@ h1 {
 
 }
 
+
+.friendship-status {
+  margin-top: 14px;
+  color: #b9afa6;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
 </style>
 
 </head>
@@ -600,10 +608,26 @@ h1 {
 
     </p>
 
+    <div
+      id="friendshipMessage"
+      class="friendship-status"
+    >
+      接下來會開啟 LINE 的加入好友視窗。
+    </div>
+
     <div class="actions">
 
-      <a
+      <button
+        id="friendButton"
         class="btn btn-primary"
+        type="button"
+        onclick="requestOfficialAccountFriendship()"
+      >
+        加入 ♡鯨魚小舖
+      </button>
+
+      <a
+        class="btn btn-secondary"
         href="/"
       >
         進入會員中心
@@ -647,6 +671,8 @@ let idToken = '';
 let accessToken = '';
 
 let token = '';
+
+let friendshipPromptRunning = false;
 
 
 
@@ -927,6 +953,22 @@ async function activateMember() {
         : '你的 LINE 已完成會員綁定。';
 
 
+    /*
+     * 會員綁定成功後，自動開啟
+     * LINE 官方帳號加入好友視窗。
+     *
+     * 這段失敗不會影響會員綁定結果。
+     */
+    setTimeout(
+      function() {
+        requestOfficialAccountFriendship(
+          true
+        );
+      },
+      350
+    );
+
+
   } catch (error) {
 
     console.error(
@@ -950,6 +992,120 @@ async function activateMember() {
       'ACTIVATION_FAILED'
 
     );
+
+  }
+
+}
+
+
+
+
+/* =========================================
+   LINE 官方帳號好友邀請
+   ========================================= */
+
+async function requestOfficialAccountFriendship(
+  automatic
+) {
+
+  if (friendshipPromptRunning) {
+    return;
+  }
+
+
+  const message =
+    document.getElementById(
+      'friendshipMessage'
+    );
+
+
+  const button =
+    document.getElementById(
+      'friendButton'
+    );
+
+
+  try {
+
+    if (
+      !liff ||
+      typeof liff.requestFriendship !==
+        'function'
+    ) {
+
+      if (message) {
+        message.textContent =
+          '目前 LINE 版本無法直接開啟好友視窗，請稍後再按一次「加入 ♡鯨魚小舖」。';
+      }
+
+      return;
+
+    }
+
+
+    friendshipPromptRunning =
+      true;
+
+
+    if (button) {
+      button.disabled =
+        true;
+
+      button.textContent =
+        '正在開啟 LINE...';
+    }
+
+
+    if (message) {
+      message.textContent =
+        automatic
+          ? '正在開啟 ♡鯨魚小舖 的加入好友視窗...'
+          : '正在重新開啟加入好友視窗...';
+    }
+
+
+    /*
+     * 不指定 officialAccount，
+     * 直接使用 LINE Developers Console
+     * 中與目前 MINI App channel 綁定的
+     * LINE Official Account。
+     */
+    await liff.requestFriendship();
+
+
+    if (message) {
+      message.textContent =
+        '好友視窗已處理完成；如果尚未加入，可以再按一次「加入 ♡鯨魚小舖」。';
+    }
+
+
+  } catch (error) {
+
+    console.warn(
+      'requestFriendship failed:',
+      error
+    );
+
+
+    if (message) {
+      message.textContent =
+        '會員已啟用成功；若沒有出現好友視窗，請確認 MINI App 已連結 ♡鯨魚小舖，並再按一次按鈕。';
+    }
+
+
+  } finally {
+
+    friendshipPromptRunning =
+      false;
+
+
+    if (button) {
+      button.disabled =
+        false;
+
+      button.textContent =
+        '加入 ♡鯨魚小舖';
+    }
 
   }
 
