@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>會員啟用 | Whale Love Club</title>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% -10%,rgba(215,177,132,.20),transparent 35%),#070707;color:#f7f3ed;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC",sans-serif;padding-bottom:calc(36px + env(safe-area-inset-bottom))}
+.page{width:min(100%,680px);margin:auto;padding:calc(22px + env(safe-area-inset-top)) 18px 40px}.brand{text-align:center;margin-top:4px}.brand small{color:#d7b184;letter-spacing:3px;font-size:9px}.brand div{margin-top:6px;font-family:Georgia,serif;font-size:15px}
+.panel{margin-top:34px;text-align:center;padding:30px 20px;border:1px solid rgba(255,255,255,.08);border-radius:24px;background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.012))}
+.symbol{font-size:38px;color:#d7b184;margin-bottom:16px}.eyebrow{font-size:10px;letter-spacing:4px;color:#d7b184}h1{margin:10px 0 0;font-family:Georgia,"Noto Serif TC",serif;font-size:30px;font-weight:400}.note{margin:14px auto 0;max-width:460px;color:#a39c95;font-size:13px;line-height:1.9}
+.notice{margin-top:22px;padding:15px;border-radius:15px;background:rgba(215,177,132,.06);border:1px solid rgba(215,177,132,.18);color:#d8c4ab;font-size:12px;line-height:1.8;text-align:left}
+.actions{margin-top:22px;display:grid;gap:10px}.btn{width:100%;border-radius:14px;padding:14px 16px;font-size:14px;text-align:center;cursor:pointer}.btn-primary{border:0;background:linear-gradient(135deg,#e3c099,#a87b55);color:#080808;font-weight:800}.btn-primary:disabled{opacity:.5}.btn-secondary{border:1px solid rgba(215,177,132,.25);background:rgba(215,177,132,.05);color:#f0d5b2;text-decoration:none}
+.spinner{width:34px;height:34px;margin:24px auto 4px;border-radius:50%;border:2px solid rgba(215,177,132,.18);border-top-color:#d7b184;animation:spin .9s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.hidden{display:none!important}
+.error{margin-top:28px;padding:20px;border-radius:18px;text-align:center;border:1px solid rgba(231,168,168,.25);background:rgba(231,168,168,.05);color:#e7a8a8}.error strong{display:block;color:#f2c1c1;font-size:17px;margin-bottom:9px}
+.success{margin-top:28px;padding:24px;border-radius:20px;text-align:center;border:1px solid rgba(215,177,132,.28);background:rgba(215,177,132,.06)}.success .big{font-size:38px;color:#d7b184}.success h2{margin:12px 0 0;font-family:Georgia,"Noto Serif TC",serif;font-weight:400}.success p{color:#aaa19a;font-size:13px;line-height:1.8}
+</style>
+</head>
+<body>
+<main class="page">
+<div class="brand"><small>♡ PRIVATE MEMBERS</small><div>Whale Love Club</div></div>
+
+<section id="loadingState" class="panel">
+  <div class="symbol">◇</div><div class="eyebrow">MEMBER · NFC ACTIVATION</div>
+  <h1>正在確認會員卡</h1><div class="note">請稍候，正在確認 LINE 登入狀態。</div><div class="spinner"></div>
+</section>
+
+<section id="confirmState" class="panel hidden">
+  <div class="symbol">♡</div><div class="eyebrow">MEMBERSHIP INVITATION</div>
+  <h1>啟用 Whale Love Club</h1>
+  <div class="note">這張 NFC 會員卡會把目前登入的 LINE 帳號，綁定到卡片指定的會員帳號。</div>
+  <div class="notice">綁定後，這個 LINE 帳號將作為會員身分使用。<br>一張會員卡只能完成一次正式綁定。</div>
+  <div class="actions">
+    <button id="activateButton" class="btn btn-primary" type="button" onclick="activateMember()">確認啟用會員</button>
+    <a class="btn btn-secondary" href="/">暫時不要啟用</a>
+  </div>
+</section>
+
+<section id="successState" class="success hidden">
+  <div class="big">♡</div><h2>會員啟用成功</h2>
+  <p id="successMessage">你的 LINE 已完成會員綁定。</p>
+  <div class="actions"><a class="btn btn-primary" href="/">進入會員中心</a></div>
+</section>
+
+<section id="errorState" class="error hidden">
+  <strong id="errorTitle">無法啟用會員</strong><div id="errorMessage"></div>
+</section>
+</main>
+
+<script>
+const LIFF_ID='2011857714-fZwEK6lN';
+let idToken='',token='';
+
+async function init(){
+  try{
+    token=new URLSearchParams(location.search).get('token')||'';
+    if(!token) throw new Error('MISSING_TOKEN');
+
+    await liff.init({liffId:LIFF_ID});
+
+    if(!liff.isLoggedIn()){
+      liff.login({redirectUri:location.href});
+      return;
+    }
+
+    idToken=liff.getIDToken();
+    if(!idToken) throw new Error('NO_LINE_TOKEN');
+
+    document.getElementById('loadingState').classList.add('hidden');
+    document.getElementById('confirmState').classList.remove('hidden');
+  }catch(error){
+    showError(error.message||'INIT_FAILED');
+  }
+}
+
+async function activateMember(){
+  const button=document.getElementById('activateButton');
+  try{
+    button.disabled=true;
+    button.textContent='啟用中...';
+
+    const response=await fetch('/api/activate-member',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({idToken,token})
+    });
+
+    const data=await response.json();
+
+    if(!data.success){
+      throw new Error(data.status||data.message||'ACTIVATION_FAILED');
+    }
+
+    document.getElementById('confirmState').classList.add('hidden');
+    document.getElementById('errorState').classList.add('hidden');
+    document.getElementById('successState').classList.remove('hidden');
+    document.getElementById('successMessage').textContent=
+      data.memberNo ? '會員 '+data.memberNo+' 已完成綁定。' : '你的 LINE 已完成會員綁定。';
+
+  }catch(error){
+    button.disabled=false;
+    button.textContent='確認啟用會員';
+    showError(error.message||'ACTIVATION_FAILED');
+  }
+}
+
+function showError(code){
+  document.getElementById('loadingState').classList.add('hidden');
+  const t=translateError(code);
+  document.getElementById('errorTitle').textContent=t.title;
+  document.getElementById('errorMessage').textContent=t.message;
+  document.getElementById('errorState').classList.remove('hidden');
+}
+
+function translateError(code){
+  const v=String(code||'');
+  if(v.includes('LINE_ALREADY_BOUND')) return {title:'這個 LINE 已綁定其他會員',message:'目前登入的 LINE 已經有會員身分，不能再綁定另一個會員帳號。'};
+  if(v.includes('MEMBER_ALREADY_BOUND')) return {title:'會員已經綁定',message:'這張卡指定的會員帳號已經綁定其他 LINE。'};
+  if(v.includes('CARD_NOT_AVAILABLE')) return {title:'會員卡已使用',message:'這張 NFC 會員卡目前已無法再次啟用。'};
+  if(v.includes('INVALID_CARD_TYPE')) return {title:'卡片類型不正確',message:'這張 NFC 卡不是會員綁定卡。'};
+  if(v.includes('INVALID_CARD')||v.includes('MISSING_TOKEN')) return {title:'找不到會員卡',message:'Token 不正確，或這張卡目前不存在。'};
+  if(v.includes('NO_LINE_TOKEN')) return {title:'LINE 登入失敗',message:'請關閉頁面後，從 LINE 重新開啟。'};
+  return {title:'無法啟用會員',message:v||'請稍後再試一次。'};
+}
+init();
+</script>
+</body>
+</html>
