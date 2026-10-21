@@ -759,6 +759,16 @@
         renderPoints();
         renderItems();
 
+        loadAllItemImages()
+          .catch(
+            function(error) {
+              console.warn(
+                '商城快取圖片載入失敗',
+                error
+              );
+            }
+          );
+
       }
 
 
@@ -1077,12 +1087,12 @@
 
   /* ======================================
      PRIVATE ITEM IMAGES
+     IndexedDB 快取 + 批次抓取
      ====================================== */
 
   async function loadAllItemImages() {
 
-    const tasks = [];
-
+    const jobs = [];
 
     for (
       let i = 0;
@@ -1096,137 +1106,342 @@
             .imageFileId || ''
         ).trim();
 
-
       if (!fileId) {
         continue;
       }
 
-
-      tasks.push(
-        loadItemImage(
-          i,
-          fileId
-        )
-      );
+      jobs.push({
+        index: i,
+        fileId: fileId
+      });
 
     }
 
+    if (!jobs.length) {
+      return;
+    }
 
-    await Promise.allSettled(
-      tasks
-    );
+    const missing = [];
+
+    for (
+      let i = 0;
+      i < jobs.length;
+      i++
+    ) {
+
+      const job =
+        jobs[i];
+
+      let cachedSrc = '';
+
+      if (
+        window.WLCFastCache &&
+        typeof WLCFastCache.getImage ===
+          'function'
+      ) {
+
+        cachedSrc =
+          await WLCFastCache.getImage(
+            job.fileId
+          );
+
+      }
+
+      if (cachedSrc) {
+
+        applyItemImage(
+          job.index,
+          job.fileId,
+          cachedSrc
+        );
+
+      } else {
+
+        missing.push(
+          job
+        );
+
+      }
+
+    }
+
+    if (!missing.length) {
+      return;
+    }
+
+    for (
+      let start = 0;
+      start < missing.length;
+      start += 6
+    ) {
+
+      const chunk =
+        missing.slice(
+          start,
+          start + 6
+        );
+
+      const fileIds =
+        chunk.map(
+          function(job) {
+            return job.fileId;
+          }
+        );
+
+      try {
+
+        const response =
+          await fetch(
+            '/api/photo',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type':
+                  'application/json'
+              },
+              body:
+                JSON.stringify({
+                  idToken: idToken,
+                  fileIds: fileIds
+                })
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (!data.success) {
+
+          const message =
+            String(
+              data.message || ''
+            );
+
+          if (
+            message
+              .toLowerCase()
+              .includes('expired')
+          ) {
+
+            refreshLogin();
+            return;
+
+          }
+
+          console.warn(
+            '商城批次圖片載入失敗',
+            message
+          );
+
+          continue;
+
+        }
+
+        const photoMap =
+          buildPhotoMap(
+            data
+          );
+
+        for (
+          let i = 0;
+          i < chunk.length;
+          i++
+        ) {
+
+          const job =
+            chunk[i];
+
+          const imageUrl =
+            photoMap[
+              job.fileId
+            ] || '';
+
+          if (!imageUrl) {
+            continue;
+          }
+
+          applyItemImage(
+            job.index,
+            job.fileId,
+            imageUrl
+          );
+
+          if (
+            window.WLCFastCache &&
+            typeof WLCFastCache.setImage ===
+              'function'
+          ) {
+
+            WLCFastCache
+              .setImage(
+                job.fileId,
+                imageUrl
+              )
+              .catch(
+                function() {}
+              );
+
+          }
+
+        }
+
+      } catch (error) {
+
+        console.warn(
+          'Shop image batch load failed',
+          error
+        );
+
+      }
+
+    }
 
   }
 
 
-  async function loadItemImage(
+  function applyItemImage(
     index,
-    fileId
+    expectedFileId,
+    imageUrl
   ) {
 
-    try {
+    if (!imageUrl) {
+      return;
+    }
 
-      const response =
-        await fetch(
-          '/api/photo',
-          {
-            method:
-              'POST',
+    const item =
+      shopItems[index];
 
-            headers: {
-              'Content-Type':
-                'application/json'
-            },
+    if (!item) {
+      return;
+    }
 
-            body:
-              JSON.stringify({
-                idToken:
-                  idToken,
-                fileId:
-                  fileId
-              })
-          }
-        );
+    const currentFileId =
+      String(
+        item.imageFileId || ''
+      ).trim();
+
+    if (
+      expectedFileId &&
+      currentFileId !==
+        String(
+          expectedFileId
+        ).trim()
+    ) {
+      return;
+    }
+
+    const box =
+      document.querySelector(
+        `[data-item-image-index="${index}"]`
+      );
+
+    if (!box) {
+      return;
+    }
+
+    box.innerHTML = '';
+
+    const img =
+      document.createElement(
+        'img'
+      );
+
+    img.alt =
+      item.itemName ||
+      'shop item';
+
+    img.decoding =
+      'async';
+
+    img.onerror =
+      function() {
+
+        box.innerHTML =
+          '<div class="item-placeholder">♡</div>';
+
+      };
+
+    box.appendChild(
+      img
+    );
+
+    img.src =
+      imageUrl;
+
+  }
 
 
-      const data =
-        await response.json();
+  function buildPhotoMap(
+    data
+  ) {
 
+    const result = {};
 
-      if (!data.success) {
-        return;
+    if (
+      Array.isArray(
+        data.photos
+      )
+    ) {
+
+      for (
+        let i = 0;
+        i < data.photos.length;
+        i++
+      ) {
+
+        const photo =
+          data.photos[i];
+
+        if (
+          !photo ||
+          !photo.success ||
+          !photo.fileId
+        ) {
+          continue;
+        }
+
+        const src =
+          buildPhotoDataUrl(
+            photo
+          );
+
+        if (src) {
+
+          result[
+            String(
+              photo.fileId
+            )
+          ] = src;
+
+        }
+
       }
 
+    }
 
-      const imageUrl =
+    if (
+      data.fileId
+    ) {
+
+      const src =
         buildPhotoDataUrl(
           data
         );
 
+      if (src) {
 
-      if (!imageUrl) {
-        return;
+        result[
+          String(
+            data.fileId
+          )
+        ] = src;
+
       }
-
-
-      const box =
-        document.querySelector(
-          `[data-item-image-index="${index}"]`
-        );
-
-
-      if (!box) {
-        return;
-      }
-
-
-      box.innerHTML = '';
-
-
-      const img =
-        document.createElement(
-          'img'
-        );
-
-
-      img.alt =
-        shopItems[index]
-          .itemName ||
-        'shop item';
-
-
-      img.decoding =
-        'async';
-
-
-      img.onerror =
-        function() {
-
-          box.innerHTML =
-            '<div class="item-placeholder">♡</div>';
-
-        };
-
-
-      /*
-       * LINE WebView：
-       * 先 append 再指定 src，
-       * 避免快取命中時不觸發顯示。
-       */
-      box.appendChild(img);
-
-      img.src =
-        imageUrl;
-
-
-    } catch (error) {
-
-      console.warn(
-        'Shop image load failed',
-        error
-      );
 
     }
+
+    return result;
 
   }
 
@@ -1238,20 +1453,14 @@
     if (
       data.dataUrl
     ) {
-
       return data.dataUrl;
-
     }
-
 
     if (
       data.imageUrl
     ) {
-
       return data.imageUrl;
-
     }
-
 
     if (
       data.mimeType &&
@@ -1267,7 +1476,6 @@
 
     }
 
-
     if (
       data.photo &&
       data.photo.mimeType &&
@@ -1282,7 +1490,6 @@
       );
 
     }
-
 
     return '';
 
