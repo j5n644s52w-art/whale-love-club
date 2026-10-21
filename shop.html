@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <title>LOVE SHOP | Whale Love Club</title>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <link rel="stylesheet" href="/theme.css?v=5">
+  <script src="/theme.js?v=5"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--wlc-bg);
+      color: var(--wlc-text);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "PingFang TC",
+        "Noto Sans TC",
+        sans-serif;
+      padding-bottom:
+        calc(42px + env(safe-area-inset-bottom));
+    }
+
+    body {
+      transition:
+        background .22s ease,
+        color .22s ease;
+    }
+
+    :root[data-theme="black-gold"] body {
+      background:
+        radial-gradient(
+          circle at 50% -8%,
+          rgba(215,177,132,.14),
+          transparent 32%
+        ),
+        var(--wlc-bg);
+    }
+
+    :root[data-theme="ocean-blue"] body {
+      background:
+        radial-gradient(
+          circle at 50% -8%,
+          rgba(118,200,232,.15),
+          transparent 32%
+        ),
+        linear-gradient(
+          180deg,
+          #061521,
+          #081b29 50%,
+          #0b2534
+        );
+    }
+
+    :root[data-theme="lavender-dream"] body {
+      background:
+        linear-gradient(
+          135deg,
+          #f8f5ff,
+          #f1eaff 50%,
+          #fff8fb
+        );
+    }
+
+    :root[data-theme="cream-cafe"] body {
+      background:
+        linear-gradient(
+          135deg,
+          #fffaf1,
+          #f7efe4 52%,
+          #efe1d0
+        );
+    }
+
+    :root[data-theme="cute-pastel"] body {
+      background:
+        linear-gradient(
+          135deg,
+          #ffe6ef,
+          #fff2f6 42%,
+          #dff4ff
+        );
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .page {
+      width: min(100%, 760px);
+      margin: 0 auto;
+      padding:
+        calc(20px + env(safe-area-inset-top))
+        18px
+        40px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .back {
+      border: 0;
+      background: transparent;
+      color: var(--wlc-text-muted);
+      padding: 8px 0;
+      font-size: 14px;
+    }
+
+    .brand {
+      text-align: right;
+    }
+
+    .brand-small {
+      color: var(--wlc-accent);
+      font-size: 10px;
+      letter-spacing: 3px;
+    }
+
+    .brand-name {
+      margin-top: 4px;
+      font-family: Georgia, serif;
+      font-size: 15px;
+    }
+
+    .eyebrow {
+      color: var(--wlc-accent);
+      font-size: 10px;
+      letter-spacing: 4px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-family:
+        Georgia,
+        "Noto Serif TC",
+        serif;
+      font-weight: 400;
+      font-size: 31px;
+      letter-spacing: 2px;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: var(--wlc-text-muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .points-box {
+      margin-top: 26px;
+      padding: 20px;
+      border-radius: 20px;
+      border: 1px solid var(--wlc-border);
+      background:
+        linear-gradient(
+          145deg,
+          color-mix(in srgb, var(--wlc-accent) 8%, transparent),
+          color-mix(in srgb, var(--wlc-panel) 95%, transparent)
+        );
+      box-shadow: var(--wlc-shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+    }
+
+    .points-label {
+      color: var(--wlc-text-muted);
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    .points-value {
+      margin-top: 8px;
+      font-family: Georgia, serif;
+      font-size: 31px;
+      color: var(--wlc-accent-strong);
+      line-height: 1;
+    }
+
+    .points-value span {
+      font-size: 12px;
+      color: var(--wlc-text-muted);
+      margin-left: 4px;
+    }
+
+    .points-icon {
+      font-size: 29px;
+      color: var(--wlc-accent);
+    }
+
+    .section-head {
+      margin-top: 34px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title {
+      font-family: Georgia, serif;
+      font-size: 14px;
+      letter-spacing: 2px;
+    }
+
+    .section-sub {
+      color: var(--wlc-text-muted);
+      font-size: 11px;
+      text-align: right;
+    }
+
+    .items {
+      display: grid;
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+      gap: 13px;
+    }
+
+    .item-card {
+      overflow: hidden;
+      border-radius: 20px;
+      border: 1px solid var(--wlc-border-soft);
+      background: var(--wlc-panel);
+      box-shadow: var(--wlc-shadow);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .item-image {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(
+          circle at 50% 25%,
+          color-mix(in srgb, var(--wlc-accent) 14%, transparent),
+          transparent 48%
+        ),
+        var(--wlc-bg-soft);
+    }
+
+    .item-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .item-placeholder {
+      font-size: 38px;
+      color: var(--wlc-accent);
+    }
+
+    .item-body {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .item-name {
+      font-family:
+        Georgia,
+        "Noto Serif TC",
+        serif;
+      font-size: 17px;
+      line-height: 1.4;
+    }
+
+    .item-description {
+      margin-top: 8px;
+      color: var(--wlc-text-muted);
+      font-size: 11px;
+      line-height: 1.65;
+      min-height: 36px;
+    }
+
+    .item-meta {
+      margin-top: auto;
+      padding-top: 15px;
+    }
+
+    .price {
+      color: var(--wlc-accent-strong);
+      font-family: Georgia, serif;
+      font-size: 18px;
+    }
+
+    .price small {
+      margin-left: 4px;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+      color: var(--wlc-text-muted);
+      font-size: 10px;
+    }
+
+    .stock {
+      margin-top: 5px;
+      color: var(--wlc-text-muted);
+      font-size: 10px;
+    }
+
+    .redeem-btn {
+      width: 100%;
+      margin-top: 12px;
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 10px;
+      background:
+        linear-gradient(
+          135deg,
+          var(--wlc-accent-strong),
+          var(--wlc-accent-dark)
+        );
+      color: #111;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .redeem-btn:disabled {
+      opacity: .42;
+      cursor: default;
+    }
+
+    .loading,
+    .empty {
+      grid-column: 1 / -1;
+      border: 1px dashed var(--wlc-border-soft);
+      background: var(--wlc-panel);
+      border-radius: 18px;
+      padding: 44px 22px;
+      color: var(--wlc-text-muted);
+      text-align: center;
+      line-height: 1.9;
+      font-size: 13px;
+    }
+
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      background: rgba(0,0,0,.62);
+      backdrop-filter: blur(8px);
+    }
+
+    .modal-mask.show {
+      display: flex;
+    }
+
+    .modal {
+      width: min(100%, 720px);
+      background: var(--wlc-panel);
+      border: 1px solid var(--wlc-border);
+      border-radius: 26px 26px 0 0;
+      padding:
+        18px
+        20px
+        calc(24px + env(safe-area-inset-bottom));
+      box-shadow: var(--wlc-shadow);
+    }
+
+    .handle {
+      width: 42px;
+      height: 4px;
+      margin: 0 auto 20px;
+      border-radius: 999px;
+      background: var(--wlc-border);
+    }
+
+    .modal-title {
+      font-family: Georgia, serif;
+      font-size: 22px;
+      color: var(--wlc-text);
+    }
+
+    .modal-text {
+      margin-top: 10px;
+      color: var(--wlc-text-muted);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .modal-price {
+      margin-top: 18px;
+      padding: 15px;
+      border-radius: 14px;
+      background: var(--wlc-bg-soft);
+      border: 1px solid var(--wlc-border-soft);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-price strong {
+      color: var(--wlc-accent-strong);
+      font-family: Georgia, serif;
+      font-size: 20px;
+    }
+
+    .modal-actions {
+      display: grid;
+      grid-template-columns: .8fr 1.2fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .cancel-btn,
+    .confirm-btn {
+      border-radius: 13px;
+      padding: 14px;
+    }
+
+    .cancel-btn {
+      border: 1px solid var(--wlc-border);
+      background: transparent;
+      color: var(--wlc-text-muted);
+    }
+
+    .confirm-btn {
+      border: 0;
+      background:
+        linear-gradient(
+          135deg,
+          var(--wlc-accent-strong),
+          var(--wlc-accent-dark)
+        );
+      color: #111;
+      font-weight: 800;
+    }
+
+    .confirm-btn:disabled {
+      opacity: .5;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom:
+        calc(25px + env(safe-area-inset-bottom));
+      transform:
+        translate(-50%, 30px);
+      opacity: 0;
+      max-width: calc(100% - 40px);
+      background: var(--wlc-panel-2);
+      color: var(--wlc-text);
+      border: 1px solid var(--wlc-border);
+      padding: 12px 18px;
+      border-radius: 999px;
+      z-index: 2000;
+      font-size: 12px;
+      transition: .25s;
+      pointer-events: none;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform:
+        translate(-50%, 0);
+    }
+
+    @media (max-width: 430px) {
+
+      .items {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .item-body {
+        padding: 13px;
+      }
+
+      .item-name {
+        font-size: 15px;
+      }
+
+      .price {
+        font-size: 16px;
+      }
+
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="page">
+
+    <div class="topbar">
+
+      <button
+        class="back"
+        onclick="goHome()"
+      >
+        ← 會員中心
+      </button>
+
+      <div class="brand">
+
+        <div class="brand-small">
+          ♡ PRIVATE MEMBERS
+        </div>
+
+        <div class="brand-name">
+          Whale Love Club
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="eyebrow">
+      LOVE SHOP
+    </div>
+
+    <h1>
+      愛心商城
+    </h1>
+
+    <div class="subtitle">
+      把累積的 Love Points 換成專屬的小驚喜 ♡
+    </div>
+
+
+    <section class="points-box">
+
+      <div>
+
+        <div class="points-label">
+          AVAILABLE LOVE POINTS
+        </div>
+
+        <div class="points-value">
+          <span id="lovePointsNumber">0</span>
+          <span>pts</span>
+        </div>
+
+      </div>
+
+      <div class="points-icon">
+        ♡
+      </div>
+
+    </section>
+
+
+    <div class="section-head">
+
+      <div class="section-title">
+        SHOP ITEMS
+      </div>
+
+      <div
+        class="section-sub"
+        id="itemCount"
+      >
+        0 ITEMS
+      </div>
+
+    </div>
+
+
+    <section
+      class="items"
+      id="items"
+    >
+
+      <div class="loading">
+        正在準備商城...
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <div
+    class="modal-mask"
+    id="redeemMask"
+    onclick="closeRedeemFromMask(event)"
+  >
+
+    <div class="modal">
+
+      <div class="handle"></div>
+
+      <div
+        class="modal-title"
+        id="redeemTitle"
+      >
+        確認兌換
+      </div>
+
+      <div
+        class="modal-text"
+        id="redeemText"
+      ></div>
+
+      <div class="modal-price">
+
+        <span>
+          需要
+        </span>
+
+        <strong
+          id="redeemPrice"
+        >
+          0 pts
+        </strong>
+
+      </div>
+
+      <div class="modal-actions">
+
+        <button
+          class="cancel-btn"
+          type="button"
+          onclick="closeRedeem()"
+        >
+          取消
+        </button>
+
+        <button
+          class="confirm-btn"
+          id="confirmRedeemButton"
+          type="button"
+          onclick="confirmRedeem()"
+        >
+          確認兌換
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div
+    class="toast"
+    id="toast"
+  ></div>
+
+
+<script>
+
+  const LIFF_ID =
+    '2011857714-fZwEK6lN';
+
+
+  let idToken = '';
+
+  let shopItems = [];
+
+  let lovePoints = 0;
+
+  let currentRedeemItem = null;
+
+
+
+  /* ======================================
+     INIT
+     ====================================== */
+
+  async function init() {
+
+    try {
+
+      await liff.init({
+        liffId:
+          LIFF_ID
+      });
+
+
+      if (!liff.isLoggedIn()) {
+
+        liff.login({
+          redirectUri:
+            window.location.href
+        });
+
+        return;
+
+      }
+
+
+      idToken =
+        liff.getIDToken();
+
+
+      if (!idToken) {
+
+        throw new Error(
+          '無法取得 LINE 登入資訊'
+        );
+
+      }
+
+
+      await loadShop();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      renderError(
+        error.message ||
+        '商城載入失敗'
+      );
+
+    }
+
+  }
+
+
+
+  /* ======================================
+     LOAD SHOP
+     ====================================== */
+
+  async function loadShop() {
+
+    const response =
+      await fetch(
+        '/api/shop',
+        {
+          method:
+            'POST',
+
+          headers: {
+            'Content-Type':
+              'application/json'
+          },
+
+          body:
+            JSON.stringify({
+              idToken:
+                idToken,
+              action:
+                'getItems'
+            })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+      const message =
+        String(
+          data.message || ''
+        );
+
+
+      if (
+        message
+          .toLowerCase()
+          .includes('expired')
+      ) {
+
+        refreshLogin();
+
+        return;
+
+      }
+
+
+      throw new Error(
+        message ||
+        '讀取商城失敗'
+      );
+
+    }
+
+
+    lovePoints =
+      Number(
+        data.lovePoints || 0
+      );
+
+
+    shopItems =
+      Array.isArray(
+        data.items
+      )
+        ? data.items
+        : [];
+
+
+    renderPoints();
+
+    renderItems();
+
+
+    await loadAllItemImages();
+
+  }
+
+
+
+  /* ======================================
+     RENDER
+     ====================================== */
+
+  function renderPoints() {
+
+    document
+      .getElementById(
+        'lovePointsNumber'
+      )
+      .textContent =
+      lovePoints
+        .toLocaleString(
+          'zh-TW'
+        );
+
+  }
+
+
+  function renderItems() {
+
+    const container =
+      document.getElementById(
+        'items'
+      );
+
+
+    document
+      .getElementById(
+        'itemCount'
+      )
+      .textContent =
+      `${shopItems.length} ${
+        shopItems.length === 1
+          ? 'ITEM'
+          : 'ITEMS'
+      }`;
+
+
+    if (!shopItems.length) {
+
+      container.innerHTML = `
+        <div class="empty">
+          商城目前還沒有上架商品 ♡
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      shopItems
+        .map(
+          function(item, index) {
+
+            const price =
+              Number(
+                item.price || 0
+              );
+
+
+            const stock =
+              Number(
+                item.stock || 0
+              );
+
+
+            const canAfford =
+              lovePoints >=
+              price;
+
+
+            const available =
+              stock > 0;
+
+
+            const disabled =
+              !canAfford ||
+              !available;
+
+
+            let buttonText =
+              '兌換';
+
+
+            if (!available) {
+
+              buttonText =
+                '已兌換完畢';
+
+            } else if (!canAfford) {
+
+              buttonText =
+                'Love Points 不足';
+
+            }
+
+
+            return `
+              <article class="item-card">
+
+                <div
+                  class="item-image"
+                  data-item-image-index="${index}"
+                >
+                  <div class="item-placeholder">
+                    ♡
+                  </div>
+                </div>
+
+                <div class="item-body">
+
+                  <div class="item-name">
+                    ${escapeHtml(
+                      item.itemName ||
+                      'LOVE SHOP ITEM'
+                    )}
+                  </div>
+
+                  <div class="item-description">
+                    ${escapeHtml(
+                      item.description ||
+                      'Whale Love Club 專屬兌換品'
+                    )}
+                  </div>
+
+                  <div class="item-meta">
+
+                    <div class="price">
+                      ${price.toLocaleString('zh-TW')}
+                      <small>
+                        LOVE PTS
+                      </small>
+                    </div>
+
+                    <div class="stock">
+                      剩餘 ${stock}
+                    </div>
+
+                    <button
+                      class="redeem-btn"
+                      type="button"
+                      ${disabled ? 'disabled' : ''}
+                      onclick="openRedeem(${index})"
+                    >
+                      ${buttonText}
+                    </button>
+
+                  </div>
+
+                </div>
+
+              </article>
+            `;
+
+          }
+        )
+        .join('');
+
+  }
+
+
+
+  /* ======================================
+     PRIVATE ITEM IMAGES
+     ====================================== */
+
+  async function loadAllItemImages() {
+
+    const tasks = [];
+
+
+    for (
+      let i = 0;
+      i < shopItems.length;
+      i++
+    ) {
+
+      const fileId =
+        String(
+          shopItems[i]
+            .imageFileId || ''
+        ).trim();
+
+
+      if (!fileId) {
+        continue;
+      }
+
+
+      tasks.push(
+        loadItemImage(
+          i,
+          fileId
+        )
+      );
+
+    }
+
+
+    await Promise.allSettled(
+      tasks
+    );
+
+  }
+
+
+  async function loadItemImage(
+    index,
+    fileId
+  ) {
+
+    try {
+
+      const response =
+        await fetch(
+          '/api/photo',
+          {
+            method:
+              'POST',
+
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+
+            body:
+              JSON.stringify({
+                idToken:
+                  idToken,
+                fileId:
+                  fileId
+              })
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!data.success) {
+        return;
+      }
+
+
+      const imageUrl =
+        buildPhotoDataUrl(
+          data
+        );
+
+
+      if (!imageUrl) {
+        return;
+      }
+
+
+      const box =
+        document.querySelector(
+          `[data-item-image-index="${index}"]`
+        );
+
+
+      if (!box) {
+        return;
+      }
+
+
+      box.innerHTML = '';
+
+
+      const img =
+        document.createElement(
+          'img'
+        );
+
+
+      img.alt =
+        shopItems[index]
+          .itemName ||
+        'shop item';
+
+
+      img.decoding =
+        'async';
+
+
+      img.onerror =
+        function() {
+
+          box.innerHTML =
+            '<div class="item-placeholder">♡</div>';
+
+        };
+
+
+      /*
+       * LINE WebView：
+       * 先 append 再指定 src，
+       * 避免快取命中時不觸發顯示。
+       */
+      box.appendChild(img);
+
+      img.src =
+        imageUrl;
+
+
+    } catch (error) {
+
+      console.warn(
+        'Shop image load failed',
+        error
+      );
+
+    }
+
+  }
+
+
+  function buildPhotoDataUrl(
+    data
+  ) {
+
+    if (
+      data.dataUrl
+    ) {
+
+      return data.dataUrl;
+
+    }
+
+
+    if (
+      data.imageUrl
+    ) {
+
+      return data.imageUrl;
+
+    }
+
+
+    if (
+      data.mimeType &&
+      data.base64Data
+    ) {
+
+      return (
+        'data:' +
+        data.mimeType +
+        ';base64,' +
+        data.base64Data
+      );
+
+    }
+
+
+    if (
+      data.photo &&
+      data.photo.mimeType &&
+      data.photo.base64Data
+    ) {
+
+      return (
+        'data:' +
+        data.photo.mimeType +
+        ';base64,' +
+        data.photo.base64Data
+      );
+
+    }
+
+
+    return '';
+
+  }
+
+
+
+  /* ======================================
+     REDEEM
+     ====================================== */
+
+  function openRedeem(index) {
+
+    const item =
+      shopItems[index];
+
+
+    if (!item) {
+      return;
+    }
+
+
+    currentRedeemItem =
+      item;
+
+
+    document
+      .getElementById(
+        'redeemTitle'
+      )
+      .textContent =
+      item.itemName ||
+      '確認兌換';
+
+
+    document
+      .getElementById(
+        'redeemText'
+      )
+      .textContent =
+      '兌換後會立即扣除 Love Points，並記錄這次兌換。';
+
+
+    document
+      .getElementById(
+        'redeemPrice'
+      )
+      .textContent =
+      Number(
+        item.price || 0
+      )
+        .toLocaleString(
+          'zh-TW'
+        ) +
+      ' pts';
+
+
+    document
+      .getElementById(
+        'redeemMask'
+      )
+      .classList
+      .add('show');
+
+  }
+
+
+  function closeRedeem() {
+
+    document
+      .getElementById(
+        'redeemMask'
+      )
+      .classList
+      .remove('show');
+
+
+    currentRedeemItem =
+      null;
+
+  }
+
+
+  function closeRedeemFromMask(
+    event
+  ) {
+
+    if (
+      event.target.id ===
+      'redeemMask'
+    ) {
+
+      closeRedeem();
+
+    }
+
+  }
+
+
+  async function confirmRedeem() {
+
+    if (!currentRedeemItem) {
+      return;
+    }
+
+
+    const button =
+      document.getElementById(
+        'confirmRedeemButton'
+      );
+
+
+    button.disabled =
+      true;
+
+
+    button.textContent =
+      '兌換中...';
+
+
+    try {
+
+      const response =
+        await fetch(
+          '/api/shop',
+          {
+            method:
+              'POST',
+
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+
+            body:
+              JSON.stringify({
+                idToken:
+                  idToken,
+                action:
+                  'redeem',
+                itemId:
+                  currentRedeemItem
+                    .itemId
+              })
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!data.success) {
+
+        throw new Error(
+          translateError(
+            data.message ||
+            '兌換失敗'
+          )
+        );
+
+      }
+
+
+      const redeemedName =
+        data.itemName ||
+        currentRedeemItem
+          .itemName ||
+        '商品';
+
+
+      closeRedeem();
+
+
+      showToast(
+        `${redeemedName} 兌換成功 ♡`
+      );
+
+
+      await loadShop();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      showToast(
+        error.message ||
+        '兌換失敗'
+      );
+
+
+    } finally {
+
+      button.disabled =
+        false;
+
+
+      button.textContent =
+        '確認兌換';
+
+    }
+
+  }
+
+
+
+  /* ======================================
+     ERROR / HELPERS
+     ====================================== */
+
+  function translateError(
+    message
+  ) {
+
+    const value =
+      String(
+        message || ''
+      );
+
+
+    if (
+      value.includes(
+        'NOT_ENOUGH_LOVE_POINTS'
+      )
+    ) {
+
+      return 'Love Points 不足';
+
+    }
+
+
+    if (
+      value.includes(
+        'OUT_OF_STOCK'
+      )
+    ) {
+
+      return '這個商品已經兌換完畢';
+
+    }
+
+
+    if (
+      value.includes(
+        'ITEM_NOT_AVAILABLE'
+      )
+    ) {
+
+      return '這個商品目前沒有上架';
+
+    }
+
+
+    if (
+      value.includes(
+        'ITEM_NOT_FOUND'
+      )
+    ) {
+
+      return '找不到這個商品';
+
+    }
+
+
+    return value;
+
+  }
+
+
+  function renderError(message) {
+
+    document
+      .getElementById(
+        'items'
+      )
+      .innerHTML = `
+        <div class="empty">
+          無法載入商城<br>
+          ${escapeHtml(
+            message
+          )}
+        </div>
+      `;
+
+  }
+
+
+  function showToast(
+    message
+  ) {
+
+    const toast =
+      document.getElementById(
+        'toast'
+      );
+
+
+    toast.textContent =
+      message;
+
+
+    toast.classList.add(
+      'show'
+    );
+
+
+    setTimeout(
+      function() {
+
+        toast.classList.remove(
+          'show'
+        );
+
+      },
+      2400
+    );
+
+  }
+
+
+  function goHome() {
+
+    window.location.href =
+      '/';
+
+  }
+
+
+  function refreshLogin() {
+
+    try {
+      liff.logout();
+    } catch (error) {}
+
+
+    liff.login({
+      redirectUri:
+        window.location.href
+    });
+
+  }
+
+
+  function escapeHtml(value) {
+
+    return String(
+      value ?? ''
+    )
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+
+  }
+
+
+
+  init();
+
+</script>
+
+</body>
+</html>
