@@ -40,7 +40,8 @@ export default async function handler(req, res) {
       idToken,
       action,
       itemId,
-      item
+      item,
+      benefitId
     } = req.body || {};
 
 
@@ -140,6 +141,49 @@ export default async function handler(req, res) {
 
         item:
           item
+      };
+
+    } else if (
+      normalizedAction === 'getBenefits'
+    ) {
+
+      payload = {
+        action:
+          'getBenefits',
+
+        secret:
+          appsScriptSecret,
+
+        lineUserId:
+          lineData.sub
+      };
+
+    } else if (
+      normalizedAction === 'useBenefit'
+    ) {
+
+      if (!benefitId) {
+
+        return res.status(400).json({
+          success: false,
+          message: 'Missing benefitId'
+        });
+
+      }
+
+
+      payload = {
+        action:
+          'useBenefit',
+
+        secret:
+          appsScriptSecret,
+
+        lineUserId:
+          lineData.sub,
+
+        benefitId:
+          benefitId
       };
 
     } else {
