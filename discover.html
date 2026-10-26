@@ -9,13 +9,13 @@
 <style>
 *{box-sizing:border-box}
 :root{
-  --bg:#080808;
-  --panel:#111;
-  --panel2:#151515;
-  --line:rgba(255,255,255,.08);
-  --text:#f5f1eb;
-  --muted:#9d968e;
-  --gold:#d7b184;
+  --bg:var(--wlc-bg,#080808);
+  --panel:var(--wlc-panel,#111);
+  --panel2:var(--wlc-panel-2,#151515);
+  --line:var(--wlc-border,rgba(255,255,255,.08));
+  --text:var(--wlc-text,#f5f1eb);
+  --muted:var(--wlc-text-muted,#9d968e);
+  --gold:var(--wlc-accent,#d7b184);
   --gold-soft:rgba(215,177,132,.11);
   --danger:#d98b8b;
 }
@@ -175,6 +175,244 @@ h1{font-family:Georgia,"Noto Serif TC",serif;font-size:34px;font-weight:400;marg
 @media(min-width:650px){
   .grid{grid-template-columns:1fr 1fr}
 }
+</style>
+<link rel="stylesheet" href="/theme.css?v=6">
+<script src="/theme.js?v=6"></script>
+
+<style id="wlc-discover-theme-bridge">
+  /* =====================================================
+     Whale Love Club - 鯨魚日報 theme bridge
+     ===================================================== */
+
+  html,
+  body {
+    background: var(--wlc-bg);
+    color: var(--wlc-text);
+  }
+
+  body {
+    transition:
+      background .25s ease,
+      color .25s ease;
+  }
+
+  .back,
+  .summary-card,
+  .search,
+  .chip,
+  .card,
+  .match-modal,
+  .modal-card {
+    background: var(--wlc-panel);
+    color: var(--wlc-text);
+    border-color: var(--wlc-border);
+    box-shadow: var(--wlc-shadow);
+  }
+
+  .brand-small,
+  .eyebrow,
+  .summary-value,
+  .score,
+  .card-title,
+  .saved,
+  .matched-badge,
+  .match-title {
+    color: var(--wlc-accent);
+  }
+
+  .subtitle,
+  .summary-label,
+  .section-count,
+  .meta,
+  .description,
+  .empty,
+  .loading,
+  .chip {
+    color: var(--wlc-text-muted);
+  }
+
+  .chip.active,
+  .save-btn.active {
+    background: var(--wlc-accent);
+    color: var(--wlc-accent-contrast, #111);
+    border-color: var(--wlc-accent);
+  }
+
+  .search::placeholder {
+    color: var(--wlc-text-muted);
+  }
+
+  .card {
+    overflow: hidden;
+  }
+
+  /* BLACK GOLD */
+  :root[data-theme="black-gold"] body {
+    background:
+      radial-gradient(
+        circle at 50% -8%,
+        rgba(215,177,132,.12),
+        transparent 30%
+      ),
+      var(--wlc-bg);
+  }
+
+  :root[data-theme="black-gold"] .summary-card,
+  :root[data-theme="black-gold"] .card,
+  :root[data-theme="black-gold"] .search,
+  :root[data-theme="black-gold"] .chip {
+    background:
+      linear-gradient(
+        145deg,
+        rgba(255,255,255,.03),
+        rgba(215,177,132,.02)
+      ),
+      var(--wlc-panel);
+  }
+
+  /* OCEAN BLUE */
+  :root[data-theme="ocean-blue"] body {
+    background:
+      radial-gradient(
+        circle at 50% -8%,
+        rgba(118,200,232,.16),
+        transparent 32%
+      ),
+      linear-gradient(
+        180deg,
+        #061521 0%,
+        #081b29 45%,
+        #0b2534 100%
+      );
+  }
+
+  :root[data-theme="ocean-blue"] .summary-card,
+  :root[data-theme="ocean-blue"] .card,
+  :root[data-theme="ocean-blue"] .search,
+  :root[data-theme="ocean-blue"] .chip {
+    background:
+      linear-gradient(
+        145deg,
+        rgba(118,200,232,.05),
+        rgba(255,255,255,.018)
+      ),
+      var(--wlc-panel);
+  }
+
+  /* LAVENDER DREAM */
+  :root[data-theme="lavender-dream"] body {
+    background:
+      radial-gradient(
+        circle at 12% 8%,
+        rgba(255,255,255,.9) 0 5px,
+        transparent 6px
+      ),
+      linear-gradient(
+        135deg,
+        #f8f5ff 0%,
+        #f1eaff 42%,
+        #fff8fb 100%
+      );
+  }
+
+  :root[data-theme="lavender-dream"] .summary-card,
+  :root[data-theme="lavender-dream"] .card,
+  :root[data-theme="lavender-dream"] .search,
+  :root[data-theme="lavender-dream"] .chip {
+    background: #f8f2ff;
+  }
+
+  /* CREAM CAFE */
+  :root[data-theme="cream-cafe"] body {
+    background:
+      radial-gradient(
+        circle at 10% 8%,
+        rgba(255,255,255,.8) 0 5px,
+        transparent 6px
+      ),
+      linear-gradient(
+        135deg,
+        #fffaf1,
+        #f7efe4 50%,
+        #efe1d0
+      );
+  }
+
+  :root[data-theme="cream-cafe"] .summary-card,
+  :root[data-theme="cream-cafe"] .card,
+  :root[data-theme="cream-cafe"] .search,
+  :root[data-theme="cream-cafe"] .chip {
+    background: #fff8ef;
+  }
+
+  /* CUTE PASTEL */
+  :root[data-theme="cute-pastel"] body {
+    color: #654545;
+    background:
+      radial-gradient(
+        circle at 12% 9%,
+        rgba(255,255,255,.9) 0 5px,
+        transparent 6px
+      ),
+      linear-gradient(
+        135deg,
+        #ffe6ef 0%,
+        #fff2f6 37%,
+        #e8f7ff 70%,
+        #dff4ff 100%
+      );
+  }
+
+  :root[data-theme="cute-pastel"] .back,
+  :root[data-theme="cute-pastel"] .summary-card,
+  :root[data-theme="cute-pastel"] .card,
+  :root[data-theme="cute-pastel"] .search,
+  :root[data-theme="cute-pastel"] .chip,
+  :root[data-theme="cute-pastel"] .modal-card {
+    color: #654545;
+    border-color: rgba(101,69,69,.35);
+  }
+
+  :root[data-theme="cute-pastel"] .summary-card,
+  :root[data-theme="cute-pastel"] .card {
+    background: rgba(255,255,255,.72);
+  }
+
+  :root[data-theme="cute-pastel"] .brand-small,
+  :root[data-theme="cute-pastel"] .eyebrow,
+  :root[data-theme="cute-pastel"] .summary-value,
+  :root[data-theme="cute-pastel"] .score,
+  :root[data-theme="cute-pastel"] .matched-badge,
+  :root[data-theme="cute-pastel"] .match-title {
+    color: #e989ad;
+  }
+
+  :root[data-theme="cute-pastel"] .subtitle,
+  :root[data-theme="cute-pastel"] .summary-label,
+  :root[data-theme="cute-pastel"] .section-count,
+  :root[data-theme="cute-pastel"] .meta,
+  :root[data-theme="cute-pastel"] .description,
+  :root[data-theme="cute-pastel"] .empty,
+  :root[data-theme="cute-pastel"] .loading {
+    color: #8a6969;
+  }
+
+  :root[data-theme="cute-pastel"] .chip.active,
+  :root[data-theme="cute-pastel"] .save-btn.active {
+    background: #f7b8cf;
+    color: #654545;
+    border-color: #e989ad;
+  }
+
+  /* Avoid original fixed-dark colors winning over theme bridge */
+  .page,
+  .topbar,
+  .hero,
+  .toolbar,
+  .grid,
+  .section-head {
+    color: inherit;
+  }
 </style>
 </head>
 
