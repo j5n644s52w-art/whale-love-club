@@ -414,6 +414,168 @@ h1{font-family:Georgia,"Noto Serif TC",serif;font-size:34px;font-weight:400;marg
     color: inherit;
   }
 </style>
+
+<style id="wlc-discover-card-theme-fix">
+  /* =====================================================
+     鯨魚日報活動卡片：上半部視覺區同步主題
+     ===================================================== */
+
+  .card {
+    background: var(--wlc-panel);
+  }
+
+  .card-visual {
+    background:
+      linear-gradient(
+        145deg,
+        var(--wlc-panel-2),
+        var(--wlc-panel)
+      );
+  }
+
+  .category-badge,
+  .meta span {
+    background: var(--wlc-panel-2);
+    color: var(--wlc-text-muted);
+    border-color: var(--wlc-border);
+  }
+
+  .score-label {
+    color: var(--wlc-text-muted);
+  }
+
+  .desc {
+    color: var(--wlc-text-muted);
+  }
+
+
+  /* BLACK GOLD */
+  :root[data-theme="black-gold"] .card-visual {
+    background:
+      radial-gradient(
+        circle at 84% 10%,
+        rgba(215,177,132,.16),
+        transparent 32%
+      ),
+      linear-gradient(
+        135deg,
+        #1b1815,
+        #101010 58%,
+        #151515
+      );
+  }
+
+  :root[data-theme="black-gold"] .category-badge {
+    background: rgba(0,0,0,.25);
+    color: #ddbc94;
+    border-color: rgba(215,177,132,.25);
+  }
+
+
+  /* OCEAN BLUE */
+  :root[data-theme="ocean-blue"] .card-visual {
+    background:
+      radial-gradient(
+        circle at 84% 12%,
+        rgba(118,200,232,.20),
+        transparent 34%
+      ),
+      linear-gradient(
+        145deg,
+        #0c2a3c,
+        #0a1c28 58%,
+        #103447
+      );
+  }
+
+  :root[data-theme="ocean-blue"] .category-badge {
+    background: rgba(118,200,232,.08);
+    color: var(--wlc-accent);
+  }
+
+
+  /* LAVENDER DREAM */
+  :root[data-theme="lavender-dream"] .card-visual {
+    background:
+      radial-gradient(
+        circle at 84% 12%,
+        rgba(150,118,199,.16),
+        transparent 34%
+      ),
+      linear-gradient(
+        145deg,
+        #eee4ff,
+        #f8f3ff 58%,
+        #e5d7f7
+      );
+  }
+
+  :root[data-theme="lavender-dream"] .category-badge {
+    background: rgba(255,255,255,.55);
+    color: var(--wlc-accent);
+  }
+
+
+  /* CREAM CAFE */
+  :root[data-theme="cream-cafe"] .card-visual {
+    background:
+      radial-gradient(
+        circle at 84% 12%,
+        rgba(157,111,76,.13),
+        transparent 34%
+      ),
+      linear-gradient(
+        145deg,
+        #f0dfcb,
+        #fff7ed 58%,
+        #ead4bc
+      );
+  }
+
+  :root[data-theme="cream-cafe"] .category-badge {
+    background: rgba(255,255,255,.58);
+    color: var(--wlc-accent);
+  }
+
+
+  /* CUTE PASTEL */
+  :root[data-theme="cute-pastel"] .card {
+    background: rgba(255,255,255,.76);
+  }
+
+  :root[data-theme="cute-pastel"] .card-visual {
+    background:
+      radial-gradient(
+        circle at 82% 12%,
+        rgba(255,255,255,.82),
+        transparent 32%
+      ),
+      linear-gradient(
+        135deg,
+        #ffdce9 0%,
+        #fff1d9 45%,
+        #def3ff 100%
+      );
+  }
+
+  :root[data-theme="cute-pastel"] .category-badge {
+    background: rgba(255,255,255,.72);
+    color: #9b6579;
+    border-color: rgba(101,69,69,.22);
+  }
+
+  :root[data-theme="cute-pastel"] .score-label,
+  :root[data-theme="cute-pastel"] .desc,
+  :root[data-theme="cute-pastel"] .meta span {
+    color: #8a6969;
+  }
+
+  :root[data-theme="cute-pastel"] .meta span {
+    background: rgba(255,255,255,.68);
+    border-color: rgba(101,69,69,.16);
+  }
+</style>
+
 </head>
 
 <body>
