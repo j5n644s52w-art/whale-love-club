@@ -579,6 +579,11 @@
         #eaf7ff;
     }
 
+    .menu-daily {
+      background:
+        #fff2df;
+    }
+
 
     .menu-icon {
       width: 67px;
@@ -1018,6 +1023,7 @@
   :root[data-theme="black-gold"] .menu-ledger,
   :root[data-theme="black-gold"] .menu-collection,
   :root[data-theme="black-gold"] .menu-memories,
+  :root[data-theme="black-gold"] .menu-daily,
   :root[data-theme="black-gold"] .menu-ticket {
     background:
       linear-gradient(
@@ -1103,6 +1109,7 @@
   :root[data-theme="ocean-blue"] .menu-ledger,
   :root[data-theme="ocean-blue"] .menu-collection,
   :root[data-theme="ocean-blue"] .menu-memories,
+  :root[data-theme="ocean-blue"] .menu-daily,
   :root[data-theme="ocean-blue"] .menu-ticket {
     background:
       linear-gradient(
@@ -1157,7 +1164,8 @@
 
   :root[data-theme="lavender-dream"] .point-card.pink,
   :root[data-theme="lavender-dream"] .menu-ledger,
-  :root[data-theme="lavender-dream"] .menu-memories {
+  :root[data-theme="lavender-dream"] .menu-memories,
+  :root[data-theme="lavender-dream"] .menu-daily {
     background: #f4ecff;
   }
 
@@ -1211,7 +1219,8 @@
 
   :root[data-theme="cream-cafe"] .point-card.pink,
   :root[data-theme="cream-cafe"] .menu-ledger,
-  :root[data-theme="cream-cafe"] .menu-memories {
+  :root[data-theme="cream-cafe"] .menu-memories,
+  :root[data-theme="cream-cafe"] .menu-daily {
     background: #f7eadc;
   }
 
@@ -1338,6 +1347,10 @@
 
   :root[data-theme="cute-pastel"] .menu-memories {
     background: #ffe6f0;
+  }
+
+  :root[data-theme="cute-pastel"] .menu-daily {
+    background: #fff0dc;
   }
 
   :root[data-theme="cute-pastel"] .menu-ticket {
@@ -2002,6 +2015,29 @@
 
 
 
+      <!-- WHALE DAILY -->
+
+      <div
+        class="menu-card menu-daily"
+        onclick="goWhaleDaily()"
+      >
+
+        <div class="corner-star">
+          ◌
+        </div>
+
+        <div class="menu-name">
+          鯨魚日報
+        </div>
+
+        <div class="menu-sub">
+          WHALE DAILY
+        </div>
+
+      </div>
+
+
+
       <!-- FUTURE NFC -->
 
       <div
@@ -2600,6 +2636,15 @@
       '/memories.html';
 
   }
+
+
+  function goWhaleDaily() {
+
+    window.location.href =
+      '/discover.html';
+
+  }
+
 
 
   function comingSoon() {
