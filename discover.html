@@ -138,6 +138,38 @@ h1{font-family:Georgia,"Noto Serif TC",serif;font-size:34px;font-weight:400;marg
   transition:.22s;z-index:30;white-space:nowrap;max-width:90vw;
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.match-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:11px;padding:7px 10px;border-radius:999px;
+  background:rgba(215,177,132,.14);
+  border:1px solid rgba(215,177,132,.28);
+  color:#e6c59e;font-size:10px;letter-spacing:1.1px;
+}
+.match-overlay{
+  position:fixed;inset:0;z-index:80;
+  display:flex;align-items:center;justify-content:center;
+  padding:22px;background:rgba(0,0,0,.72);
+  backdrop-filter:blur(7px);
+}
+.match-modal{
+  width:min(100%,430px);
+  border:1px solid rgba(215,177,132,.28);
+  background:linear-gradient(155deg,#191613,#0c0c0c 62%);
+  border-radius:28px;padding:30px 22px;text-align:center;
+  box-shadow:0 24px 80px rgba(0,0,0,.55);
+}
+.match-heart{font-size:44px;color:var(--gold)}
+.match-kicker{margin-top:12px;color:var(--gold);font-size:10px;letter-spacing:4px}
+.match-title{
+  margin:11px 0 0;font-family:Georgia,"Noto Serif TC",serif;
+  font-size:30px;font-weight:400
+}
+.match-event{margin-top:12px;color:#bdb4ab;font-size:13px;line-height:1.7}
+.match-close{
+  width:100%;margin-top:22px;border:0;border-radius:15px;
+  padding:13px 15px;background:var(--gold);color:#17120e;font-weight:700
+}
 .hidden{display:none!important}
 
 @media(min-width:650px){
@@ -190,6 +222,16 @@ h1{font-family:Georgia,"Noto Serif TC",serif;font-size:34px;font-weight:400;marg
   <div id="stateBox" class="loading">正在讀取最近的活動…</div>
   <section id="grid" class="grid hidden"></section>
 </main>
+
+<div id="matchOverlay" class="match-overlay hidden" onclick="closeMatch(event)">
+  <div class="match-modal" onclick="event.stopPropagation()">
+    <div class="match-heart">♡</div>
+    <div class="match-kicker">IT'S A MATCH!</div>
+    <h2 class="match-title">你們都想去</h2>
+    <div id="matchEvent" class="match-event"></div>
+    <button class="match-close" onclick="closeMatch()">收進約會清單 ♡</button>
+  </div>
+</div>
 
 <div id="toast" class="toast"></div>
 
@@ -380,6 +422,10 @@ function cardTemplate(item) {
       <div class="card-body">
         <h2 class="card-title">${title}</h2>
 
+        ${item.matched
+          ? `<div class="match-badge">♡ IT'S A MATCH</div>`
+          : ''}
+
         <div class="meta">
           <span>📍 ${city}</span>
           ${venue ? `<span>${venue}</span>` : ''}
@@ -440,14 +486,39 @@ async function toggleWant(itemId) {
       throw new Error(data.message || '更新失敗');
     }
 
-    item.saved = !!data.saved;
+    item.saved =
+      !!data.saved;
+
+    item.matched =
+      !!data.matched;
+
 
     document.getElementById('savedCount').textContent =
       items.filter(x => !!x.saved).length;
 
+
     render();
 
-    showToast(data.saved ? '已加入「想去」♡' : '已從「想去」移除');
+
+    if (
+      data.saved &&
+      data.matched
+    ) {
+
+      showMatch(
+        item.title ||
+        '這個活動'
+      );
+
+    } else {
+
+      showToast(
+        data.saved
+          ? '已加入「想去」♡'
+          : '已從「想去」移除'
+      );
+
+    }
   } catch (error) {
     console.error(error);
     showToast(error.message || '更新失敗');
@@ -561,6 +632,54 @@ function showToast(message) {
     toast.classList.remove('show');
   }, 1700);
 }
+
+function showMatch(title) {
+
+  document
+    .getElementById(
+      'matchEvent'
+    )
+    .textContent =
+      String(
+        title || ''
+      );
+
+
+  document
+    .getElementById(
+      'matchOverlay'
+    )
+    .classList
+    .remove(
+      'hidden'
+    );
+
+}
+
+
+function closeMatch(event) {
+
+  if (
+    event &&
+    event.target &&
+    event.currentTarget &&
+    event.target !== event.currentTarget
+  ) {
+    return;
+  }
+
+
+  document
+    .getElementById(
+      'matchOverlay'
+    )
+    .classList
+    .add(
+      'hidden'
+    );
+
+}
+
 
 function refreshLogin() {
   try {
