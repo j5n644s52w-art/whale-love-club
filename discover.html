@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>約會雷達 | Whale Love Club</title>
+<link rel="stylesheet" href="/theme.css?v=6">
+<script src="/theme.js?v=6"></script>
+<script src="/fast-cache.js?v=1"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--wlc-bg);color:var(--wlc-text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC",sans-serif;padding-bottom:calc(40px + env(safe-area-inset-bottom))}
+button{font:inherit;cursor:pointer}
+.page{width:min(100%,760px);margin:auto;padding:calc(18px + env(safe-area-inset-top)) 18px 40px}
+.topbar{display:flex;justify-content:space-between;align-items:center}
+.back{border:0;background:transparent;color:var(--wlc-text-muted);padding:8px 0}
+.brand{text-align:right}.brand-small{color:var(--wlc-accent);font-size:9px;letter-spacing:3px}.brand-name{margin-top:4px;font-family:Georgia,serif}
+.hero{margin-top:28px;padding:24px 20px;border:1px solid var(--wlc-border-soft);border-radius:24px;background:linear-gradient(145deg,color-mix(in srgb,var(--wlc-accent) 10%,var(--wlc-panel)),var(--wlc-panel));position:relative;overflow:hidden}
+.hero:after{content:"♡";position:absolute;right:18px;top:8px;font-size:84px;font-family:Georgia,serif;color:color-mix(in srgb,var(--wlc-accent) 10%,transparent)}
+.eyebrow{color:var(--wlc-accent);font-size:10px;letter-spacing:4px}
+h1{margin:9px 0 0;font:400 31px Georgia,"Noto Serif TC",serif}
+.hero-text{margin-top:10px;color:var(--wlc-text-muted);font-size:13px;line-height:1.8;max-width:520px}
+.stats{margin-top:18px;display:flex;gap:9px;flex-wrap:wrap}.stat{padding:8px 11px;border:1px solid var(--wlc-border);border-radius:999px;background:var(--wlc-panel-2);color:var(--wlc-text-soft);font-size:11px}
+.section{margin-top:28px}.section-title{font:18px Georgia,"Noto Serif TC",serif}.section-sub{margin-top:4px;color:var(--wlc-text-muted);font-size:10px;letter-spacing:2px}
+.filters{margin-top:14px;display:flex;gap:8px;overflow-x:auto;padding-bottom:3px;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}
+.filter{flex:0 0 auto;border:1px solid var(--wlc-border);border-radius:999px;padding:9px 13px;background:var(--wlc-panel-2);color:var(--wlc-text-muted);font-size:12px}
+.filter.active{background:linear-gradient(135deg,var(--wlc-accent-strong),var(--wlc-accent-dark));color:#111;border-color:transparent;font-weight:800}
+.list{margin-top:16px;display:grid;gap:14px}
+.card{border:1px solid var(--wlc-border-soft);border-radius:22px;background:var(--wlc-panel);overflow:hidden}
+.image{height:185px;display:grid;place-items:center;position:relative;background:linear-gradient(145deg,var(--wlc-panel-2),color-mix(in srgb,var(--wlc-accent) 8%,var(--wlc-panel)))}
+.icon{font-size:45px}.badge{position:absolute;top:12px;left:12px;padding:7px 10px;border-radius:999px;background:rgba(15,15,15,.78);color:#fff;font-size:10px}
+.body{padding:17px}.meta{display:flex;justify-content:space-between;gap:10px;color:var(--wlc-text-muted);font-size:11px}.cat{color:var(--wlc-accent);letter-spacing:1px}
+.title{margin-top:9px;font:21px Georgia,"Noto Serif TC",serif}.desc{margin-top:9px;color:var(--wlc-text-muted);font-size:12px;line-height:1.7}
+.info{margin-top:12px;display:grid;gap:5px;color:var(--wlc-text-soft);font-size:11px}
+.actions{margin-top:15px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.btn{border-radius:13px;padding:12px;text-align:center;font-size:12px}
+.want{border:1px solid var(--wlc-border);background:var(--wlc-panel-2);color:var(--wlc-text)}
+.want.saved{color:var(--wlc-accent);border-color:var(--wlc-accent);background:color-mix(in srgb,var(--wlc-accent) 14%,var(--wlc-panel-2))}
+.detail{border:0;background:linear-gradient(135deg,var(--wlc-accent-strong),var(--wlc-accent-dark));color:#111;font-weight:800}
+.toast{position:fixed;left:50%;bottom:calc(25px + env(safe-area-inset-bottom));transform:translate(-50%,30px);opacity:0;background:var(--wlc-text);color:var(--wlc-bg);padding:12px 17px;border-radius:999px;font-size:12px;transition:.25s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.footer{margin-top:34px;text-align:center;color:var(--wlc-text-muted);font-size:9px;letter-spacing:2px;line-height:1.8}
+@media(min-width:660px){.list{grid-template-columns:1fr 1fr}.image{height:205px}}
+</style>
+</head>
+<body>
+<main class="page">
+<div class="topbar">
+<button class="back" onclick="location.href='/'">← 會員中心</button>
+<div class="brand"><div class="brand-small">♡ PRIVATE MEMBERS</div><div class="brand-name">Whale Love Club</div></div>
+</div>
+
+<section class="hero">
+<div class="eyebrow">DISCOVER · DATE RADAR</div>
+<h1>約會雷達</h1>
+<div class="hero-text">自動整理近期熱門電影、展覽、演出、市集、快閃店與值得出門走走的新鮮事。</div>
+<div class="stats">
+<div class="stat" id="totalStat">0 個近期推薦</div>
+<div class="stat" id="savedStat">♡ 0 個想去</div>
+</div>
+</section>
+
+<section class="section">
+<div class="section-title">最近有什麼好玩的？</div>
+<div class="section-sub">TRENDING NOW</div>
+<div class="filters" id="filters"></div>
+<div class="list" id="list"></div>
+</section>
+
+<div class="footer">WHALE LOVE CLUB<br>DISCOVER TOGETHER ♡</div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const items=[
+{itemId:"D001",title:"近期熱門電影",category:"MOVIE",city:"全台",venue:"各大影城",date:"本週熱映",description:"之後會自動抓近期票房與熱門電影，挑幾部適合約會看的。",trendScore:96,badge:"🔥 本週熱門"},
+{itemId:"D002",title:"期間限定主題展",category:"EXHIBITION",city:"台北",venue:"展覽場館",date:"近期展出",description:"動漫、角色 IP、藝術展、主題展等近期熱門展覽會整理在這裡。",trendScore:91,badge:"🔥 社群熱度高"},
+{itemId:"D003",title:"週末市集與快閃店",category:"POPUP",city:"台中",venue:"市區",date:"週末",description:"臨時不知道去哪裡時，可以快速找一個能逛、能吃、能拍照的地方。",trendScore:84,badge:"NEW"},
+{itemId:"D004",title:"近期熱門音樂演出",category:"MUSIC",city:"全台",venue:"演唱會／音樂廳",date:"近期",description:"演唱會、動漫音樂會、電影配樂與特色演出都可以自動整理。",trendScore:88,badge:"♪ 推薦"},
+{itemId:"D005",title:"最近爆紅的新景點",category:"PLACE",city:"全台",venue:"景點",date:"隨時",description:"之後可加入近期新聞、社群討論與地方活動來源，找最近大家在去的地方。",trendScore:90,badge:"📸 熱門"},
+{itemId:"D006",title:"吃吃喝喝約會提案",category:"FOOD",city:"台中",venue:"餐廳／甜點",date:"隨時",description:"之後可加入期間限定餐廳、主題咖啡廳、甜點活動與近期熱門店家。",trendScore:79,badge:"♡ DATE IDEA"}
+];
+
+const categories=[
+["ALL","全部"],["HOT","🔥 熱門"],["MOVIE","🎬 電影"],["EXHIBITION","🎨 展覽"],
+["MUSIC","🎵 演出"],["POPUP","🎪 市集／快閃"],["PLACE","📸 景點"],["FOOD","🍰 吃吃喝喝"]
+];
+const icons={MOVIE:"🎬",EXHIBITION:"🎨",MUSIC:"🎵",POPUP:"🎪",PLACE:"📸",FOOD:"🍰"};
+let active="ALL";
+let saved=JSON.parse(localStorage.getItem("wlc-discover-demo")||"[]");
+
+function renderFilters(){
+document.getElementById("filters").innerHTML=categories.map(([k,v])=>`<button class="filter ${k===active?"active":""}" onclick="setCat('${k}')">${v}</button>`).join("");
+}
+
+function visible(){
+if(active==="ALL") return items;
+if(active==="HOT") return items.filter(x=>x.trendScore>=88);
+return items.filter(x=>x.category===active);
+}
+
+function render(){
+const data=visible();
+document.getElementById("list").innerHTML=data.map(x=>{
+const isSaved=saved.includes(x.itemId);
+return `<article class="card">
+<div class="image"><div class="icon">${icons[x.category]||"♡"}</div><div class="badge">${x.badge}</div></div>
+<div class="body">
+<div class="meta"><div class="cat">${x.category}</div><div>熱度 ${x.trendScore}</div></div>
+<div class="title">${x.title}</div>
+<div class="desc">${x.description}</div>
+<div class="info"><div>◇ ${x.city} · ${x.venue}</div><div>○ ${x.date}</div></div>
+<div class="actions">
+<button class="btn want ${isSaved?"saved":""}" onclick="toggleWant('${x.itemId}')">${isSaved?"♥ 已加入想去":"♡ 想去"}</button>
+<button class="btn detail" onclick="demoDetail()">查看詳情</button>
+</div>
+</div>
+</article>`;
+}).join("");
+updateStats();
+}
+
+function setCat(cat){active=cat;renderFilters();render();}
+function toggleWant(id){
+if(saved.includes(id)){saved=saved.filter(x=>x!==id);toast("已從「想去」移除");}
+else{saved.push(id);toast("♡ 已加入我們想去的地方");}
+localStorage.setItem("wlc-discover-demo",JSON.stringify(saved));
+render();
+}
+function updateStats(){
+document.getElementById("totalStat").textContent=`${items.length} 個近期推薦`;
+document.getElementById("savedStat").textContent=`♡ ${saved.length} 個想去`;
+}
+function demoDetail(){toast("目前是展示版，下一階段會接真實活動連結");}
+let timer;
+function toast(msg){
+const el=document.getElementById("toast");
+el.textContent=msg;el.classList.add("show");
+clearTimeout(timer);timer=setTimeout(()=>el.classList.remove("show"),1800);
+}
+renderFilters();render();
+</script>
+</body>
+</html>
