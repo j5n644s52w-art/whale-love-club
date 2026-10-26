@@ -215,33 +215,59 @@ const CATEGORY_LABELS = {
 
 async function init() {
   try {
-    await liff.init({ liffId: LIFF_ID });
+    setStateMessage('正在初始化 LINE 登入…');
+
+    await liff.init({
+      liffId: LIFF_ID
+    });
 
     if (!liff.isLoggedIn()) {
-      liff.login({ redirectUri: location.href });
+      liff.login({
+        redirectUri:
+          window.location.origin +
+          window.location.pathname +
+          window.location.search
+      });
       return;
     }
 
-    idToken = liff.getIDToken();
+    setStateMessage('正在確認會員身分…');
+
+    idToken =
+      liff.getIDToken();
 
     if (!idToken) {
       throw new Error('無法取得 LINE 登入資訊');
     }
 
+    setStateMessage('正在載入活動…');
+
     await loadDiscover();
+
   } catch (error) {
     console.error(error);
-    showError(error.message || 'Discover 載入失敗');
+    showError(
+      [
+        error && error.name
+          ? error.name
+          : '',
+        error && error.message
+          ? error.message
+          : 'Discover 載入失敗'
+      ]
+      .filter(Boolean)
+      .join(': ')
+    );
   }
 }
 
 async function loadDiscover() {
-  const response = await fetch('/api/discover', {
+  const response = await fetch('/api/member', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       idToken,
-      operation: 'list'
+      operation: 'discoverList'
     })
   });
 
@@ -398,12 +424,12 @@ async function toggleWant(itemId) {
   }
 
   try {
-    const response = await fetch('/api/discover', {
+    const response = await fetch('/api/member', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         idToken,
-        operation: 'toggle',
+        operation: 'discoverToggle',
         itemId
       })
     });
@@ -474,12 +500,20 @@ function cleanDescription(text) {
 }
 
 function safeHttpUrl(value) {
-  try {
-    const u = new URL(value);
-    return ['http:', 'https:'].includes(u.protocol) ? u.href : '';
-  } catch {
+  const s =
+    String(value || '').trim();
+
+  if (!s) {
     return '';
   }
+
+  if (
+    /^https?:\/\//i.test(s)
+  ) {
+    return s;
+  }
+
+  return '';
 }
 
 function escapeHtml(value) {
@@ -494,6 +528,22 @@ function escapeHtml(value) {
 function escapeAttr(value) {
   return escapeHtml(value);
 }
+
+function setStateMessage(message) {
+  const state =
+    document.getElementById('stateBox');
+
+  if (!state) {
+    return;
+  }
+
+  state.className =
+    'loading';
+
+  state.textContent =
+    String(message || '');
+}
+
 
 function showError(message) {
   const state = document.getElementById('stateBox');
@@ -513,8 +563,17 @@ function showToast(message) {
 }
 
 function refreshLogin() {
-  try { liff.logout(); } catch (e) {}
-  location.replace(location.href);
+  try {
+    liff.logout();
+  } catch (e) {}
+
+  const cleanUrl =
+    window.location.origin +
+    window.location.pathname +
+    window.location.search;
+
+  window.location.href =
+    cleanUrl;
 }
 
 init();
