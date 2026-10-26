@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Discover | Whale Love Club</title>
+<title>鯨魚日報 | Whale Love Club</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
 <style>
@@ -189,9 +189,9 @@ h1{font-family:Georgia,"Noto Serif TC",serif;font-size:34px;font-weight:400;marg
   </div>
 
   <section class="hero">
-    <div class="eyebrow">DATE RADAR · DISCOVER</div>
-    <h1>最近大家在去哪？</h1>
-    <div class="subtitle">把近期活動、展覽、快閃、音樂、市集與約會靈感收在這裡。</div>
+    <div class="eyebrow">WHALE DAILY · DISCOVER</div>
+    <h1>鯨魚日報</h1>
+    <div class="subtitle">把近期值得一起去看看的活動、展覽、快閃、音樂與市集收在這裡。</div>
   </section>
 
   <section class="summary">
@@ -215,11 +215,11 @@ h1{font-family:Georgia,"Noto Serif TC",serif;font-size:34px;font-weight:400;marg
   </section>
 
   <div class="section-head">
-    <div class="section-title">TRENDING NOW</div>
+    <div class="section-title">TODAY'S PICKS</div>
     <div class="section-count" id="resultCount">0 ITEMS</div>
   </div>
 
-  <div id="stateBox" class="loading">正在讀取最近的活動…</div>
+  <div id="stateBox" class="loading">正在整理今天的鯨魚日報…</div>
   <section id="grid" class="grid hidden"></section>
 </main>
 
@@ -295,7 +295,7 @@ async function init() {
           : '',
         error && error.message
           ? error.message
-          : 'Discover 載入失敗'
+          : '鯨魚日報載入失敗'
       ]
       .filter(Boolean)
       .join(': ')
