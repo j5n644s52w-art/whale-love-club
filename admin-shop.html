@@ -10,9 +10,8 @@
   <title>商城管理 | Whale Love Club</title>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <link rel="stylesheet" href="/theme.css?v=6">
-  <script src="/theme.js?v=6"></script>
-<script src="/fast-cache.js?v=1"></script>
+  <link rel="stylesheet" href="/theme.css?v=5">
+  <script src="/theme.js?v=5"></script>
 
   <style>
     * {
@@ -516,44 +515,19 @@
         <div class="field">
 
           <div class="label">
-            庫存模式 *
+            庫存 *
           </div>
 
-          <select
+          <input
             class="input"
-            id="stockMode"
-            onchange="toggleStockInput()"
+            id="stock"
+            type="number"
+            min="0"
+            step="1"
+            value="1"
           >
-            <option value="LIMITED">
-              限量
-            </option>
-            <option value="UNLIMITED">
-              無限制
-            </option>
-          </select>
 
         </div>
-
-      </div>
-
-
-      <div
-        class="field"
-        id="stockField"
-      >
-
-        <div class="label">
-          限量數量 *
-        </div>
-
-        <input
-          class="input"
-          id="stock"
-          type="number"
-          min="1"
-          step="1"
-          value="1"
-        >
 
       </div>
 
@@ -648,6 +622,8 @@
 
 <script>
 
+  /* admin-shop auth lifecycle v2 */
+
   const LIFF_ID =
     '2011857714-fZwEK6lN';
 
@@ -656,10 +632,27 @@
 
   let selectedImageFile = null;
 
+  /*
+   * LINE ID Token 只有 1 小時有效。
+   * 每次管理操作前都會檢查剩餘時間。
+   *
+   * 低於 3 分鐘時會主動更新登入，
+   * 避免剛好在上傳圖片 / 建立商品途中過期。
+   */
+  const TOKEN_REFRESH_BUFFER_SECONDS = 180;
+
+  const AUTH_DRAFT_KEY =
+    'wlc_admin_shop_auth_draft_v1';
+
+  const AUTH_RESTORE_KEY =
+    'wlc_admin_shop_auth_restore_v1';
+
+  let authRefreshInProgress = false;
+
 
 
   /* ======================================
-     INIT
+     INIT / LINE AUTH
      ====================================== */
 
   async function init() {
@@ -676,7 +669,7 @@
 
         liff.login({
           redirectUri:
-            window.location.href
+            getCleanCurrentUrl()
         });
 
         return;
@@ -697,16 +690,49 @@
       }
 
 
+      /*
+       * 某些瀏覽器 / LIFF Resume 情況下，
+       * 頁面可能回到舊 session。
+       * 初始化後先做一次 expiry 檢查。
+       */
+      if (
+        getIdTokenSecondsRemaining() <= 0
+      ) {
+
+        await refreshLineLogin({
+          preserveDraft: false
+        });
+
+        return;
+
+      }
+
+
       await verifyAdmin();
 
-      toggleStockInput();
+
+      restoreDraftAfterAuthRefresh();
+
+
+      bindAuthLifecycleWatchers();
 
 
     } catch (error) {
 
+      if (
+        isAuthRefreshSignal(
+          error
+        )
+      ) {
+        return;
+      }
+
+
       showError(
-        error.message ||
-        '初始化失敗'
+        translateError(
+          error.message ||
+          '初始化失敗'
+        )
       );
 
     }
@@ -716,14 +742,534 @@
 
 
   /* ======================================
-     ADMIN CHECK
+     TOKEN HELPERS
      ====================================== */
 
-  async function verifyAdmin() {
+  function getIdTokenSecondsRemaining() {
+
+    try {
+
+      const decoded =
+        liff.getDecodedIDToken();
+
+      const exp =
+        Number(
+          decoded &&
+          decoded.exp
+        );
+
+
+      if (!exp) {
+        return -1;
+      }
+
+
+      return (
+        exp -
+        Math.floor(
+          Date.now() / 1000
+        )
+      );
+
+
+    } catch (_) {
+
+      return -1;
+
+    }
+
+  }
+
+
+
+  async function ensureFreshIdToken(
+    options = {}
+  ) {
+
+    const preserveDraft =
+      options.preserveDraft !== false;
+
+
+    if (authRefreshInProgress) {
+
+      const error =
+        new Error(
+          'AUTH_REFRESHING'
+        );
+
+      error.code =
+        'AUTH_REFRESHING';
+
+      throw error;
+
+    }
+
+
+    const token =
+      liff.getIDToken();
+
+
+    const secondsRemaining =
+      getIdTokenSecondsRemaining();
+
+
+    if (
+      token &&
+      secondsRemaining >
+        TOKEN_REFRESH_BUFFER_SECONDS
+    ) {
+
+      idToken =
+        token;
+
+      return token;
+
+    }
+
+
+    await refreshLineLogin({
+      preserveDraft:
+        preserveDraft
+    });
+
+
+    const error =
+      new Error(
+        'AUTH_REFRESHING'
+      );
+
+    error.code =
+      'AUTH_REFRESHING';
+
+    throw error;
+
+  }
+
+
+
+  async function refreshLineLogin(
+    options = {}
+  ) {
+
+    if (authRefreshInProgress) {
+      return;
+    }
+
+
+    authRefreshInProgress =
+      true;
+
+
+    const preserveDraft =
+      options.preserveDraft !== false;
+
+
+    if (preserveDraft) {
+      saveDraftForAuthRefresh();
+    }
+
+
+    sessionStorage.setItem(
+      AUTH_RESTORE_KEY,
+      '1'
+    );
+
+
+    /*
+     * LIFF Browser 內不能手動 liff.login()。
+     * 重新載入後 liff.init() 會重新取得 token。
+     */
+    if (liff.isInClient()) {
+
+      window.location.reload();
+
+      return;
+
+    }
+
+
+    /*
+     * 外部瀏覽器：
+     * logout → reload → init() 發現未登入 →
+     * liff.login() → 回到同頁重新 init。
+     */
+    try {
+
+      if (liff.isLoggedIn()) {
+        liff.logout();
+      }
+
+    } catch (_) {}
+
+
+    window.location.replace(
+      getCleanCurrentUrl()
+    );
+
+  }
+
+
+
+  function getCleanCurrentUrl() {
+
+    const url =
+      new URL(
+        window.location.href
+      );
+
+
+    /*
+     * 不把 LIFF / OAuth 暫時參數永久留在 redirectUri。
+     */
+    [
+      'code',
+      'state',
+      'liffClientId',
+      'liffRedirectUri',
+      'error',
+      'error_description'
+    ].forEach(
+      function(key) {
+        url.searchParams.delete(
+          key
+        );
+      }
+    );
+
+
+    url.hash =
+      '';
+
+
+    return url.toString();
+
+  }
+
+
+
+  function isExpiredTokenMessage(
+    message
+  ) {
+
+    const value =
+      String(
+        message || ''
+      )
+        .trim()
+        .toLowerCase();
+
+
+    return (
+      value.includes(
+        'idtoken expired'
+      ) ||
+      value.includes(
+        'id token expired'
+      ) ||
+      value.includes(
+        'token expired'
+      ) ||
+      value.includes(
+        'expired token'
+      ) ||
+      (
+        value.includes(
+          'expired'
+        ) &&
+        value.includes(
+          'token'
+        )
+      )
+    );
+
+  }
+
+
+
+  function isAuthRefreshSignal(
+    error
+  ) {
+
+    return !!(
+      error &&
+      (
+        error.code ===
+          'AUTH_REFRESHING' ||
+        error.message ===
+          'AUTH_REFRESHING'
+      )
+    );
+
+  }
+
+
+
+  function saveDraftForAuthRefresh() {
+
+    try {
+
+      const draft = {
+
+        itemName:
+          document
+            .getElementById(
+              'itemName'
+            )
+            .value,
+
+        description:
+          document
+            .getElementById(
+              'description'
+            )
+            .value,
+
+        price:
+          document
+            .getElementById(
+              'price'
+            )
+            .value,
+
+        stock:
+          document
+            .getElementById(
+              'stock'
+            )
+            .value,
+
+        hadImage:
+          !!selectedImageFile,
+
+        savedAt:
+          Date.now()
+
+      };
+
+
+      sessionStorage.setItem(
+        AUTH_DRAFT_KEY,
+        JSON.stringify(
+          draft
+        )
+      );
+
+
+    } catch (_) {}
+
+  }
+
+
+
+  function restoreDraftAfterAuthRefresh() {
+
+    let shouldRestore =
+      false;
+
+
+    try {
+
+      shouldRestore =
+        sessionStorage.getItem(
+          AUTH_RESTORE_KEY
+        ) ===
+        '1';
+
+    } catch (_) {}
+
+
+    if (!shouldRestore) {
+      return;
+    }
+
+
+    let draft =
+      null;
+
+
+    try {
+
+      const raw =
+        sessionStorage.getItem(
+          AUTH_DRAFT_KEY
+        );
+
+
+      if (raw) {
+        draft =
+          JSON.parse(
+            raw
+          );
+      }
+
+    } catch (_) {}
+
+
+    try {
+
+      sessionStorage.removeItem(
+        AUTH_RESTORE_KEY
+      );
+
+      sessionStorage.removeItem(
+        AUTH_DRAFT_KEY
+      );
+
+    } catch (_) {}
+
+
+    if (!draft) {
+
+      toast(
+        'LINE 登入已更新 ♡'
+      );
+
+      return;
+
+    }
+
+
+    document
+      .getElementById(
+        'itemName'
+      )
+      .value =
+      draft.itemName || '';
+
+
+    document
+      .getElementById(
+        'description'
+      )
+      .value =
+      draft.description || '';
+
+
+    document
+      .getElementById(
+        'price'
+      )
+      .value =
+      draft.price ===
+      undefined
+        ? '100'
+        : draft.price;
+
+
+    document
+      .getElementById(
+        'stock'
+      )
+      .value =
+      draft.stock ===
+      undefined
+        ? '1'
+        : draft.stock;
+
+
+    if (draft.hadImage) {
+
+      showError(
+        'LINE 登入已自動更新，商品文字已保留；基於瀏覽器安全限制，請重新選擇一次商品圖片。'
+      );
+
+      toast(
+        '登入已更新，請重新選擇圖片'
+      );
+
+    } else {
+
+      toast(
+        'LINE 登入已自動更新 ♡'
+      );
+
+    }
+
+  }
+
+
+
+  function bindAuthLifecycleWatchers() {
+
+    document.addEventListener(
+      'visibilitychange',
+      function() {
+
+        if (
+          document.visibilityState !==
+          'visible'
+        ) {
+          return;
+        }
+
+
+        /*
+         * 從背景 / LINE 其他畫面回來時，
+         * 若 token 已過期才立即刷新。
+         *
+         * 未過期但剩不到 3 分鐘的情況，
+         * 會在下一次真正 API 操作前刷新。
+         */
+        if (
+          getIdTokenSecondsRemaining() <= 0
+        ) {
+
+          refreshLineLogin({
+            preserveDraft: true
+          });
+
+        }
+
+      }
+    );
+
+
+    window.addEventListener(
+      'pageshow',
+      function(event) {
+
+        /*
+         * Safari / WebView Back-Forward Cache
+         * 可能直接還原舊頁面。
+         */
+        if (
+          event.persisted &&
+          getIdTokenSecondsRemaining() <= 0
+        ) {
+
+          refreshLineLogin({
+            preserveDraft: true
+          });
+
+        }
+
+      }
+    );
+
+  }
+
+
+
+  /* ======================================
+     AUTH FETCH
+     ====================================== */
+
+  async function postJsonWithFreshAuth(
+    url,
+    payload,
+    options = {}
+  ) {
+
+    const token =
+      await ensureFreshIdToken({
+        preserveDraft:
+          options.preserveDraft !== false
+      });
+
 
     const response =
       await fetch(
-        '/api/member',
+        url,
         {
           method:
             'POST',
@@ -735,15 +1281,96 @@
 
           body:
             JSON.stringify({
+              ...payload,
+
               idToken:
-                idToken
+                token
             })
         }
       );
 
 
+    let data =
+      null;
+
+
+    try {
+
+      data =
+        await response.json();
+
+    } catch (_) {
+
+      data = {
+        success: false,
+        message:
+          '伺服器回傳格式錯誤'
+      };
+
+    }
+
+
+    /*
+     * 即使 client-side exp 判斷因時鐘差異沒抓到，
+     * server 一旦明確回 token expired，
+     * 仍立即進入自動更新登入。
+     */
+    if (
+      isExpiredTokenMessage(
+        data &&
+        data.message
+      )
+    ) {
+
+      await refreshLineLogin({
+        preserveDraft:
+          options.preserveDraft !== false
+      });
+
+
+      const error =
+        new Error(
+          'AUTH_REFRESHING'
+        );
+
+      error.code =
+        'AUTH_REFRESHING';
+
+      throw error;
+
+    }
+
+
+    return {
+      response:
+        response,
+
+      data:
+        data
+    };
+
+  }
+
+
+
+  /* ======================================
+     ADMIN CHECK
+     ====================================== */
+
+  async function verifyAdmin() {
+
+    const result =
+      await postJsonWithFreshAuth(
+        '/api/member',
+        {},
+        {
+          preserveDraft: false
+        }
+      );
+
+
     const data =
-      await response.json();
+      result.data;
 
 
     if (!data.success) {
@@ -1030,44 +1657,33 @@
       );
 
 
-    const response =
-      await fetch(
+    const result =
+      await postJsonWithFreshAuth(
         '/api/upload-photo',
         {
-          method:
-            'POST',
+          fileName:
+            prepared.fileName,
 
-          headers: {
-            'Content-Type':
-              'application/json'
-          },
+          mimeType:
+            prepared.mimeType,
 
-          body:
-            JSON.stringify({
-              idToken:
-                idToken,
+          base64Data:
+            prepared.base64Data,
 
-              fileName:
-                prepared.fileName,
+          folderType:
+            'Cards',
 
-              mimeType:
-                prepared.mimeType,
-
-              base64Data:
-                prepared.base64Data,
-
-              folderType:
-                'Cards',
-
-              subfolderName:
-                'ShopItems'
-            })
+          subfolderName:
+            'ShopItems'
+        },
+        {
+          preserveDraft: true
         }
       );
 
 
     const data =
-      await response.json();
+      result.data;
 
 
     if (!data.success) {
@@ -1084,30 +1700,6 @@
       data.fileId ||
       ''
     );
-
-  }
-
-
-
-  function toggleStockInput() {
-
-    const mode =
-      document
-        .getElementById(
-          'stockMode'
-        )
-        .value;
-
-
-    document
-      .getElementById(
-        'stockField'
-      )
-      .style
-      .display =
-      mode === 'UNLIMITED'
-        ? 'none'
-        : 'block';
 
   }
 
@@ -1147,14 +1739,6 @@
       );
 
 
-    const stockMode =
-      document
-        .getElementById(
-          'stockMode'
-        )
-        .value;
-
-
     const stock =
       Number(
         document
@@ -1191,15 +1775,12 @@
 
 
     if (
-      stockMode === 'LIMITED' &&
-      (
-        !Number.isFinite(stock) ||
-        stock < 1
-      )
+      !Number.isFinite(stock) ||
+      stock < 0
     ) {
 
       toast(
-        '限量商品至少需要 1 個庫存'
+        '請輸入正確的庫存'
       );
 
       return;
@@ -1244,58 +1825,42 @@
         '正在建立商品...';
 
 
-      const response =
-        await fetch(
+      const result =
+        await postJsonWithFreshAuth(
           '/api/shop',
           {
-            method:
-              'POST',
+            action:
+              'createItem',
 
-            headers: {
-              'Content-Type':
-                'application/json'
-            },
+            item: {
+              itemName:
+                itemName,
 
-            body:
-              JSON.stringify({
-                idToken:
-                  idToken,
+              description:
+                description,
 
-                action:
-                  'createItem',
+              price:
+                Math.floor(
+                  price
+                ),
 
-                item: {
-                  itemName:
-                    itemName,
+              stock:
+                Math.floor(
+                  stock
+                ),
 
-                  description:
-                    description,
-
-                  price:
-                    Math.floor(
-                      price
-                    ),
-
-                  stockMode:
-                    stockMode,
-
-                  stock:
-                    stockMode === 'UNLIMITED'
-                      ? 0
-                      : Math.floor(
-                          stock
-                        ),
-
-                  imageFileId:
-                    imageFileId
-                }
-              })
+              imageFileId:
+                imageFileId
+            }
+          },
+          {
+            preserveDraft: true
           }
         );
 
 
       const data =
-        await response.json();
+        result.data;
 
 
       if (!data.success) {
@@ -1336,6 +1901,15 @@
 
 
     } catch (error) {
+
+      if (
+        isAuthRefreshSignal(
+          error
+        )
+      ) {
+        return;
+      }
+
 
       showError(
         translateError(
@@ -1409,22 +1983,11 @@
 
     if (
       value.includes(
-        'INVALID_STOCK_MODE'
-      )
-    ) {
-
-      return '庫存模式不正確';
-
-    }
-
-
-    if (
-      value.includes(
         'INVALID_STOCK'
       )
     ) {
 
-      return '限量商品至少需要 1 個庫存';
+      return '庫存格式不正確';
 
     }
 
@@ -1435,7 +1998,7 @@
         .includes('expired')
     ) {
 
-      return 'LINE 登入已過期，請重新開啟';
+      return 'LINE 登入已過期，系統正在重新驗證登入。';
 
     }
 
