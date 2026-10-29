@@ -1,497 +1,346 @@
-module.exports =
-async function handler(req, res) {
+module.exports = async function handler(req, res) {
 
-  res.setHeader(
-    'Cache-Control',
-    'no-store'
-  );
-
-
-  /* =========================================
-     API 存活測試
-     ========================================= */
+  res.setHeader('Cache-Control', 'no-store');
 
   if (req.method === 'GET') {
-
     return res.status(200).json({
-
       success: true,
-
-      service:
-        'Whale Love Club Member + Discover API',
-
-      version:
-        '2.0-discover',
-
-      message:
-        'API is running'
-
+      service: 'Whale Love Club Member API',
+      discover: true,
+      viewLearning: true,
+      message: 'API is running'
     });
-
   }
-
 
   if (req.method !== 'POST') {
-
     return res.status(405).json({
-
       success: false,
-
-      message:
-        'Method not allowed'
-
+      message: 'Method not allowed'
     });
-
   }
 
-
   try {
-
     const {
       idToken,
       operation,
       itemId
-    } =
-      req.body || {};
-
+    } = req.body || {};
 
     if (!idToken) {
-
       return res.status(400).json({
-
         success: false,
-
-        message:
-          'ID token is required'
-
+        message: 'LINE ID token is required'
       });
-
     }
-
 
     const channelId =
       process.env.LINE_CHANNEL_ID;
 
-
     const appsScriptUrl =
       process.env.APPS_SCRIPT_URL;
 
-
     const appsScriptSecret =
       process.env.APPS_SCRIPT_SECRET;
-
 
     if (
       !channelId ||
       !appsScriptUrl ||
       !appsScriptSecret
     ) {
-
       return res.status(500).json({
-
         success: false,
-
         message:
           'Server configuration is incomplete'
-
       });
-
     }
 
-
-    /* =========================================
-       1. 向 LINE 驗證 ID Token
-       ========================================= */
-
+    /*
+     * 驗證 LINE ID token。
+     */
     const form =
       new URLSearchParams();
-
 
     form.append(
       'id_token',
       idToken
     );
 
-
     form.append(
       'client_id',
       channelId
     );
 
-
     const lineResponse =
       await fetch(
-
         'https://api.line.me/oauth2/v2.1/verify',
-
         {
-
-          method:
-            'POST',
-
-
+          method: 'POST',
           headers: {
-
             'Content-Type':
               'application/x-www-form-urlencoded'
-
           },
-
-
-          body:
-            form.toString()
-
+          body: form.toString()
         }
-
       );
-
 
     const lineData =
       await lineResponse.json();
 
-
     if (!lineResponse.ok) {
-
-      console.error(
-        'LINE verification failed:',
-        lineData
-      );
-
-
       return res.status(401).json({
-
         success: false,
-
         message:
-
           lineData.error_description ||
-
           lineData.error ||
-
-          'LINE verification failed'
-
+          'LINE ID token verification failed'
       });
-
     }
-
 
     if (
       String(lineData.aud) !==
       String(channelId)
     ) {
-
       return res.status(401).json({
-
         success: false,
-
-        message:
-          'Invalid LINE channel'
-
+        message: 'Invalid LINE channel'
       });
-
     }
-
 
     if (!lineData.sub) {
-
       return res.status(401).json({
-
         success: false,
-
-        message:
-          'LINE user ID missing'
-
+        message: 'LINE user ID missing'
       });
-
     }
-
 
     const lineUserId =
       String(
         lineData.sub
       ).trim();
 
+    const op =
+      String(
+        operation || ''
+      ).trim();
 
-    /* =========================================
-       2. 判斷要呼叫哪個 Apps Script Action
-       ========================================= */
+    /*
+     * 沿用同一支 member.js，
+     * 不新增第 13 個 Vercel API function。
+     */
+    let action = 'getMember';
 
-    let action =
-      'getMember';
+    if (op === 'discoverList') {
+      action = 'getDiscoverItems';
+    }
 
+    if (op === 'discoverToggle') {
+      action = 'toggleDateIdea';
+    }
+
+    if (op === 'dateIdeas') {
+      action = 'getDateIdeas';
+    }
+
+    if (op === 'discoverView') {
+      action = 'recordDiscoverView';
+    }
+
+    const discoverItemActions =
+      new Set([
+        'toggleDateIdea',
+        'recordDiscoverView'
+      ]);
+
+    if (
+      discoverItemActions.has(action) &&
+      !String(itemId || '').trim()
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Item ID is required'
+      });
+    }
 
     const payload = {
-
+      action,
       secret:
         appsScriptSecret,
-
-      lineUserId:
-        lineUserId
-
+      lineUserId
     };
 
-
-    /*
-     * 沒有 operation：
-     * 維持原本會員首頁使用方式
-     */
     if (
-      !operation ||
-      operation === 'member'
+      discoverItemActions.has(action)
     ) {
-
-      action =
-        'getMember';
-
-    }
-
-
-    /*
-     * Discover 活動清單
-     */
-    else if (
-      operation === 'discoverList'
-    ) {
-
-      action =
-        'getDiscoverItems';
-
-    }
-
-
-    /*
-     * 加入 / 移除「想去」
-     */
-    else if (
-      operation === 'discoverToggle'
-    ) {
-
-      if (!itemId) {
-
-        return res.status(400).json({
-
-          success: false,
-
-          message:
-            'Item ID is required'
-
-        });
-
-      }
-
-
-      action =
-        'toggleDateIdea';
-
-
       payload.itemId =
         String(
           itemId
         ).trim();
-
     }
-
-
-    /*
-     * 自己目前的想去清單
-     */
-    else if (
-      operation === 'dateIdeas'
-    ) {
-
-      action =
-        'getDateIdeas';
-
-    }
-
-
-    else {
-
-      return res.status(400).json({
-
-        success: false,
-
-        message:
-          'Invalid operation: ' +
-          operation
-
-      });
-
-    }
-
-
-    payload.action =
-      action;
-
-
-    /* =========================================
-       3. 呼叫 Apps Script
-       ========================================= */
 
     const appsData =
-      await callAppsScript(
-
+      await callAppsScriptJson(
         appsScriptUrl,
-
         payload
-
       );
-
 
     if (
       !appsData ||
-      !appsData.success
+      typeof appsData !== 'object'
     ) {
-
-      return res
-        .status(400)
-        .json(
-
-          appsData || {
-
-            success: false,
-
-            message:
-              'Apps Script request failed'
-
-          }
-
-        );
-
-    }
-
-
-    /* =========================================
-       4. 原本 MEMBER 格式保持相容
-       ========================================= */
-
-    if (
-      action === 'getMember'
-    ) {
-
-      return res.status(200).json({
-
-        success: true,
-
-        member:
-          appsData.member
-
+      return res.status(502).json({
+        success: false,
+        message:
+          'Invalid Apps Script response'
       });
-
     }
-
-
-    /* =========================================
-       5. Discover 直接回傳 Apps Script 結果
-       ========================================= */
 
     return res
-      .status(200)
+      .status(
+        appsData.success
+          ? 200
+          : 400
+      )
       .json(
         appsData
       );
 
-
   } catch (error) {
-
     console.error(
-
-      'Member / Discover API error:',
-
+      'Member API error:',
       error
-
     );
 
-
     return res.status(500).json({
-
       success: false,
-
       message:
-
         error.message ||
-
         'Server error'
-
     });
-
   }
 
 };
 
 
-
 /* =========================================
-   呼叫 Apps Script
+   Apps Script JSON 呼叫
+   手動追蹤 ContentService Redirect
    ========================================= */
 
-async function callAppsScript(
-  url,
+async function callAppsScriptJson(
+  initialUrl,
   payload
 ) {
 
-  const response =
-    await fetch(
+  let currentUrl =
+    initialUrl;
 
-      url,
+  let method =
+    'POST';
 
-      {
-
-        method:
-          'POST',
-
-
-        headers: {
-
-          'Content-Type':
-            'application/json'
-
-        },
-
-
-        body:
-          JSON.stringify(
-            payload
-          ),
-
-
-        redirect:
-          'follow'
-
-      }
-
+  let body =
+    JSON.stringify(
+      payload
     );
 
+  let headers = {
+    'Content-Type':
+      'application/json'
+  };
 
-  const text =
-    await response.text();
+  const maxRedirects = 6;
 
+  for (
+    let i = 0;
+    i <= maxRedirects;
+    i++
+  ) {
 
-  let data;
+    const response =
+      await fetch(
+        currentUrl,
+        {
+          method,
+          headers,
+          body:
+            method === 'GET'
+              ? undefined
+              : body,
+          redirect: 'manual',
+          cache: 'no-store'
+        }
+      );
 
+    if (
+      response.status === 301 ||
+      response.status === 302 ||
+      response.status === 303 ||
+      response.status === 307 ||
+      response.status === 308
+    ) {
+      const location =
+        response.headers.get(
+          'location'
+        );
 
-  try {
+      if (!location) {
+        throw new Error(
+          'Apps Script redirect is missing Location header'
+        );
+      }
 
-    data =
-      JSON.parse(
+      currentUrl =
+        new URL(
+          location,
+          currentUrl
+        ).toString();
+
+      if (
+        response.status === 301 ||
+        response.status === 302 ||
+        response.status === 303
+      ) {
+        method =
+          'GET';
+
+        body =
+          undefined;
+
+        headers =
+          {};
+      }
+
+      continue;
+    }
+
+    const text =
+      await response.text();
+
+    try {
+      return JSON.parse(
         text
       );
 
-  } catch (error) {
+    } catch (_) {
+      console.error(
+        'Apps Script non-JSON response:',
+        {
+          status:
+            response.status,
+          preview:
+            text.slice(
+              0,
+              300
+            )
+        }
+      );
 
-    console.error(
-      'Apps Script response:',
-      text
-    );
-
-
-    throw new Error(
-      'Invalid Apps Script response'
-    );
-
+      throw new Error(
+        'Invalid Apps Script response'
+      );
+    }
   }
 
-
-  return data;
-
+  throw new Error(
+    'Too many Apps Script redirects'
+  );
 }
