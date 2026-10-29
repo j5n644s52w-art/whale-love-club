@@ -591,7 +591,7 @@ h1{font-family:Georgia,"Noto Serif TC",serif;font-size:34px;font-weight:400;marg
   <section class="hero">
     <div class="eyebrow">WHALE DAILY · DISCOVER</div>
     <h1>鯨魚日報</h1>
-    <div class="subtitle">把近期值得一起去看看的活動、展覽、快閃、音樂與市集收在這裡。</div>
+    <div class="subtitle">每天收進新的電影、市集、美食、咖啡、甜點、快閃、展覽與搶票情報。</div>
   </section>
 
   <section class="summary">
@@ -643,16 +643,28 @@ let items = [];
 let activeCategory = 'ALL';
 let busyIds = new Set();
 
+/*
+ * View Learning：
+ * 同一次開啟鯨魚日報時，同一張卡只送一次 VIEW。
+ * 後端另有 6 小時 cooldown，避免重新整理頁面洗分數。
+ */
+let viewedThisSession = new Set();
+
 const CATEGORY_LABELS = {
   ALL: '全部',
-  IP: 'IP / 快閃',
-  EXHIBITION: '展覽',
-  MUSIC: '音樂',
+  MOVIE: '電影',
   MARKET: '市集',
+  FOOD: '美食',
   CAFE: '咖啡',
+  DESSERT: '甜點',
+  IP: 'IP / 動漫',
+  EXHIBITION: '展覽 / 快閃',
+  MUSIC: '音樂 / 搶票',
+  PHOTO_SPOT: '打卡',
+  SEASONAL: '節日',
+  GUIDE: '特輯',
   TRAVEL: '景點',
-  SEASONAL: '季節',
-  EVENT: '活動'
+  EVENT: '其他'
 };
 
 async function init() {
@@ -736,7 +748,22 @@ async function loadDiscover() {
 
 function buildChips() {
   const available = new Set(items.map(x => normalizeCategory(x.category)));
-  const order = ['ALL','IP','EXHIBITION','MUSIC','MARKET','CAFE','TRAVEL','SEASONAL','EVENT'];
+  const order = [
+    'ALL',
+    'MOVIE',
+    'MARKET',
+    'FOOD',
+    'CAFE',
+    'DESSERT',
+    'IP',
+    'EXHIBITION',
+    'MUSIC',
+    'PHOTO_SPOT',
+    'SEASONAL',
+    'GUIDE',
+    'TRAVEL',
+    'EVENT'
+  ];
 
   document.getElementById('chips').innerHTML =
     order
@@ -846,6 +873,7 @@ function cardTemplate(item) {
           <a
             class="source ${sourceUrl ? '' : 'disabled'}"
             ${sourceUrl ? `href="${escapeAttr(sourceUrl)}" target="_blank" rel="noopener noreferrer"` : ''}
+            ${sourceUrl ? `onclick="recordView('${itemId}')"` : ''}
           >
             查看來源
           </a>
@@ -853,6 +881,68 @@ function cardTemplate(item) {
       </div>
     </article>
   `;
+}
+
+
+async function recordView(itemId) {
+  itemId = String(itemId || '').trim();
+
+  if (
+    !itemId ||
+    !idToken ||
+    viewedThisSession.has(itemId)
+  ) {
+    return;
+  }
+
+  /*
+   * 先標記，避免使用者連點同一個來源時重複送出。
+   * 若 API 真的失敗，再解除，讓之後可重試。
+   */
+  viewedThisSession.add(itemId);
+
+  try {
+    const response = await fetch('/api/member', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        idToken,
+        operation: 'discoverView',
+        itemId
+      }),
+      keepalive: true
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(
+        data.message ||
+        'View learning failed'
+      );
+    }
+
+    /*
+     * 不顯示 toast。
+     * 偏好學習應該在背景安靜進行，
+     * 不干擾使用者翻資訊。
+     */
+    console.debug(
+      '[Whale Daily] view learned:',
+      itemId,
+      data.learned !== false
+    );
+
+  } catch (error) {
+    console.warn(
+      '[Whale Daily] view learning skipped:',
+      error
+    );
+
+    viewedThisSession.delete(itemId);
+  }
 }
 
 async function toggleWant(itemId) {
@@ -931,13 +1021,18 @@ async function toggleWant(itemId) {
 function normalizeCategory(value) {
   const c = String(value || '').trim().toUpperCase();
 
+  if (c === 'MOVIE') return 'MOVIE';
+  if (c === 'MARKET') return 'MARKET';
+  if (c === 'FOOD') return 'FOOD';
+  if (c === 'CAFE') return 'CAFE';
+  if (c === 'DESSERT') return 'DESSERT';
   if (c === 'IP') return 'IP';
   if (c === 'EXHIBITION' || c === 'EXPO') return 'EXHIBITION';
-  if (c === 'MUSIC') return 'MUSIC';
-  if (c === 'MARKET') return 'MARKET';
-  if (c === 'CAFE') return 'CAFE';
-  if (c === 'TRAVEL' || c === 'SPOT') return 'TRAVEL';
+  if (c === 'MUSIC' || c === 'TICKET') return 'MUSIC';
+  if (c === 'PHOTO_SPOT') return 'PHOTO_SPOT';
   if (c === 'SEASONAL') return 'SEASONAL';
+  if (c === 'GUIDE') return 'GUIDE';
+  if (c === 'TRAVEL' || c === 'SPOT') return 'TRAVEL';
   return 'EVENT';
 }
 
